@@ -806,6 +806,25 @@
             <div class="filter-bar">
                 <button class="btn-secondary" onclick="showWineModal()">➕ Ajouter un vin</button>
                 <button class="btn-secondary" onclick="showManageLists()">📝 Gérer les listes</button>
+            
+           <div style="background: rgba(255, 255, 255, 0.95); padding: 16px; margin-bottom: 16px; border-radius: 0;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <div>
+            <strong style="color: var(--primary);">☁️ Synchronisation Cloud</strong>
+            <div style="font-size: 12px; color: var(--text-light); margin-top: 4px;" id="sync-status">
+                Non connecté
+            </div>
+        </div>
+        <button class="btn-secondary" onclick="toggleGoogleDrive()" id="google-drive-btn" style="margin: 0; width: auto; padding: 12px 20px;">
+            Se connecter
+        </button>
+    </div>
+    <div style="font-size: 11px; color: var(--text-light);">
+        Connectez-vous pour synchroniser vos données entre tous vos appareils
+    </div>
+</div>     
+                
+                
                 <button class="btn-secondary" onclick="exportToJSON()">📥 Exporter JSON</button>
                 <button class="btn-secondary" onclick="exportToExcel()">📊 Exporter Excel</button>
                 <button class="btn-secondary" onclick="document.getElementById('importFile').click()">📤 Importer</button>

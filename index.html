@@ -1069,6 +1069,16 @@
         let locationCounter = 0;
         let currentRemoveWineId = null;
         let selectedRemoveLocationIndex = null;
+        // Google Drive Configuration
+
+        
+const GOOGLE_CLIENT_ID = '1009522404150-bjt71d4d4a35uvv8iflqscsl1da561o0.apps.googleusercontent.com'; // Remplacer par votre Client ID
+const GOOGLE_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const VINO_FILENAME = 'vino_data.json';
+
+let googleAccessToken = null;
+let googleDriveFileId = null;
+let isGoogleDriveEnabled = localStorage.getItem('vino_gdrive_enabled') === 'true';
 
         const countries = [
             'France', 'Italie', 'Espagne', 'Portugal', 'Canada', 
@@ -2189,6 +2199,204 @@
         }
 
         init();
+
+// ========== GOOGLE DRIVE INTEGRATION ==========
+
+function initGoogleDrive() {
+    if (!isGoogleDriveEnabled) return;
+    
+    gapi.load('client:auth2', () => {
+        gapi.client.init({
+            clientId: GOOGLE_CLIENT_ID,
+            scope: GOOGLE_DRIVE_SCOPE,
+            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+        }).then(() => {
+            const authInstance = gapi.auth2.getAuthInstance();
+            if (authInstance.isSignedIn.get()) {
+                handleGoogleSignIn();
+            }
+        });
+    });
+}
+
+function toggleGoogleDrive() {
+    if (isGoogleDriveEnabled) {
+        // Déconnexion
+        if (confirm('Voulez-vous vraiment vous déconnecter de Google Drive?')) {
+            gapi.auth2.getAuthInstance().signOut().then(() => {
+                isGoogleDriveEnabled = false;
+                localStorage.setItem('vino_gdrive_enabled', 'false');
+                googleAccessToken = null;
+                googleDriveFileId = null;
+                updateSyncStatus('Non connecté', false);
+            });
+        }
+    } else {
+        // Connexion
+        gapi.auth2.getAuthInstance().signIn().then(() => {
+            handleGoogleSignIn();
+        });
+    }
+}
+
+function handleGoogleSignIn() {
+    const authInstance = gapi.auth2.getAuthInstance();
+    const user = authInstance.currentUser.get();
+    googleAccessToken = user.getAuthResponse().access_token;
+    
+    isGoogleDriveEnabled = true;
+    localStorage.setItem('vino_gdrive_enabled', 'true');
+    
+    updateSyncStatus('Connecté - ' + user.getBasicProfile().getEmail(), true);
+    
+    // Charger les données depuis Google Drive
+    loadFromGoogleDrive();
+}
+
+function updateSyncStatus(message, connected) {
+    document.getElementById('sync-status').textContent = message;
+    const btn = document.getElementById('google-drive-btn');
+    if (connected) {
+        btn.textContent = 'Se déconnecter';
+        btn.style.background = '#dc2626';
+    } else {
+        btn.textContent = 'Se connecter';
+        btn.style.background = '';
+    }
+}
+
+async function saveToGoogleDrive() {
+    if (!isGoogleDriveEnabled || !googleAccessToken) return;
+    
+    const data = {
+        wines: wines,
+        customLists: customLists,
+        version: '2.0',
+        lastModified: new Date().toISOString()
+    };
+    
+    const content = JSON.stringify(data, null, 2);
+    const blob = new Blob([content], { type: 'application/json' });
+    
+    try {
+        if (googleDriveFileId) {
+            // Mettre à jour le fichier existant
+            await updateGoogleDriveFile(blob);
+        } else {
+            // Chercher si le fichier existe
+            const fileId = await findGoogleDriveFile();
+            if (fileId) {
+                googleDriveFileId = fileId;
+                await updateGoogleDriveFile(blob);
+            } else {
+                // Créer un nouveau fichier
+                await createGoogleDriveFile(blob);
+            }
+        }
+        console.log('✅ Données sauvegardées sur Google Drive');
+    } catch (error) {
+        console.error('❌ Erreur sauvegarde Google Drive:', error);
+    }
+}
+
+async function findGoogleDriveFile() {
+    const response = await fetch(
+        `https://www.googleapis.com/drive/v3/files?q=name='${VINO_FILENAME}'&spaces=appDataFolder`,
+        {
+            headers: { Authorization: `Bearer ${googleAccessToken}` }
+        }
+    );
+    
+    const data = await response.json();
+    return data.files && data.files.length > 0 ? data.files[0].id : null;
+}
+
+async function createGoogleDriveFile(blob) {
+    const metadata = {
+        name: VINO_FILENAME,
+        mimeType: 'application/json',
+        parents: ['appDataFolder']
+    };
+    
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    form.append('file', blob);
+    
+    const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${googleAccessToken}` },
+        body: form
+    });
+    
+    const data = await response.json();
+    googleDriveFileId = data.id;
+}
+
+async function updateGoogleDriveFile(blob) {
+    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${googleDriveFileId}?uploadType=media`, {
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${googleAccessToken}`,
+            'Content-Type': 'application/json'
+        },
+        body: blob
+    });
+}
+
+async function loadFromGoogleDrive() {
+    if (!isGoogleDriveEnabled || !googleAccessToken) return;
+    
+    try {
+        const fileId = await findGoogleDriveFile();
+        if (!fileId) {
+            console.log('Aucune sauvegarde trouvée sur Google Drive');
+            return;
+        }
+        
+        googleDriveFileId = fileId;
+        
+        const response = await fetch(
+            `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+            {
+                headers: { Authorization: `Bearer ${googleAccessToken}` }
+            }
+        );
+        
+        const data = await response.json();
+        
+        if (confirm('Des données ont été trouvées sur Google Drive. Voulez-vous les charger?')) {
+            wines = data.wines || [];
+            if (data.customLists) {
+                customLists = data.customLists;
+                saveCustomLists();
+            }
+            save();
+            init();
+            updateHomePage();
+            alert('✅ Données chargées depuis Google Drive!');
+        }
+    } catch (error) {
+        console.error('❌ Erreur chargement Google Drive:', error);
+    }
+}
+
+// Modifier la fonction save() existante
+const originalSave = save;
+function save() {
+    originalSave();
+    // Sauvegarder aussi sur Google Drive si activé
+    if (isGoogleDriveEnabled) {
+        saveToGoogleDrive();
+    }
+}
+
+// Initialiser Google Drive au démarrage
+window.addEventListener('load', () => {
+    setTimeout(initGoogleDrive, 1000);
+});
+
+
+        
     </script>
 </body>
 </html>

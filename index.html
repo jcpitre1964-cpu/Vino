@@ -1136,7 +1136,8 @@
                 div.innerHTML = `<input type="checkbox" id="filter_${c}" value="${c}" onchange="applyFilters()"><label for="filter_${c}">${c}</label>`;
                 cepageFilterWhite.appendChild(div);
             });
-// Initialiser les filtres de cépages rouges
+
+            // Initialiser les filtres de cépages rouges
             const cepageFilterRed = document.getElementById('cepageFilterRed');
             cepagesRouges.forEach(c => {
                 const div = document.createElement('div');

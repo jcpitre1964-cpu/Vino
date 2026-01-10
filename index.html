@@ -2225,6 +2225,11 @@ function initGoogleDrive() {
 }
 
 function toggleGoogleDrive() {
+    if (!gapi || !gapi.auth2) {
+        alert('Google API n\'est pas encore chargé. Veuillez rafraîchir la page et réessayer dans quelques secondes.');
+        return;
+    }
+    
     if (isGoogleDriveEnabled) {
         // Déconnexion
         if (confirm('Voulez-vous vraiment vous déconnecter de Google Drive?')) {
@@ -2243,7 +2248,6 @@ function toggleGoogleDrive() {
         });
     }
 }
-
 function handleGoogleSignIn() {
     const authInstance = gapi.auth2.getAuthInstance();
     const user = authInstance.currentUser.get();

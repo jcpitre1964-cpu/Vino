@@ -4,499 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>VINO v2.1</title>
+    <title>VINO v2.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary: #1E3A5F;
-            --primary-dark: #0F2744;
-            --secondary: #D4AF37;
-            --bg-light: #F8F6F3;
-            --text-dark: #2C2C2C;
-            --text-light: #6B6B6B;
-            --border: #E8E3DC;
-            --cellier1: #8B4513;
-            --cellier2: #2F4F4F;
-            --cellier3: #8B0000;
+            --primary: #1E3A5F; --primary-dark: #0F2744; --secondary: #D4AF37; --bg-light: #F8F6F3;
+            --text-dark: #2C2C2C; --text-light: #6B6B6B; --border: #E8E3DC;
+            --cellier1: #8B4513; --cellier2: #2F4F4F; --cellier3: #8B0000;
         }
-        body {
-            font-family: 'Lato', sans-serif;
-            background: #000;
-            color: var(--text-dark);
-            padding-bottom: 80px;
-            position: relative;
-            min-height: 100vh;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzJENEE2RTtzdG9wLW9wYWNpdHk6MSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzFBMjkzQztzdG9wLW9wYWNpdHk6MSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IGZpbGw9InVybCgjc2t5KSIgd2lkdGg9IjE5MjAiIGhlaWdodD0iMTA4MCIvPjxwYXRoIGZpbGw9IiMxQTI5M0MiIGQ9Ik0wLDUwMCBRNDgwLDQ1MCA5NjAsNTAwIFQxOTIwLDUwMCBMMTkyMCwxMDgwIEwwLDEwODAgWiIvPjxlbGxpcHNlIGN4PSI0MDAiIGN5PSI2MDAiIHJ4PSIxNTAiIHJ5PSI1MCIgZmlsbD0iIzFGM0UyRCIgb3BhY2l0eT0iMC42Ii8+PGVsbGlwc2UgY3g9IjEwMDAiIGN5PSI2NTAiIHJ4PSIyMDAiIHJ5PSI2MCIgZmlsbD0iIzFGM0UyRCIgb3BhY2l0eT0iMC41Ii8+PGVsbGlwc2UgY3g9IjE2MDAiIGN5PSI2MjAiIHJ4PSIxODAiIHJ5PSI1NSIgZmlsbD0iIzFGM0UyRCIgb3BhY2l0eT0iMC42Ii8+PC9zdmc+') center center / cover;
-            z-index: -1;
-        }
-        .header {
-            background: rgba(30, 58, 95, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 16px 20px;
-            text-align: center;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
-            position: relative;
-        }
-        .version {
-            position: absolute;
-            top: 8px;
-            right: 12px;
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 300;
-        }
-        .header h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 52px;
-            font-weight: 700;
-            color: var(--secondary);
-            letter-spacing: 8px;
-            margin-bottom: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        .subtitle {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.8);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-weight: 300;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .page {
-            display: none;
-        }
-        .page.active {
-            display: block;
-        }
-        .nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(30, 58, 95, 0.98);
-            backdrop-filter: blur(15px);
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-            box-shadow: 0 -2px 20px rgba(0,0,0,0.3);
-            z-index: 100;
-        }
-        .nav-item {
-            flex: 1;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-            padding: 8px 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 20px;
-        }
-        .nav-item.active {
-            color: var(--secondary);
-        }
-        .nav-item .nav-label {
-            font-size: 9px;
-            margin-top: 2px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            font-weight: 400;
-        }
-        .scan-hero {
-            text-align: center;
-            padding: 60px 20px 40px;
-        }
-        .scan-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 30px;
-        }
-        .btn-scan-large {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: none;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            font-size: 52px;
-            cursor: pointer;
-            box-shadow: 0 8px 30px rgba(30, 58, 95, 0.4);
-            transition: all 0.3s;
-        }
-        .btn-scan-large:active {
-            transform: scale(0.95);
-        }
-        .filter-bar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 16px;
-            border-radius: 0;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .filter-bar select, .filter-bar input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            border: 1px solid var(--border);
-            border-radius: 0;
-            font-size: 14px;
-            background: white;
-        }
-        .cepage-filter-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        .cepage-filter-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-        }
-        .cepage-filter-item input[type="checkbox"] {
-            width: auto;
-            margin: 0;
-        }
-        .wine-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 16px;
-            margin-bottom: 12px;
-            border-radius: 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: all 0.2s;
-            border-left: 4px solid var(--primary);
-        }
-        .wine-card:active {
-            transform: scale(0.98);
-        }
-        .wine-name {
-            font-family: 'Playfair Display', serif;
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .wine-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            font-size: 12px;
-            color: var(--text-light);
-        }
-        .badge {
-            background: var(--bg-light);
-            padding: 4px 10px;
-            border-radius: 0;
-            font-size: 11px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .wine-location {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 0;
-            font-size: 11px;
-            font-weight: 600;
-            color: white;
-            margin-right: 6px;
-            margin-bottom: 6px;
-        }
+        body { font-family: 'Lato', sans-serif; background: #000; color: var(--text-dark); padding-bottom: 80px; position: relative; min-height: 100vh; }
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzJENEE2RTtzdG9wLW9wYWNpdHk6MSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzFBMjkzQztzdG9wLW9wYWNpdHk6MSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IGZpbGw9InVybCgjc2t5KSIgd2lkdGg9IjE5MjAiIGhlaWdodD0iMTA4MCIvPjxwYXRoIGZpbGw9IiMxQTI5M0MiIGQ9Ik0wLDUwMCBRNDgwLDQ1MCA5NjAsNTAwIFQxOTIwLDUwMCBMMTkyMCwxMDgwIEwwLDEwODAgWiIvPjxlbGxpcHNlIGN4PSI0MDAiIGN5PSI2MDAiIHJ4PSIxNTAiIHJ5PSI1MCIgZmlsbD0iIzFGM0UyRCIgb3BhY2l0eT0iMC42Ii8+PGVsbGlwc2UgY3g9IjEwMDAiIGN5PSI2NTAiIHJ4PSIyMDAiIHJ5PSI2MCIgZmlsbD0iIzFGM0UyRCIgb3BhY2l0eT0iMC41Ii8+PGVsbGlwc2UgY3g9IjE2MDAiIGN5PSI2MjAiIHJ4PSIxODAiIHJ5PSI1NSIgZmlsbD0iIzFGM0UyRCIgb3BhY2l0eT0iMC42Ii8+PC9zdmc+') center center / cover; z-index: -1; }
+        .header { background: rgba(30, 58, 95, 0.95); backdrop-filter: blur(10px); padding: 16px 20px; text-align: center; box-shadow: 0 2px 20px rgba(0,0,0,0.3); position: relative; }
+        .version { position: absolute; top: 8px; right: 12px; font-size: 9px; color: rgba(255, 255, 255, 0.5); font-weight: 300; }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 700; color: var(--secondary); letter-spacing: 8px; margin-bottom: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .subtitle { font-size: 12px; color: rgba(255, 255, 255, 0.8); letter-spacing: 3px; text-transform: uppercase; font-weight: 300; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(30, 58, 95, 0.98); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 8px 0 max(8px, env(safe-area-inset-bottom)); box-shadow: 0 -2px 20px rgba(0,0,0,0.3); z-index: 100; }
+        .nav-item { flex: 1; text-align: center; color: rgba(255, 255, 255, 0.6); padding: 8px 4px; cursor: pointer; transition: all 0.3s; font-size: 20px; }
+        .nav-item.active { color: var(--secondary); }
+        .nav-item .nav-label { font-size: 9px; margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 400; }
+        .scan-hero { text-align: center; padding: 60px 20px 40px; }
+        .scan-buttons { display: flex; justify-content: center; gap: 40px; margin-top: 30px; }
+        .btn-scan-large { width: 120px; height: 120px; border-radius: 50%; border: none; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; font-size: 52px; cursor: pointer; box-shadow: 0 8px 30px rgba(30, 58, 95, 0.4); transition: all 0.3s; }
+        .btn-scan-large:active { transform: scale(0.95); }
+        .filter-bar { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 16px; border-radius: 0; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .filter-bar select, .filter-bar input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 0; font-size: 14px; background: white; }
+        .cepage-filter-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+        .cepage-filter-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .cepage-filter-item input[type="checkbox"] { width: auto; margin: 0; }
+        .wine-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 16px; margin-bottom: 12px; border-radius: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.2s; border-left: 4px solid var(--primary); }
+        .wine-card:active { transform: scale(0.98); }
+        .wine-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .wine-info { display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--text-light); }
+        .badge { background: var(--bg-light); padding: 4px 10px; border-radius: 0; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .wine-location { display: inline-block; padding: 4px 10px; border-radius: 0; font-size: 11px; font-weight: 600; color: white; margin-right: 6px; margin-bottom: 6px; }
         .cellier-1 { background: var(--cellier1); }
         .cellier-2 { background: var(--cellier2); }
         .cellier-3 { background: var(--cellier3); }
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 200;
-            overflow-y: auto;
-            padding: 20px;
-        }
-        .modal.active {
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-        }
-        .modal-content {
-            background: white;
-            border-radius: 0;
-            padding: 24px;
-            max-width: 600px;
-            width: 100%;
-            margin: 20px auto;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--border);
-        }
-        .modal-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--primary);
-        }
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 32px;
-            color: var(--text-light);
-            cursor: pointer;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            line-height: 1;
-        }
-        .form-group {
-            margin-bottom: 16px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--text-dark);
-        }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 0;
-            font-size: 14px;
-            font-family: 'Lato', sans-serif;
-        }
-        .checkbox-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            padding: 12px;
-            background: var(--bg-light);
-        }
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-        }
-        .checkbox-item input[type="checkbox"] {
-            width: auto;
-            margin: 0;
-        }
-        .btn-primary, .btn-secondary, .btn-danger {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 0;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(30, 58, 95, 0.3);
-        }
-        .btn-primary:active {
-            transform: translateY(2px);
-        }
-        .btn-secondary {
-            background: white;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            margin-bottom: 10px;
-        }
-        .btn-danger {
-            background: #dc2626;
-            color: white;
-        }
-        .btn-icon {
-            width: auto;
-            padding: 10px 20px;
-            font-size: 13px;
-        }
-        .location-entry {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 10px;
-            border-radius: 0;
-            margin-bottom: 8px;
-            border: 1px solid var(--border);
-        }
-        .location-entry-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-top: 6px;
-        }
-        #scanner {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: black;
-            z-index: 300;
-            overflow: hidden;
-        }
-        #scanner.active {
-            display: block;
-        }
-        #scannerVideo {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-        #scannerVideo video, #scannerVideo canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover;
-        }
-        #scanner .controls {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-        }
-        .empty {
-            text-align: center;
-            padding: 40px 20px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-        .cepage-summary {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 12px;
-            border-radius: 0;
-            margin-bottom: 10px;
-            border-left: 4px solid var(--primary);
-        }
-        .cepage-summary h3 {
-            margin-bottom: 8px;
-            color: var(--primary);
-            font-size: 16px;
-        }
-        .home-stats {
-            text-align: center;
-            margin: 30px 0 20px;
-            padding: 0;
-            display: flex;
-            align-items: baseline;
-            justify-content: center;
-            gap: 8px;
-        }
-        .total-bottles {
-            font-family: 'Playfair Display', serif;
-            font-size: 48px;
-            font-weight: 700;
-            color: var(--secondary);
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            line-height: 1;
-        }
-        .total-label {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 300;
-            letter-spacing: 1px;
-        }
-        .grape-summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 8px;
-            margin-top: 30px;
-        }
-        .grape-summary-card {
-            background: linear-gradient(135deg, rgba(30, 58, 95, 0.9) 0%, rgba(15, 39, 68, 0.9) 100%);
-            backdrop-filter: blur(10px);
-            padding: 12px;
-            border-radius: 50%;
-            aspect-ratio: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            text-align: center;
-            transition: all 0.2s;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-        .grape-summary-card:hover {
-            border-color: var(--secondary);
-        }
-        .grape-summary-card:active {
-            transform: scale(0.95);
-        }
-        .grape-summary-name {
-            font-size: 10px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 4px;
-            line-height: 1.2;
-        }
-        .grape-summary-count {
-            font-family: 'Playfair Display', serif;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--secondary);
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-        }
-        .toast {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(30, 58, 95, 0.95);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 4px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-        .toast.show {
-            opacity: 1;
-        }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); z-index: 200; overflow-y: auto; padding: 20px; }
+        .modal.active { display: flex; align-items: flex-start; justify-content: center; }
+        .modal-content { background: white; border-radius: 0; padding: 24px; max-width: 600px; width: 100%; margin: 20px auto; box-shadow: 0 10px 50px rgba(0,0,0,0.3); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
+        .modal-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: var(--primary); }
+        .close-btn { background: none; border: none; font-size: 32px; color: var(--text-light); cursor: pointer; padding: 0; width: 32px; height: 32px; line-height: 1; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--text-dark); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 0; font-size: 14px; font-family: 'Lato', sans-serif; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 300px; overflow-y: auto; border: 1px solid var(--border); padding: 12px; background: var(--bg-light); }
+        .checkbox-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .checkbox-item input[type="checkbox"] { width: auto; margin: 0; }
+        .btn-primary, .btn-secondary, .btn-danger { width: 100%; padding: 14px; border: none; border-radius: 0; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; box-shadow: 0 4px 15px rgba(30, 58, 95, 0.3); }
+        .btn-primary:active { transform: translateY(2px); }
+        .btn-secondary { background: white; color: var(--primary); border: 2px solid var(--primary); margin-bottom: 10px; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-icon { width: auto; padding: 10px 20px; font-size: 13px; }
+        .btn-copy { background: none; border: none; color: var(--primary); cursor: pointer; padding: 4px 8px; font-size: 18px; transition: all 0.2s; }
+        .btn-copy:hover { color: var(--secondary); }
+        .location-entry { background: rgba(255, 255, 255, 0.95); padding: 10px; border-radius: 0; margin-bottom: 8px; border: 1px solid var(--border); }
+        .location-entry-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
+        #scanner { display: none; position: fixed; inset: 0; background: black; z-index: 300; overflow: hidden; }
+        #scanner.active { display: block; }
+        #scannerVideo { width: 100%; height: 100%; position: relative; }
+        #scannerVideo video, #scannerVideo canvas { position: absolute; top: 0; left: 0; width: 100% !important; height: 100% !important; object-fit: cover; }
+        #scanner .controls { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10; }
+        .empty { text-align: center; padding: 40px 20px; color: rgba(255, 255, 255, 0.7); }
+        .cepage-summary { background: rgba(255, 255, 255, 0.95); padding: 12px; border-radius: 0; margin-bottom: 10px; border-left: 4px solid var(--primary); }
+        .cepage-summary h3 { margin-bottom: 8px; color: var(--primary); font-size: 16px; }
+        .missing-cepages { background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 12px; border-radius: 0; margin-bottom: 12px; }
+        .missing-cepages h3 { color: #ef4444; margin-bottom: 8px; font-size: 16px; }
+        .missing-list { display: flex; flex-wrap: wrap; gap: 6px; }
+        .missing-badge { background: white; padding: 4px 10px; border-radius: 0; font-size: 12px; border: 1px solid #ef4444; color: #ef4444; }
+        .home-stats { text-align: center; margin: 30px 0 20px; padding: 0; display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+        .total-bottles { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; color: var(--secondary); text-shadow: 2px 2px 4px rgba(0,0,0,0.3); line-height: 1; }
+        .total-label { font-size: 16px; color: rgba(255, 255, 255, 0.8); font-weight: 300; letter-spacing: 1px; }
+        .grape-summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 30px; }
+        .grape-summary-card { background: linear-gradient(135deg, rgba(30, 58, 95, 0.9) 0%, rgba(15, 39, 68, 0.9) 100%); backdrop-filter: blur(10px); padding: 12px; border-radius: 50%; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-align: center; transition: all 0.2s; cursor: pointer; border: 2px solid transparent; }
+        .grape-summary-card:hover { border-color: var(--secondary); }
+        .grape-summary-card:active { transform: scale(0.95); }
+        .grape-summary-name { font-size: 10px; font-weight: 600; color: rgba(255, 255, 255, 0.9); margin-bottom: 4px; line-height: 1.2; }
+        .grape-summary-count { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--secondary); text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
+        .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(30, 58, 95, 0.95); color: white; padding: 12px 24px; border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        .toast.show { opacity: 1; }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="version">11/01/2026 9h38</div>
+        <div class="version">11/01/2026 10h50</div>
         <h1>VINO</h1>
         <div class="subtitle">Collection Privée</div>
     </div>
@@ -516,17 +115,17 @@
         </div>
         <div id="page2" class="page">
             <div class="filter-bar">
-                <label style="font-size: 13px; font-weight: 700; margin-bottom: 8px; display: block; color: var(--primary);">CÉPAGES BLANCS</label>
-                <div class="cepage-filter-grid" id="cepageFilterWhite"></div>
-                <label style="font-size: 13px; font-weight: 700; margin: 16px 0 8px; display: block; color: var(--primary);">CÉPAGES ROUGES</label>
-                <div class="cepage-filter-grid" id="cepageFilterRed"></div>
-                <select id="filterType" onchange="app.applyFilters()">
+                <select id="filterType" onchange="app.filterTypeChanged()">
                     <option value="">Tous les types</option>
                     <option value="Rouge">Rouge</option>
                     <option value="Blanc">Blanc</option>
                     <option value="Rosé">Rosé</option>
                     <option value="Mousseux">Mousseux</option>
                 </select>
+                <div id="cepageFilterSection" style="display: none;">
+                    <label id="cepageFilterLabel" style="font-size: 13px; font-weight: 700; margin: 12px 0 8px; display: block; color: var(--primary);"></label>
+                    <div class="cepage-filter-grid" id="cepageFilterDynamic"></div>
+                </div>
                 <select id="filterCountry" onchange="app.applyFilters()"><option value="">Tous les pays</option></select>
                 <select id="filterRegion" onchange="app.applyFilters()"><option value="">Toutes les régions</option></select>
                 <select id="filterAccord" onchange="app.applyFilters()"><option value="">Tous les accords</option></select>
@@ -575,59 +174,11 @@
         <div class="nav-item" onclick="app.showPage(5, this)"><div style="font-size: 24px;">🛒</div><div class="nav-label">Achats</div></div>
         <div class="nav-item" onclick="app.showPage(6, this)"><div style="font-size: 24px;">⚙️</div><div class="nav-label">Gestion</div></div>
     </div>
-    <div id="wineModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title" id="modalTitle">Ajouter un vin</div>
-                <button class="close-btn" onclick="app.closeWineModal()">×</button>
-            </div>
-            <div class="form-group"><label>Code-barres</label><input type="text" id="barcode" placeholder="Scanner ou saisir"></div>
-            <div class="form-group"><label>Nom du vin *</label><input type="text" id="wineName" required></div>
-            <div class="form-group"><label>URL SAQ</label><div style="display: flex; gap: 10px;"><input type="text" id="saqUrl" placeholder="https://..." style="flex: 1;"><button type="button" class="btn-secondary" onclick="window.open('https://www.saq.com/fr/', '_blank')" style="width: auto; padding: 12px 20px; margin: 0;">🔗 Ouvrir SAQ</button></div></div>
-            <div class="form-group"><label>Type de vin *</label><select id="wineType" onchange="app.updateCepageList(this.value)" required><option value="">Sélectionner</option><option value="Rouge">Rouge</option><option value="Blanc">Blanc</option><option value="Rosé">Rosé</option><option value="Mousseux">Mousseux</option></select></div>
-            <div class="form-group"><label>Pays</label><select id="country" onchange="app.updateRegions()"><option value="">Sélectionner</option></select></div>
-            <div class="form-group"><label>Région</label><select id="region"><option value="">Sélectionner</option></select></div>
-            <div class="form-group"><label>Appellation d'origine</label><input type="text" id="appellation" placeholder="Ex: Fitou, Navarra, Chianti..."></div>
-            <div class="form-group"><label>Particularité</label><input type="text" id="particularity" placeholder="Ex: Bio, Biodynamique, Vieilles vignes..."></div>
-            <div class="form-group"><label>Cépages</label><div class="checkbox-grid" id="cepageList"></div></div>
-            <div class="form-group"><label>Accords mets</label><div class="checkbox-grid" id="accordList"></div></div>
-            <div class="form-group"><label>Importateur</label><input type="text" id="importateur" placeholder="Nom de l'importateur"></div>
-            <div class="form-group"><label>Lieu d'achat</label><input type="text" id="lieuAchat" placeholder="Quelle succursale ?"></div>
-            <div class="form-group"><label>Emplacements <span id="locationCount" style="font-size: 11px; color: var(--text-light); font-weight: normal;">(0)</span></label><div id="locationEntries"></div><button type="button" class="btn-secondary" onclick="app.addLocationEntry()">+ Ajouter un emplacement</button></div>
-            <button type="button" class="btn-primary" onclick="app.saveWine()" id="saveBtn">Ajouter au Cellier</button>
-        </div>
-    </div>
-    <div id="addBottleModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><div class="modal-title">Ajouter une bouteille</div><button class="close-btn" onclick="app.closeAddBottleModal()">×</button></div>
-            <div style="margin-bottom: 20px;"><div style="font-size: 18px; font-weight: 600; color: var(--primary); margin-bottom: 8px;" id="addBottleWineName"></div><div style="font-size: 13px; color: var(--text-light);">Dans quel cellier se trouve cette bouteille ?</div></div>
-            <div id="addBottleLocationEntries"></div>
-            <button type="button" class="btn-secondary" onclick="app.addBottleLocationEntry()" style="margin-bottom: 12px;">+ Ajouter un autre emplacement</button>
-            <button type="button" class="btn-primary" onclick="app.saveAddBottle()">Ajouter au cellier</button>
-        </div>
-    </div>
-    <div id="detailModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><div class="modal-title">Détails du vin</div><button class="close-btn" onclick="app.closeDetailModal()">×</button></div>
-            <div id="wineDetail"></div>
-        </div>
-    </div>
-    <div id="removeModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><div class="modal-title">Retirer une bouteille</div><button class="close-btn" onclick="app.closeRemoveModal()">×</button></div>
-            <div style="margin-bottom: 20px;"><div style="font-size: 18px; font-weight: 600; color: var(--primary); margin-bottom: 8px;" id="removeWineName"></div><div style="font-size: 13px; color: var(--text-light);">Sélectionnez l'emplacement de la bouteille à retirer:</div></div>
-            <div id="removeLocationsList" style="max-height: 300px; overflow-y: auto;"></div>
-            <button type="button" class="btn-danger" onclick="app.confirmRemoveBottle()" id="confirmRemoveBtn" disabled>Retirer la bouteille</button>
-        </div>
-    </div>
-    <div id="scanner">
-        <div id="scannerVideo"></div>
-        <div class="controls"><button class="btn-secondary btn-icon" onclick="app.stopScan()">Fermer</button></div>
-    </div>
-    <div id="toast" class="toast"></div>
-    <input type="file" id="importFile" accept=".json,.xlsx" style="display: none;" onchange="app.handleImport(event)">
+    <div id="wineModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="modalTitle">Ajouter un vin</div><button class="close-btn" onclick="app.closeWineModal()">×</button></div><div class="form-group"><label>Code-barres</label><input type="text" id="barcode" placeholder="Scanner ou saisir"></div><div class="form-group"><label>Nom du vin *</label><input type="text" id="wineName" required></div><div class="form-group"><label>URL SAQ</label><div style="display: flex; gap: 10px;"><input type="text" id="saqUrl" placeholder="https://..." style="flex: 1;"><button type="button" class="btn-secondary" onclick="window.open('https://www.saq.com/fr/', '_blank')" style="width: auto; padding: 12px 20px; margin: 0;">🔗 Ouvrir SAQ</button></div></div><div class="form-group"><label>Type de vin *</label><select id="wineType" onchange="app.updateCepageList(this.value)" required><option value="">Sélectionner</option><option value="Rouge">Rouge</option><option value="Blanc">Blanc</option><option value="Rosé">Rosé</option><option value="Mousseux">Mousseux</option></select></div><div class="form-group"><label>Pays</label><select id="country" onchange="app.updateRegions()"><option value="">Sélectionner</option></select></div><div class="form-group"><label>Région</label><select id="region"><option value="">Sélectionner</option></select></div><div class="form-group"><label>Appellation d'origine</label><input type="text" id="appellation" placeholder="Ex: Fitou, Navarra, Chianti..."></div><div class="form-group"><label>Particularité</label><input type="text" id="particularity" placeholder="Ex: Bio, Biodynamique, Vieilles vignes..."></div><div class="form-group"><label>Cépages</label><div class="checkbox-grid" id="cepageList"></div></div><div class="form-group"><label>Accords mets</label><div class="checkbox-grid" id="accordList"></div></div><div class="form-group"><label>Importateur</label><input type="text" id="importateur" placeholder="Nom de l'importateur"></div><div class="form-group"><label>Lieu d'achat</label><input type="text" id="lieuAchat" placeholder="Quelle succursale ?"></div><div class="form-group"><label>Emplacements <span id="locationCount" style="font-size: 11px; color: var(--text-light); font-weight: normal;">(0)</span></label><div id="locationEntries"></div><button type="button" class="btn-secondary" onclick="app.addLocationEntry()">+ Ajouter un emplacement</button></div><button type="button" class="btn-primary" onclick="app.saveWine()" id="saveBtn">Ajouter au Cellier</button></div></div><div id="addBottleModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Ajouter une bouteille</div><button class="close-btn" onclick="app.closeAddBottleModal()">×</button></div><div style="margin-bottom: 20px;"><div style="font-size: 18px; font-weight: 600; color: var(--primary); margin-bottom: 8px;" id="addBottleWineName"></div><div style="font-size: 13px; color: var(--text-light);">Dans quel cellier se trouve cette bouteille ?</div></div><div id="addBottleLocationEntries"></div><button type="button" class="btn-secondary" onclick="app.addBottleLocationEntry()" style="margin-bottom: 12px;">+ Ajouter un autre emplacement</button><button type="button" class="btn-primary" onclick="app.saveAddBottle()">Ajouter au cellier</button></div></div><div id="detailModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Détails du vin</div><button class="close-btn" onclick="app.closeDetailModal()">×</button></div><div id="wineDetail"></div></div></div><div id="removeModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Retirer une bouteille</div><button class="close-btn" onclick="app.closeRemoveModal()">×</button></div><div style="margin-bottom: 20px;"><div style="font-size: 18px; font-weight: 600; color: var(--primary); margin-bottom: 8px;" id="removeWineName"></div><div style="font-size: 13px; color: var(--text-light);">Sélectionnez l'emplacement de la bouteille à retirer:</div></div><div id="removeLocationsList" style="max-height: 300px; overflow-y: auto;"></div><button type="button" class="btn-danger" onclick="app.confirmRemoveBottle()" id="confirmRemoveBtn" disabled>Retirer la bouteille</button></div></div><div id="scanner"><div id="scannerVideo"></div><div class="controls"><button class="btn-secondary btn-icon" onclick="app.stopScan()">Fermer</button></div></div><div id="toast" class="toast"></div><input type="file" id="importFile" accept=".json,.xlsx" style="display: none;" onchange="app.handleImport(event)">
     <script>
-const app={wines:JSON.parse(localStorage.getItem('wines'))||[],scannerActive:!1,scanMode:'add',editingId:null,locationCounter:0,currentRemoveWineId:null,selectedRemoveLocationIndex:null,countries:['France','Italie','Espagne','Portugal','Canada','États-Unis','Argentine','Chili','Australie','Nouvelle-Zélande','Afrique du Sud','Allemagne'].sort(),regionsByCountry:{'France':['Alsace','Beaujolais','Bordeaux','Bourgogne','Champagne','Jura','Languedoc','Loire','Provence','Rhône','Roussillon','Savoie','Sud-Ouest'],'Italie':['Piémont','Toscane','Vénétie','Sicile','Pouilles','Lombardie','Trentin'],'Espagne':['Rioja','Ribera del Duero','Priorat','Navarre','Catalogne','Rías Baixas'],'Portugal':['Douro','Alentejo','Dão','Vinho Verde'],'Canada':['Colombie-Britannique','Ontario','Québec'],'États-Unis':['Californie','Oregon','Washington','New York'],'Argentine':['Mendoza','Salta'],'Chili':['Vallée de Maipo','Vallée de Colchagua'],'Australie':['Barossa Valley','Margaret River','Hunter Valley'],'Nouvelle-Zélande':['Marlborough','Hawke\'s Bay','Central Otago'],'Afrique du Sud':['Stellenbosch','Paarl','Swartland'],'Allemagne':['Mosel','Rheingau','Pfalz']},cepagesBlancs:['Chardonnay','Sauvignon Blanc','Sémillon','Chenin Blanc','Riesling','Gewürztraminer','Pinot Blanc','Pinot Gris/Grigio','Viognier','Muscat Blanc','Sylvaner','Malvasia','Trebbiano','Albariño','Verdejo','Vermentino','Marsanne','Roussanne','Grüner Veltliner'].sort(),cepagesRouges:['Cabernet Sauvignon','Pinot Noir','Merlot','Syrah/Shiraz','Cabernet Franc','Gamay','Grenache','Cinsault','Carignan','Barbera','Sangiovese','Zinfandel','Tempranillo','Nebbiolo','Mourvèdre','Malbec','Moscato'].sort(),accords:['Apéro','Asiatique','Cuisine grecque','Cuisine indienne','Cuisine italienne (pâtes)','Dessert','Fromage','Friture','Grillades','Mets portugais','Mets traditionnels','Moyen orient','Noël','Pizza','Poisson','Polyvalent','Poulet','Saumon','Saucisses','Tomates','ZZZ - Ne pas racheter'].sort(),getWineTypeIcon(t){const i={'Rouge':'<span style="display: inline-block; width: 12px; height: 12px; background: #8B0000; border-radius: 50%; flex-shrink: 0;"></span>','Blanc':'<span style="display: inline-block; width: 12px; height: 12px; background: #F5DEB3; border-radius: 50%; border: 1px solid #D4AF37; flex-shrink: 0;"></span>','Rosé':'<span style="display: inline-block; width: 12px; height: 12px; background: #FFB6C1; border-radius: 50%; flex-shrink: 0;"></span>','Mousseux':'<span style="font-size: 14px;">🫧</span>'};return i[t]||'<span style="display: inline-block; width: 12px; height: 12px; background: #888; border-radius: 50%; flex-shrink: 0;"></span>'},showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)},copyToClipboard(t){if(navigator.clipboard){navigator.clipboard.writeText(t).then(()=>{this.showToast('Code copié !')})}},save(){localStorage.setItem('wines',JSON.stringify(this.wines));this.updateHomePage();this.updateShoppingList()},init(){this.initFilters();this.initCountries();this.initCepages();this.initAccords();this.updateHomePage();this.render()},initFilters(){const w=document.getElementById('cepageFilterWhite');this.cepagesBlancs.forEach(c=>{const d=document.createElement('div');d.className='cepage-filter-item';d.innerHTML=`<input type="checkbox" id="filter_${c}" value="${c}" onchange="app.applyFilters()"><label for="filter_${c}">${c}</label>`;w.appendChild(d)});const r=document.getElementById('cepageFilterRed');this.cepagesRouges.forEach(c=>{const d=document.createElement('div');d.className='cepage-filter-item';d.innerHTML=`<input type="checkbox" id="filter_${c}" value="${c}" onchange="app.applyFilters()"><label for="filter_${c}">${c}</label>`;r.appendChild(d)});const a=document.getElementById('filterAccord');this.accords.forEach(ac=>{const o=document.createElement('option');o.value=ac;o.textContent=ac;a.appendChild(o)})},initCountries(){const cs=document.getElementById('country');const fc=document.getElementById('filterCountry');this.countries.forEach(c=>{const o1=document.createElement('option');o1.value=c;o1.textContent=c;cs.appendChild(o1);const o2=document.createElement('option');o2.value=c;o2.textContent=c;fc.appendChild(o2)})},initCepages(){const g=document.getElementById('cepageList');const bh=document.createElement('div');bh.style.cssText='padding: 8px; background: #F5DEB3; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 4px; display: flex; align-items: center; gap: 6px;';bh.innerHTML=this.getWineTypeIcon('Blanc')+' CÉPAGES BLANCS';g.appendChild(bh);this.cepagesBlancs.forEach(c=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="cepage_${c}" value="${c}"><label for="cepage_${c}">${c}</label>`;g.appendChild(d)});const rh=document.createElement('div');rh.style.cssText='padding: 8px; background: #FFE4E4; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 8px; display: flex; align-items: center; gap: 6px;';rh.innerHTML=this.getWineTypeIcon('Rouge')+' CÉPAGES ROUGES';g.appendChild(rh);this.cepagesRouges.forEach(c=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="cepage_${c}" value="${c}"><label for="cepage_${c}">${c}</label>`;g.appendChild(d)})},initAccords(){const g=document.getElementById('accordList');this.accords.forEach(a=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="accord_${a}" value="${a}"><label for="accord_${a}">${a}</label>`;g.appendChild(d)})},showPage(n,b){const cp=document.querySelector('.page.active');if(cp&&cp.id==='page2'&&n!==2){this.resetFilters()}document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));document.getElementById('page'+n).classList.add('active');b.classList.add('active');if(n===1)this.updateHomePage();if(n===2)this.render();if(n===3)this.showLocations();if(n===4)this.showCepagesByCellier();if(n===5)this.updateShoppingList()},updateHomePage(){let t=0;const gc={};this.wines.forEach(w=>{const q=w.locations?w.locations.length:w.quantity;t+=q;if(w.cepages&&w.cepages.length>0&&q>0){w.cepages.forEach(g=>{gc[g]=(gc[g]||0)+q})}});document.getElementById('totalBottles').textContent=t;const gr=document.getElementById('grapeSummaryGrid');gr.innerHTML='';const sg=Object.entries(gc).filter(([_,c])=>c>0).sort((a,b)=>b[1]-a[1]);if(sg.length===0){gr.innerHTML='<div class="empty">Aucun vin en cave</div>';return}sg.forEach(([g,c])=>{const cd=document.createElement('div');cd.className='grape-summary-card';cd.onclick=()=>this.filterByGrape(g);cd.innerHTML=`<div class="grape-summary-name">${g}</div><div class="grape-summary-count">${c}</div>`;gr.appendChild(cd)})},filterByGrape(g){this.showPage(2,document.querySelectorAll('.nav-item')[1]);this.resetFilters();const cb=document.getElementById('filter_'+g);if(cb)cb.checked=true;this.applyFilters()},updateShoppingList(){const c=document.getElementById('shoppingList');const tb=this.wines.filter(w=>{const q=w.locations?w.locations.length:w.quantity;const nr=w.accords&&w.accords.includes('ZZZ - Ne pas racheter');return q===0&&!nr});if(tb.length===0){c.innerHTML='<div class="empty">Aucun vin à racheter 🎉</div>';return}c.innerHTML=tb.map(w=>`<div style="background: rgba(255, 255, 255, 0.95); padding: 8px 12px; margin-bottom: 6px; border-radius: 0; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; border-left: 4px solid var(--primary);" onclick="app.showDetail(${w.id})">${this.getWineTypeIcon(w.type)}<div style="font-weight: 600; color: var(--primary); font-size: 14px; flex: 1;">${w.name}</div>${w.country?`<div style="font-size: 11px; color: var(--text-light);">🌍 ${w.country}</div>`:''}${w.cepages&&w.cepages.length>0?`<div style="font-size: 11px; color: var(--text-light);">🍇 ${w.cepages.join(', ')}</div>`:''}</div>`).join('')},resetFilters(){document.getElementById('searchWine').value='';document.getElementById('filterType').value='';document.getElementById('filterCountry').value='';document.getElementById('filterRegion').value='';document.getElementById('filterAccord').value='';document.querySelectorAll('.cepage-filter-item input').forEach(cb=>cb.checked=false)},applyFilters(){this.render();const sc=document.getElementById('filterCountry').value;const fr=document.getElementById('filterRegion');fr.innerHTML='<option value="">Toutes les régions</option>';if(sc&&this.regionsByCountry[sc]){this.regionsByCountry[sc].forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;fr.appendChild(o)})}},render(){const s=document.getElementById('searchWine').value.toLowerCase();const ft=document.getElementById('filterType').value;const fc=document.getElementById('filterCountry').value;const fr=document.getElementById('filterRegion').value;const fa=document.getElementById('filterAccord').value;const scep=Array.from(document.querySelectorAll('.cepage-filter-item input:checked')).map(cb=>cb.value);const wl=document.getElementById('wineList');const hc=s||ft||fc||fr||fa||scep.length>0;if(!hc){wl.innerHTML='<div class="empty">Sélectionnez un critère de recherche</div>';return}let fil=this.wines.filter(w=>{const mn=!s||w.name.toLowerCase().includes(s);const mt=!ft||w.type===ft;const mc=!fc||w.country===fc;const mr=!fr||w.region===fr;const ma=!fa||(w.accords&&w.accords.includes(fa));const mce=scep.length===0||(w.cepages&&w.cepages.some(c=>scep.includes(c)));return mn&&mt&&mc&&mr&&ma&&mce});if(fil.length===0){wl.innerHTML='<div class="empty">Aucun vin trouvé</div>';return}wl.innerHTML=fil.map(w=>{const q=w.locations?w.locations.length:w.quantity;return`<div class="wine-card" onclick="app.showDetail(${w.id})"><div class="wine-name">${this.getWineTypeIcon(w.type)}${w.name}<span class="badge" style="margin-left: auto;">${q} bouteille(s)</span></div><div class="wine-info">${w.cepages&&w.cepages.length>0?`<span class="badge">🍇 ${w.cepages.join(', ')}</span>`:''}${w.country?`<span class="badge">🌍 ${w.country}</span>`:''}${w.region?`<span class="badge">📍 ${w.region}</span>`:''}${w.appellation?`<span class="badge">🏆 ${w.appellation}</span>`:''}</div></div>`}).join('')},showWineModal(id=null){this.editingId=id;const m=document.getElementById('wineModal');if(id){const w=this.wines.find(x=>x.id===id);if(!w)return;document.getElementById('modalTitle').textContent='Modifier le vin';document.getElementById('saveBtn').textContent='Enregistrer';document.getElementById('barcode').value=w.barcode||'';document.getElementById('wineName').value=w.name;document.getElementById('saqUrl').value=w.saqUrl||'';document.getElementById('wineType').value=w.type;document.getElementById('country').value=w.country||'';this.updateRegions();setTimeout(()=>{document.getElementById('region').value=w.region||''},50);document.getElementById('appellation').value=w.appellation||'';document.getElementById('particularity').value=w.particularity||'';document.getElementById('importateur').value=w.importateur||'';document.getElementById('lieuAchat').value=w.lieuAchat||'';this.updateCepageList(w.type);if(w.cepages){w.cepages.forEach(c=>{const cb=document.getElementById('cepage_'+c);if(cb)cb.checked=true})}if(w.accords){w.accords.forEach(a=>{const cb=document.getElementById('accord_'+a);if(cb)cb.checked=true})}document.getElementById('locationEntries').innerHTML='';if(w.locations&&w.locations.length>0){w.locations.forEach(l=>{this.addLocationEntry();const le=document.querySelector('#locationEntries .location-entry:last-child');le.querySelector('.location-zone').value=l.zone;le.querySelector('.location-rangee').value=l.rangee;le.querySelector('.location-espace').value=l.espace})}}else{document.getElementById('modalTitle').textContent='Ajouter un vin';document.getElementById('saveBtn').textContent='Ajouter au Cellier';document.getElementById('barcode').value='';document.getElementById('wineName').value='';document.getElementById('saqUrl').value='';document.getElementById('wineType').value='';document.getElementById('country').value='';document.getElementById('region').innerHTML='<option value="">Sélectionner</option>';document.getElementById('appellation').value='';document.getElementById('particularity').value='';document.getElementById('importateur').value='';document.getElementById('lieuAchat').value='';document.getElementById('locationEntries').innerHTML='';document.querySelectorAll('#cepageList input[type="checkbox"]').forEach(cb=>cb.checked=false);document.querySelectorAll('#accordList input[type="checkbox"]').forEach(cb=>cb.checked=false);this.updateCepageList('')}m.classList.add('active')},closeWineModal(){document.getElementById('wineModal').classList.remove('active');this.editingId=null},updateRegions(){const c=document.getElementById('country').value;const rs=document.getElementById('region');rs.innerHTML='<option value="">Sélectionner</option>';if(c&&this.regionsByCountry[c]){this.regionsByCountry[c].forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;rs.appendChild(o)})}},updateCepageList(st=''){const g=document.getElementById('cepageList');if(!g)return;g.innerHTML='';const cs=Array.from(document.querySelectorAll('#cepageList input:checked')).map(cb=>cb.value);if(st==='Blanc'){const bh=document.createElement('div');bh.style.cssText='padding: 8px; background: #F5DEB3; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 4px; display: flex; align-items: center; gap: 6px;';bh.innerHTML=this.getWineTypeIcon('Blanc')+' CÉPAGES BLANCS';g.appendChild(bh);this.cepagesBlancs.forEach(c=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="cepage_${c}" value="${c}" ${cs.includes(c)?'checked':''}><label for="cepage_${c}">${c}</label>`;g.appendChild(d)})}else if(st==='Rouge'){const rh=document.createElement('div');rh.style.cssText='padding: 8px; background: #FFE4E4; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 4px; display: flex; align-items: center; gap: 6px;';rh.innerHTML=this.getWineTypeIcon('Rouge')+' CÉPAGES ROUGES';g.appendChild(rh);this.cepagesRouges.forEach(c=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="cepage_${c}" value="${c}" ${cs.includes(c)?'checked':''}><label for="cepage_${c}">${c}</label>`;g.appendChild(d)})}else{const bh=document.createElement('div');bh.style.cssText='padding: 8px; background: #F5DEB3; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 4px; display: flex; align-items: center; gap: 6px;';bh.innerHTML=this.getWineTypeIcon('Blanc')+' CÉPAGES BLANCS';g.appendChild(bh);this.cepagesBlancs.forEach(c=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="cepage_${c}" value="${c}" ${cs.includes(c)?'checked':''}><label for="cepage_${c}">${c}</label>`;g.appendChild(d)});const rh=document.createElement('div');rh.style.cssText='padding: 8px; background: #FFE4E4; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 8px; display: flex; align-items: center; gap: 6px;';rh.innerHTML=this.getWineTypeIcon('Rouge')+' CÉPAGES ROUGES';g.appendChild(rh);this.cepagesRouges.forEach(c=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="cepage_${c}" value="${c}" ${cs.includes(c)?'checked':''}><label for="cepage_${c}">${c}</label>`;g.appendChild(d)})}},addLocationEntry(){this.locationCounter++;const c=document.getElementById('locationEntries');const d=document.createElement('div');d.className='location-entry';d.id='location_'+this.locationCounter;d.innerHTML=`<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><strong style="font-size: 12px;">Emplacement</strong><button type="button" onclick="app.removeLocationEntry(${this.locationCounter})" style="width: auto; padding: 4px 8px; margin: 0; background: #ef4444; color: white; font-size: 11px; border: none; cursor: pointer;">✕</button></div><div class="location-entry-grid"><div><label style="font-size: 10px;">Cellier</label><select class="location-zone"><option value="">-</option><option value="1">Cellier 1</option><option value="2">Cellier 2</option><option value="3">Cellier 3</option></select></div><div><label style="font-size: 10px;">Rangée</label><select class="location-rangee"><option value="">-</option>${Array.from({length:10},(_,i)=>`<option value="${i+1}">R${i+1}</option>`).join('')}</select></div><div><label style="font-size: 10px;">Espace</label><select class="location-espace"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select></div></div>`;c.appendChild(d);this.updateLocationCount()},removeLocationEntry(id){const e=document.getElementById('location_'+id);if(e){e.remove();this.updateLocationCount()}},updateLocationCount(){const c=document.querySelectorAll('#locationEntries .location-entry').length;const ce=document.getElementById('locationCount');if(ce){ce.textContent=`(${c})`}},saveWine(){const n=document.getElementById('wineName').value.trim();const t=document.getElementById('wineType').value;if(!n||!t){alert('Veuillez remplir au moins le nom et le type du vin');return}const sc=Array.from(document.querySelectorAll('#cepageList input:checked')).map(cb=>cb.value);const sa=Array.from(document.querySelectorAll('#accordList input:checked')).map(cb=>cb.value);const locs=[];document.querySelectorAll('#locationEntries .location-entry').forEach(e=>{const z=e.querySelector('.location-zone').value;const r=e.querySelector('.location-rangee').value;const es=e.querySelector('.location-espace').value;if(z&&r&&es){locs.push({zone:z,rangee:r,espace:es})}});const wd={name:n,barcode:document.getElementById('barcode').value.trim(),saqUrl:document.getElementById('saqUrl').value.trim(),type:t,country:document.getElementById('country').value,region:document.getElementById('region').value,appellation:document.getElementById('appellation').value.trim(),particularity:document.getElementById('particularity').value.trim(),cepages:sc,accords:sa,importateur:document.getElementById('importateur').value.trim(),lieuAchat:document.getElementById('lieuAchat').value.trim(),locations:locs,quantity:locs.length||1};if(this.editingId){const i=this.wines.findIndex(w=>w.id===this.editingId);this.wines[i]={...this.wines[i],...wd};this.showToast('Vin modifié !')}else{this.wines.push({id:Date.now(),...wd});this.showToast('Vin ajouté !')}this.save();this.closeWineModal();this.render()},deleteWine(id){if(!confirm('Êtes-vous sûr de vouloir supprimer ce vin?'))return;this.wines=this.wines.filter(w=>w.id!==id);this.save();this.closeDetailModal();this.render();this.showToast('Vin supprimé')},showDetail(id){const w=this.wines.find(x=>x.id===id);if(!w)return;let lh='';if(w.locations&&w.locations.length>0){lh=w.locations.map(l=>`<div class="wine-location cellier-${l.zone}">C${l.zone} • R${l.rangee} • ${l.espace}</div>`).join(' ')}else{lh='<div style="color: var(--text-light); font-size: 13px; margin-bottom: 12px;">Emplacement non défini</div>'}const q=w.locations?w.locations.length:w.quantity;document.getElementById('wineDetail').innerHTML=`<div class="wine-name" style="font-size: 24px; margin-bottom: 12px;">${w.name}</div>${lh}${w.saqUrl?`<button class="btn-secondary btn-icon" onclick="app.copyToClipboard('${w.barcode||''}'); window.open('${w.saqUrl}', '_blank')" style="margin: 12px 0;">🔗 Voir sur SAQ</button>`:''}<div style="display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0;">${w.type?`<span class="badge" style="display: flex; align-items: center; gap: 6px;">${this.getWineTypeIcon(w.type)} ${w.type}</span>`:''}${w.barcode?`<span class="badge">📊 ${w.barcode}</span>`:''}${w.country?`<span class="badge">🌍 ${w.country}</span>`:''}${w.region?`<span class="badge">📍 ${w.region}</span>`:''}${w.appellation?`<span class="badge">🏆 ${w.appellation}</span>`:''}${w.particularity?`<span class="badge">✨ ${w.particularity}</span>`:''}<span class="badge"><span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; font-weight: 700; margin-right: 6px;">${q}</span>bouteille(s)</span></div><div style="display: flex; gap: 10px; margin: 16px 0;"><button class="btn-icon btn-secondary" onclick="app.showRemoveModal(${w.id})" style="flex: 1;" ${q===0?'disabled':''}>− Retirer</button><button class="btn-icon btn-secondary" onclick="app.adjustQuantity(${w.id}, 1)" style="flex: 1;">+ Ajouter</button></div>${w.cepages&&w.cepages.length>0?`<div style="margin-top: 16px;"><strong style="font-size: 13px;">Cépages:</strong><div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">${w.cepages.map(c=>`<span class="badge">🍇 ${c}</span>`).join('')}</div></div>`:''}${w.accords&&w.accords.length>0?`<div style="margin-top: 16px;"><strong style="font-size: 13px;">Accords mets:</strong><div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">${w.accords.map(a=>`<span class="badge">🍽️ ${a}</span>`).join('')}</div></div>`:''}${w.importateur?`<div style="margin-top: 12px; font-size: 13px;"><strong>Importateur:</strong> ${w.importateur}</div>`:''}${w.lieuAchat?`<div style="margin-top: 6px; font-size: 13px;"><strong>Succursale:</strong> ${w.lieuAchat}</div>`:''}<div style="display: flex; gap: 10px; margin-top: 20px;"><button class="btn-secondary" onclick="app.showWineModal(${w.id}); app.closeDetailModal();" style="flex: 1;">✏️ Modifier</button><button class="btn-danger" onclick="app.deleteWine(${w.id})" style="flex: 1;">🗑️ Supprimer</button></div>`;document.getElementById('detailModal').classList.add('active')},closeDetailModal(){document.getElementById('detailModal').classList.remove('active')},adjustQuantity(id,ch){if(ch>0){this.closeDetailModal();this.showAddBottleModal(id)}},showAddBottleModal(wid){const w=this.wines.find(x=>x.id===wid);if(!w)return;const m=document.getElementById('addBottleModal');document.getElementById('addBottleWineName').textContent=w.name;document.getElementById('addBottleLocationEntries').innerHTML='';this.addBottleLocationEntry();m.classList.add('active');m.dataset.wineId=wid},closeAddBottleModal(){document.getElementById('addBottleModal').classList.remove('active')},addBottleLocationEntry(){const c=document.getElementById('addBottleLocationEntries');const eid=Date.now();const d=document.createElement('div');d.className='location-entry';d.id='addloc_'+eid;d.innerHTML=`<div class="location-entry-grid"><div><label style="font-size: 10px;">Cellier</label><select class="addlocation-zone"><option value="">-</option><option value="1">Cellier 1</option><option value="2">Cellier 2</option><option value="3">Cellier 3</option></select></div><div><label style="font-size: 10px;">Rangée</label><select class="addlocation-rangee"><option value="">-</option>${Array.from({length:10},(_,i)=>`<option value="${i+1}">R${i+1}</option>`).join('')}</select></div><div><label style="font-size: 10px;">Espace</label><select class="addlocation-espace"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select></div></div>`;c.appendChild(d)},saveAddBottle(){const wid=parseInt(document.getElementById('addBottleModal').dataset.wineId);const w=this.wines.find(x=>x.id===wid);if(!w)return;const locs=[];document.querySelectorAll('#addBottleLocationEntries .location-entry').forEach(e=>{const z=e.querySelector('.addlocation-zone').value;const r=e.querySelector('.addlocation-rangee').value;const es=e.querySelector('.addlocation-espace').value;if(z&&r&&es){locs.push({zone:z,rangee:r,espace:es})}});if(locs.length===0){alert('Veuillez définir au moins un emplacement');return}if(!w.locations){w.locations=[]}w.locations.push(...locs);w.quantity=w.locations.length;this.save();this.closeAddBottleModal();this.render();this.showToast('Bouteille ajoutée !')},showRemoveModal(wid){this.currentRemoveWineId=wid;this.selectedRemoveLocationIndex=null;const w=this.wines.find(x=>x.id===wid);if(!w)return;document.getElementById('removeWineName').textContent=w.name;document.getElementById('confirmRemoveBtn').disabled=true;const ll=document.getElementById('removeLocationsList');if(w.locations&&w.locations.length>0){ll.innerHTML=w.locations.map((l,i)=>`<div class="location-entry" style="cursor: pointer; margin-bottom: 8px; transition: all 0.2s;" onclick="app.selectRemoveLocation(${i})" id="removeLoc_${i}"><div style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 2px solid var(--border); border-radius: 0;"><input type="radio" name="removeLocation" id="radio_${i}" style="width: auto; margin: 0;"><div class="wine-location cellier-${l.zone}">C${l.zone} • R${l.rangee} • ${l.espace}</div></div></div>`).join('')}else{ll.innerHTML='<div style="color: var(--text-light); padding: 20px; text-align: center;">Aucun emplacement défini pour ce vin</div>'}document.getElementById('removeModal').classList.add('active')},selectRemoveLocation(i){this.selectedRemoveLocationIndex=i;document.querySelectorAll('#removeLocationsList .location-entry').forEach((e,idx)=>{if(idx===i){e.style.background='rgba(30, 58, 95, 0.1)';e.querySelector('input[type="radio"]').checked=true}else{e.style.background='transparent';e.querySelector('input[type="radio"]').checked=false}});document.getElementById('confirmRemoveBtn').disabled=false},closeRemoveModal(){document.getElementById('removeModal').classList.remove('active');this.currentRemoveWineId=null;this.selectedRemoveLocationIndex=null},confirmRemoveBottle(){if(this.selectedRemoveLocationIndex===null){alert('Veuillez sélectionner un emplacement');return}const w=this.wines.find(x=>x.id===this.currentRemoveWineId);if(!w)return;if(w.locations&&w.locations.length>0){w.locations.splice(this.selectedRemoveLocationIndex,1);w.quantity=w.locations.length}else{w.quantity=Math.max(0,w.quantity-1)}this.save();this.closeRemoveModal();this.closeDetailModal();this.render();this.showToast('Bouteille retirée !')},showLocations(){const z=document.getElementById('viewZone').value;const c=document.getElementById('locationView');const wz=this.wines.filter(w=>w.locations&&w.locations.some(l=>l.zone===z));if(wz.length===0){c.innerHTML='<div class="empty">Aucun vin dans ce cellier</div>';return}c.innerHTML=wz.map(w=>{const lz=w.locations.filter(l=>l.zone===z);return`<div class="wine-card" onclick="app.showDetail(${w.id})"><div class="wine-name">${this.getWineTypeIcon(w.type)}${w.name}</div><div class="wine-info">${lz.map(l=>`<div class="wine-location cellier-${l.zone}">R${l.rangee} • ${l.espace}</div>`).join('')}</div></div>`}).join('')},showCepagesByCellier(){const z=document.getElementById('cepageZone').value;const c=document.getElementById('cepageView');const cc={};this.wines.forEach(w=>{if(w.cepages&&w.cepages.length>0){let cnt=0;if(z==='0'){cnt=w.locations?w.locations.length:w.quantity}else{if(w.locations){cnt=w.locations.filter(l=>l.zone===z).length}}if(cnt>0){w.cepages.forEach(cep=>{cc[cep]=(cc[cep]||0)+cnt})}}});if(Object.keys(cc).length===0){c.innerHTML='<div class="empty">Aucun cépage trouvé</div>';return}const sc=Object.entries(cc).sort((a,b)=>b[1]-a[1]);c.innerHTML=sc.map(([cep,cnt])=>`<div class="cepage-summary"><h3>${cep}</h3><div style="font-size: 14px; color: var(--text-light);">${cnt} bouteille(s)</div></div>`).join('')},quickScan(){this.scanMode='add';this.startScan()},startScan(){const sc=document.getElementById('scanner');sc.classList.add('active');this.scannerActive=true;Quagga.init({inputStream:{name:"Live",type:"LiveStream",target:document.querySelector('#scannerVideo'),constraints:{facingMode:"environment",aspectRatio:{min:1,max:2}}},locator:{patchSize:"medium",halfSample:true},numOfWorkers:2,decoder:{readers:["ean_reader","ean_8_reader","code_128_reader","code_39_reader","upc_reader","upc_e_reader"]},locate:true},(err)=>{if(err){console.error(err);alert('Erreur caméra: '+err);this.stopScan();return}Quagga.start()});Quagga.onDetected((res)=>{const bc=res.codeResult.code;if(this.scanMode==='add'){this.stopScan();const ex=this.wines.find(w=>w.barcode===bc);if(ex){this.showDetail(ex.id)}else{document.getElementById('barcode').value=bc;this.copyToClipboard(bc);this.showWineModal()}}})},stopScan(){if(this.scannerActive){Quagga.stop();this.scannerActive=false}document.getElementById('scanner').classList.remove('active');document.querySelector('#scannerVideo').innerHTML=''},exportToJSON(){const d=JSON.stringify(this.wines,null,2);const b=new Blob([d],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='vino_export_'+new Date().toISOString().split('T')[0]+'.json';a.click();this.showToast('Export JSON réussi !')},exportToExcel(){const d=this.wines.map(w=>({'Nom':w.name,'Type':w.type,'Pays':w.country||'','Région':w.region||'','Appellation':w.appellation||'','Particularité':w.particularity||'','Cépages':w.cepages?w.cepages.join(', '):'','Accords':w.accords?w.accords.join(', '):'','Quantité':w.locations?w.locations.length:w.quantity,'Code-barres':w.barcode||'','Importateur':w.importateur||'','Lieu d\'achat':w.lieuAchat||''}));const ws=XLSX.utils.json_to_sheet(d);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Vins");XLSX.writeFile(wb,'vino_export_'+new Date().toISOString().split('T')[0]+'.xlsx');this.showToast('Export Excel réussi !')},handleImport(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();if(f.name.endsWith('.json')){r.onload=(ev)=>{try{const im=JSON.parse(ev.target.result);if(confirm(`Importer ${im.length} vins? Cela remplacera vos données actuelles.`)){this.wines=im;this.save();this.render();this.showToast('Import réussi !')}}catch(err){alert('Erreur lors de l\'import: '+err.message)}};r.readAsText(f)}else if(f.name.endsWith('.xlsx')||f.name.endsWith('.xls')){r.onload=(ev)=>{try{const d=new Uint8Array(ev.target.result);const wb=XLSX.read(d,{type:'array'});const fs=wb.Sheets[wb.SheetNames[0]];const im=XLSX.utils.sheet_to_json(fs);const cv=im.map(row=>({id:Date.now()+Math.random(),name:row['Nom']||'',type:row['Type']||'',country:row['Pays']||'',region:row['Région']||'',appellation:row['Appellation']||'',particularity:row['Particularité']||'',cepages:row['Cépages']?row['Cépages'].split(',').map(c=>c.trim()):[],accords:row['Accords']?row['Accords'].split(',').map(a=>a.trim()):[],quantity:row['Quantité']||0,barcode:row['Code-barres']||'',importateur:row['Importateur']||'',lieuAchat:row['Lieu d\'achat']||'',locations:[]}));if(confirm(`Importer ${cv.length} vins? Cela remplacera vos données actuelles.`)){this.wines=cv;this.save();this.render();this.showToast('Import réussi !')}}catch(err){alert('Erreur lors de l\'import Excel: '+err.message)}};r.readAsArrayBuffer(f)}e.target.value=''}};document.addEventListener('DOMContentLoaded',()=>{app.init()});
+const app={wines:JSON.parse(localStorage.getItem('wines'))||[],scannerActive:!1,scanMode:'add',editingId:null,locationCounter:0,currentRemoveWineId:null,selectedRemoveLocationIndex:null,countries:['France','Italie','Espagne','Portugal','Canada','États-Unis','Argentine','Chili','Australie','Nouvelle-Zélande','Afrique du Sud','Allemagne'].sort(),regionsByCountry:{'France':['Alsace','Beaujolais','Bordeaux','Bourgogne','Champagne','Jura','Languedoc','Loire','Provence','Rhône','Roussillon','Savoie','Sud-Ouest'],'Italie':['Piémont','Toscane','Vénétie','Sicile','Pouilles','Lombardie','Trentin'],'Espagne':['Rioja','Ribera del Duero','Priorat','Navarre','Catalogne','Rías Baixas'],'Portugal':['Douro','Alentejo','Dão','Vinho Verde'],'Canada':['Colombie-Britannique','Ontario','Québec'],'États-Unis':['Californie','Oregon','Washington','New York'],'Argentine':['Mendoza','Salta'],'Chili':['Vallée de Maipo','Vallée de Colchagua'],'Australie':['Barossa Valley','Margaret River','Hunter Valley'],'Nouvelle-Zélande':['Marlborough','Hawke\'s Bay','Central Otago'],'Afrique du Sud':['Stellenbosch','Paarl','Swartland'],'Allemagne':['Mosel','Rheingau','Pfalz']},cepagesBlancs:['Albariño','Chardonnay','Chenin Blanc','Gewürztraminer','Grüner Veltliner','Malvasia','Marsanne','Muscat Blanc','Pinot Blanc','Pinot Gris/Grigio','Riesling','Roussanne','Sauvignon Blanc','Sémillon','Sylvaner','Trebbiano','Verdejo','Vermentino','Viognier'].sort(),cepagesRouges:['Barbera','Cabernet Franc','Cabernet Sauvignon','Carignan','Cinsault','Gamay','Grenache','Malbec','Merlot','Moscato','Mourvèdre','Nebbiolo','Pinot Noir','Sangiovese','Syrah/Shiraz','Tempranillo','Zinfandel'].sort(),accords:['Apéro','Asiatique','Cuisine grecque','Cuisine indienne','Cuisine italienne (pâtes)','Dessert','Fromage','Friture','Grillades','Mets portugais','Mets traditionnels','Moyen orient','Noël','Pizza','Poisson','Polyvalent','Poulet','Saumon','Saucisses','Tomates','ZZZ - Ne pas racheter'].sort(),getWineTypeIcon(t){const i={'Rouge':'<span style="display: inline-block; width: 12px; height: 12px; background: #8B0000; border-radius: 50%; flex-shrink: 0;"></span>','Blanc':'<span style="display: inline-block; width: 12px; height: 12px; background: #F5DEB3; border-radius: 50%; border: 1px solid #D4AF37; flex-shrink: 0;"></span>','Rosé':'<span style="display: inline-block; width: 12px; height: 12px; background: #FFB6C1; border-radius: 50%; flex-shrink: 0;"></span>','Mousseux':'<span style="font-size: 14px;">🫧</span>'};return i[t]||'<span style="display: inline-block; width: 12px; height: 12px; background: #888; border-radius: 50%; flex-shrink: 0;"></span>'},showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)},copyToClipboard(t){if(navigator.clipboard){navigator.clipboard.writeText(t).then(()=>{const m=t.length>20?'Nom copié !':'Code copié !';this.showToast(m)})}},save(){localStorage.setItem('wines',JSON.stringify(this.wines));this.updateHomePage();this.updateShoppingList()},init(){this.initCountries();this.initCepages();this.initAccords();this.updateHomePage();this.render()},initCountries(){const cs=document.getElementById('country');const fc=document.getElementById('filterCountry');this.countries.forEach(c=>{const o1=document.createElement('option');o1.value=c;o1.textContent=c;cs.appendChild(o1);const o2=document.createElement('option');o2.value=c;o2.textContent=c;fc.appendChild(o2)})},initCepages(){const g=document.getElementById('cepageList');const bh=document.createElement('div');bh.style.cssText='padding: 8px; background: #F5DEB3; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 4px; display: flex; align-items: center; gap: 6px;';bh.innerHTML=this.getWineTypeIcon('Blanc')+' CÉPAGES BLANCS';g.appendChild(bh);this.cepagesBlancs.forEach(c=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="cepage_${c}" value="${c}"><label for="cepage_${c}">${c}</label>`;g.appendChild(d)});const rh=document.createElement('div');rh.style.cssText='padding: 8px; background: #FFE4E4; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 8px; display: flex; align-items: center; gap: 6px;';rh.innerHTML=this.getWineTypeIcon('Rouge')+' CÉPAGES ROUGES';g.appendChild(rh);this.cepagesRouges.forEach(c=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="cepage_${c}" value="${c}"><label for="cepage_${c}">${c}</label>`;g.appendChild(d)})},initAccords(){const g=document.getElementById('accordList');this.accords.forEach(a=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="accord_${a}" value="${a}"><label for="accord_${a}">${a}</label>`;g.appendChild(d)})},showPage(n,b){const cp=document.querySelector('.page.active');if(cp&&cp.id==='page2'&&n!==2){this.resetFilters()}document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));document.getElementById('page'+n).classList.add('active');b.classList.add('active');if(n===1)this.updateHomePage();if(n===2)this.render();if(n===3)this.showLocations();if(n===4)this.showCepagesByCellier();if(n===5)this.updateShoppingList()},updateHomePage(){let t=0;const gc={};this.wines.forEach(w=>{const q=w.locations?w.locations.length:w.quantity;t+=q;if(w.cepages&&w.cepages.length>0&&q>0){w.cepages.forEach(g=>{gc[g]=(gc[g]||0)+q})}});document.getElementById('totalBottles').textContent=t;const gr=document.getElementById('grapeSummaryGrid');gr.innerHTML='';const sg=Object.entries(gc).filter(([_,c])=>c>0).sort((a,b)=>b[1]-a[1]);if(sg.length===0){gr.innerHTML='<div class="empty">Aucun vin en cave</div>';return}sg.forEach(([g,c])=>{const cd=document.createElement('div');cd.className='grape-summary-card';cd.onclick=()=>this.filterByGrape(g);cd.innerHTML=`<div class="grape-summary-name">${g}</div><div class="grape-summary-count">${c}</div>`;gr.appendChild(cd)})},filterByGrape(g){this.showPage(2,document.querySelectorAll('.nav-item')[1]);this.resetFilters();document.getElementById('filterType').value='';this.filterTypeChanged()},filterTypeChanged(){const selectedType=document.getElementById('filterType').value;const section=document.getElementById('cepageFilterSection');const label=document.getElementById('cepageFilterLabel');const grid=document.getElementById('cepageFilterDynamic');if(!selectedType){section.style.display='none';grid.innerHTML=''}else{section.style.display='block';grid.innerHTML='';let cepages=[];if(selectedType==='Blanc'){label.textContent='CÉPAGES BLANCS';cepages=this.cepagesBlancs}else if(selectedType==='Rouge'){label.textContent='CÉPAGES ROUGES';cepages=this.cepagesRouges}else{label.textContent='CÉPAGES';cepages=[...this.cepagesBlancs,...this.cepagesRouges].sort()}cepages.forEach(c=>{const div=document.createElement('div');div.className='cepage-filter-item';div.innerHTML=`<input type="checkbox" id="filter_${c}" value="${c}" onchange="app.applyFilters()"><label for="filter_${c}">${c}</label>`;grid.appendChild(div)})}this.applyFilters()},
+updateShoppingList(){const c=document.getElementById('shoppingList');const tb=this.wines.filter(w=>{const q=w.locations?w.locations.length:w.quantity;const nr=w.accords&&w.accords.includes('ZZZ - Ne pas racheter');return q===0&&!nr});if(tb.length===0){c.innerHTML='<div class="empty">Aucun vin à racheter 🎉</div>';return}c.innerHTML=tb.map(w=>`<div style="background: rgba(255, 255, 255, 0.95); padding: 8px 12px; margin-bottom: 6px; border-radius: 0; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; border-left: 4px solid var(--primary);" onclick="app.showDetail(${w.id})">${this.getWineTypeIcon(w.type)}<div style="font-weight: 600; color: var(--primary); font-size: 14px; flex: 1;">${w.name}</div>${w.country?`<div style="font-size: 11px; color: var(--text-light);">🌍 ${w.country}</div>`:''}${w.cepages&&w.cepages.length>0?`<div style="font-size: 11px; color: var(--text-light);">🍇 ${w.cepages.join(', ')}</div>`:''}</div>`).join('')},resetFilters(){document.getElementById('searchWine').value='';document.getElementById('filterType').value='';document.getElementById('filterCountry').value='';document.getElementById('filterRegion').value='';document.getElementById('filterAccord').value='';document.getElementById('cepageFilterSection').style.display='none';document.getElementById('cepageFilterDynamic').innerHTML=''},applyFilters(){this.render();const sc=document.getElementById('filterCountry').value;const fr=document.getElementById('filterRegion');fr.innerHTML='<option value="">Toutes les régions</option>';if(sc&&this.regionsByCountry[sc]){this.regionsByCountry[sc].forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;fr.appendChild(o)})}},render(){const s=document.getElementById('searchWine').value.toLowerCase();const ft=document.getElementById('filterType').value;const fc=document.getElementById('filterCountry').value;const fr=document.getElementById('filterRegion').value;const fa=document.getElementById('filterAccord').value;const scep=Array.from(document.querySelectorAll('#cepageFilterDynamic input:checked')).map(cb=>cb.value);const wl=document.getElementById('wineList');const hc=s||ft||fc||fr||fa||scep.length>0;if(!hc){wl.innerHTML='<div class="empty">Sélectionnez un critère de recherche</div>';return}let fil=this.wines.filter(w=>{const mn=!s||w.name.toLowerCase().includes(s);const mt=!ft||w.type===ft;const mc=!fc||w.country===fc;const mr=!fr||w.region===fr;const ma=!fa||(w.accords&&w.accords.includes(fa));const mce=scep.length===0||(w.cepages&&w.cepages.some(c=>scep.includes(c)));return mn&&mt&&mc&&mr&&ma&&mce});if(fil.length===0){wl.innerHTML='<div class="empty">Aucun vin trouvé</div>';return}wl.innerHTML=fil.map(w=>{const q=w.locations?w.locations.length:w.quantity;return`<div class="wine-card" onclick="app.showDetail(${w.id})"><div class="wine-name">${this.getWineTypeIcon(w.type)}${w.name}<span class="badge" style="margin-left: auto;">${q} bouteille(s)</span></div><div class="wine-info">${w.cepages&&w.cepages.length>0?`<span class="badge">🍇 ${w.cepages.join(', ')}</span>`:''}${w.country?`<span class="badge">🌍 ${w.country}</span>`:''}${w.region?`<span class="badge">📍 ${w.region}</span>`:''}${w.appellation?`<span class="badge">🏆 ${w.appellation}</span>`:''}</div></div>`}).join('')},showWineModal(id=null){this.editingId=id;const m=document.getElementById('wineModal');if(id){const w=this.wines.find(x=>x.id===id);if(!w)return;document.getElementById('modalTitle').textContent='Modifier le vin';document.getElementById('saveBtn').textContent='Enregistrer';document.getElementById('barcode').value=w.barcode||'';document.getElementById('wineName').value=w.name;document.getElementById('saqUrl').value=w.saqUrl||'';document.getElementById('wineType').value=w.type;document.getElementById('country').value=w.country||'';this.updateRegions();setTimeout(()=>{document.getElementById('region').value=w.region||''},50);document.getElementById('appellation').value=w.appellation||'';document.getElementById('particularity').value=w.particularity||'';document.getElementById('importateur').value=w.importateur||'';document.getElementById('lieuAchat').value=w.lieuAchat||'';this.updateCepageList(w.type);if(w.cepages){w.cepages.forEach(c=>{const cb=document.getElementById('cepage_'+c);if(cb)cb.checked=true})}if(w.accords){w.accords.forEach(a=>{const cb=document.getElementById('accord_'+a);if(cb)cb.checked=true})}document.getElementById('locationEntries').innerHTML='';if(w.locations&&w.locations.length>0){w.locations.forEach(l=>{this.addLocationEntry();const le=document.querySelector('#locationEntries .location-entry:last-child');le.querySelector('.location-zone').value=l.zone;le.querySelector('.location-rangee').value=l.rangee;le.querySelector('.location-espace').value=l.espace})}}else{document.getElementById('modalTitle').textContent='Ajouter un vin';document.getElementById('saveBtn').textContent='Ajouter au Cellier';document.getElementById('barcode').value='';document.getElementById('wineName').value='';document.getElementById('saqUrl').value='';document.getElementById('wineType').value='';document.getElementById('country').value='';document.getElementById('region').innerHTML='<option value="">Sélectionner</option>';document.getElementById('appellation').value='';document.getElementById('particularity').value='';document.getElementById('importateur').value='';document.getElementById('lieuAchat').value='';document.getElementById('locationEntries').innerHTML='';document.querySelectorAll('#cepageList input[type="checkbox"]').forEach(cb=>cb.checked=false);document.querySelectorAll('#accordList input[type="checkbox"]').forEach(cb=>cb.checked=false);this.updateCepageList('')}m.classList.add('active')},closeWineModal(){document.getElementById('wineModal').classList.remove('active');this.editingId=null},updateRegions(){const c=document.getElementById('country').value;const rs=document.getElementById('region');rs.innerHTML='<option value="">Sélectionner</option>';if(c&&this.regionsByCountry[c]){this.regionsByCountry[c].forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;rs.appendChild(o)})}},updateCepageList(st=''){const g=document.getElementById('cepageList');if(!g)return;g.innerHTML='';const cs=Array.from(document.querySelectorAll('#cepageList input:checked')).map(cb=>cb.value);if(st==='Blanc'){const bh=document.createElement('div');bh.style.cssText='padding: 8px; background: #F5DEB3; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 4px; display: flex; align-items: center; gap: 6px;';bh.innerHTML=this.getWineTypeIcon('Blanc')+' CÉPAGES BLANCS';g.appendChild(bh);this.cepagesBlancs.forEach(c=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="cepage_${c}" value="${c}" ${cs.includes(c)?'checked':''}><label for="cepage_${c}">${c}</label>`;g.appendChild(d)})}else if(st==='Rouge'){const rh=document.createElement('div');rh.style.cssText='padding: 8px; background: #FFE4E4; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 4px; display: flex; align-items: center; gap: 6px;';rh.innerHTML=this.getWineTypeIcon('Rouge')+' CÉPAGES ROUGES';g.appendChild(rh);this.cepagesRouges.forEach(c=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="cepage_${c}" value="${c}" ${cs.includes(c)?'checked':''}><label for="cepage_${c}">${c}</label>`;g.appendChild(d)})}else{const bh=document.createElement('div');bh.style.cssText='padding: 8px; background: #F5DEB3; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 4px; display: flex; align-items: center; gap: 6px;';bh.innerHTML=this.getWineTypeIcon('Blanc')+' CÉPAGES BLANCS';g.appendChild(bh);this.cepagesBlancs.forEach(c=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="cepage_${c}" value="${c}" ${cs.includes(c)?'checked':''}><label for="cepage_${c}">${c}</label>`;g.appendChild(d)});const rh=document.createElement('div');rh.style.cssText='padding: 8px; background: #FFE4E4; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 8px; display: flex; align-items: center; gap: 6px;';rh.innerHTML=this.getWineTypeIcon('Rouge')+' CÉPAGES ROUGES';g.appendChild(rh);this.cepagesRouges.forEach(c=>{const d=document.createElement('div');d.className='checkbox-item';d.innerHTML=`<input type="checkbox" id="cepage_${c}" value="${c}" ${cs.includes(c)?'checked':''}><label for="cepage_${c}">${c}</label>`;g.appendChild(d)})}},
+addLocationEntry(){this.locationCounter++;const c=document.getElementById('locationEntries');const d=document.createElement('div');d.className='location-entry';d.id='location_'+this.locationCounter;d.innerHTML=`<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><strong style="font-size: 12px;">Emplacement</strong><button type="button" onclick="app.removeLocationEntry(${this.locationCounter})" style="width: auto; padding: 4px 8px; margin: 0; background: #ef4444; color: white; font-size: 11px; border: none; cursor: pointer;">✕</button></div><div class="location-entry-grid"><div><label style="font-size: 10px;">Cellier</label><select class="location-zone"><option value="">-</option><option value="1">Cellier 1</option><option value="2">Cellier 2</option><option value="3">Cellier 3</option></select></div><div><label style="font-size: 10px;">Rangée</label><select class="location-rangee"><option value="">-</option>${Array.from({length:10},(_,i)=>`<option value="${i+1}">R${i+1}</option>`).join('')}</select></div><div><label style="font-size: 10px;">Espace</label><select class="location-espace"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select></div></div>`;c.appendChild(d);this.updateLocationCount()},removeLocationEntry(id){const e=document.getElementById('location_'+id);if(e){e.remove();this.updateLocationCount()}},updateLocationCount(){const c=document.querySelectorAll('#locationEntries .location-entry').length;const ce=document.getElementById('locationCount');if(ce){ce.textContent=`(${c})`}},saveWine(){const n=document.getElementById('wineName').value.trim();const t=document.getElementById('wineType').value;if(!n||!t){alert('Veuillez remplir au moins le nom et le type du vin');return}const sc=Array.from(document.querySelectorAll('#cepageList input:checked')).map(cb=>cb.value);const sa=Array.from(document.querySelectorAll('#accordList input:checked')).map(cb=>cb.value);const locs=[];document.querySelectorAll('#locationEntries .location-entry').forEach(e=>{const z=e.querySelector('.location-zone').value;const r=e.querySelector('.location-rangee').value;const es=e.querySelector('.location-espace').value;if(z&&r&&es){locs.push({zone:z,rangee:r,espace:es})}});const wd={name:n,barcode:document.getElementById('barcode').value.trim(),saqUrl:document.getElementById('saqUrl').value.trim(),type:t,country:document.getElementById('country').value,region:document.getElementById('region').value,appellation:document.getElementById('appellation').value.trim(),particularity:document.getElementById('particularity').value.trim(),cepages:sc,accords:sa,importateur:document.getElementById('importateur').value.trim(),lieuAchat:document.getElementById('lieuAchat').value.trim(),locations:locs,quantity:locs.length||1};if(this.editingId){const i=this.wines.findIndex(w=>w.id===this.editingId);this.wines[i]={...this.wines[i],...wd};this.showToast('Vin modifié !')}else{this.wines.push({id:Date.now(),...wd});this.showToast('Vin ajouté !')}this.save();this.closeWineModal();this.render()},deleteWine(id){if(!confirm('Êtes-vous sûr de vouloir supprimer ce vin?'))return;this.wines=this.wines.filter(w=>w.id!==id);this.save();this.closeDetailModal();this.render();this.showToast('Vin supprimé')},showDetail(id){const w=this.wines.find(x=>x.id===id);if(!w)return;let lh='';if(w.locations&&w.locations.length>0){lh=w.locations.map(l=>`<div class="wine-location cellier-${l.zone}">C${l.zone} • R${l.rangee} • ${l.espace}</div>`).join(' ')}else{lh='<div style="color: var(--text-light); font-size: 13px; margin-bottom: 12px;">Emplacement non défini</div>'}const q=w.locations?w.locations.length:w.quantity;document.getElementById('wineDetail').innerHTML=`<div class="wine-name" style="font-size: 24px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">${w.name}<button class="btn-copy" onclick="app.copyToClipboard('${w.name.replace(/'/g,"\\'")}'); event.stopPropagation();" title="Copier le nom">📋</button></div>${lh}${w.saqUrl?`<button class="btn-secondary btn-icon" onclick="app.copyToClipboard('${w.barcode||''}'); window.open('${w.saqUrl}', '_blank')" style="margin: 12px 0;">🔗 Voir sur SAQ</button>`:''}<div style="display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0;">${w.type?`<span class="badge" style="display: flex; align-items: center; gap: 6px;">${this.getWineTypeIcon(w.type)} ${w.type}</span>`:''}${w.barcode?`<span class="badge">📊 ${w.barcode}</span>`:''}${w.country?`<span class="badge">🌍 ${w.country}</span>`:''}${w.region?`<span class="badge">📍 ${w.region}</span>`:''}${w.appellation?`<span class="badge">🏆 ${w.appellation}</span>`:''}${w.particularity?`<span class="badge">✨ ${w.particularity}</span>`:''}<span class="badge"><span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; font-weight: 700; margin-right: 6px;">${q}</span>bouteille(s)</span></div><div style="display: flex; gap: 10px; margin: 16px 0;"><button class="btn-icon btn-secondary" onclick="app.showRemoveModal(${w.id})" style="flex: 1;" ${q===0?'disabled':''}>− Retirer</button><button class="btn-icon btn-secondary" onclick="app.adjustQuantity(${w.id}, 1)" style="flex: 1;">+ Ajouter</button></div>${w.cepages&&w.cepages.length>0?`<div style="margin-top: 16px;"><strong style="font-size: 13px;">Cépages:</strong><div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">${w.cepages.map(c=>`<span class="badge">🍇 ${c}</span>`).join('')}</div></div>`:''}${w.accords&&w.accords.length>0?`<div style="margin-top: 16px;"><strong style="font-size: 13px;">Accords mets:</strong><div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">${w.accords.map(a=>`<span class="badge">🍽️ ${a}</span>`).join('')}</div></div>`:''}${w.importateur?`<div style="margin-top: 12px; font-size: 13px;"><strong>Importateur:</strong> ${w.importateur}</div>`:''}${w.lieuAchat?`<div style="margin-top: 6px; font-size: 13px;"><strong>Succursale:</strong> ${w.lieuAchat}</div>`:''}<div style="display: flex; gap: 10px; margin-top: 20px;"><button class="btn-secondary" onclick="app.showWineModal(${w.id}); app.closeDetailModal();" style="flex: 1;">✏️ Modifier</button><button class="btn-danger" onclick="app.deleteWine(${w.id})" style="flex: 1;">🗑️ Supprimer</button></div>`;document.getElementById('detailModal').classList.add('active')},closeDetailModal(){document.getElementById('detailModal').classList.remove('active')},adjustQuantity(id,ch){if(ch>0){this.closeDetailModal();this.showAddBottleModal(id)}},showAddBottleModal(wid){const w=this.wines.find(x=>x.id===wid);if(!w)return;const m=document.getElementById('addBottleModal');document.getElementById('addBottleWineName').textContent=w.name;document.getElementById('addBottleLocationEntries').innerHTML='';this.addBottleLocationEntry();m.classList.add('active');m.dataset.wineId=wid},closeAddBottleModal(){document.getElementById('addBottleModal').classList.remove('active')},addBottleLocationEntry(){const c=document.getElementById('addBottleLocationEntries');const eid=Date.now();const d=document.createElement('div');d.className='location-entry';d.id='addloc_'+eid;d.innerHTML=`<div class="location-entry-grid"><div><label style="font-size: 10px;">Cellier</label><select class="addlocation-zone"><option value="">-</option><option value="1">Cellier 1</option><option value="2">Cellier 2</option><option value="3">Cellier 3</option></select></div><div><label style="font-size: 10px;">Rangée</label><select class="addlocation-rangee"><option value="">-</option>${Array.from({length:10},(_,i)=>`<option value="${i+1}">R${i+1}</option>`).join('')}</select></div><div><label style="font-size: 10px;">Espace</label><select class="addlocation-espace"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select></div></div>`;c.appendChild(d)},saveAddBottle(){const wid=parseInt(document.getElementById('addBottleModal').dataset.wineId);const w=this.wines.find(x=>x.id===wid);if(!w)return;const locs=[];document.querySelectorAll('#addBottleLocationEntries .location-entry').forEach(e=>{const z=e.querySelector('.addlocation-zone').value;const r=e.querySelector('.addlocation-rangee').value;const es=e.querySelector('.addlocation-espace').value;if(z&&r&&es){locs.push({zone:z,rangee:r,espace:es})}});if(locs.length===0){alert('Veuillez définir au moins un emplacement');return}if(!w.locations){w.locations=[]}w.locations.push(...locs);w.quantity=w.locations.length;this.save();this.closeAddBottleModal();this.render();this.showToast('Bouteille ajoutée !')},showRemoveModal(wid){this.currentRemoveWineId=wid;this.selectedRemoveLocationIndex=null;const w=this.wines.find(x=>x.id===wid);if(!w)return;document.getElementById('removeWineName').textContent=w.name;document.getElementById('confirmRemoveBtn').disabled=true;const ll=document.getElementById('removeLocationsList');if(w.locations&&w.locations.length>0){ll.innerHTML=w.locations.map((l,i)=>`<div class="location-entry" style="cursor: pointer; margin-bottom: 8px; transition: all 0.2s;" onclick="app.selectRemoveLocation(${i})" id="removeLoc_${i}"><div style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 2px solid var(--border); border-radius: 0;"><input type="radio" name="removeLocation" id="radio_${i}" style="width: auto; margin: 0;"><div class="wine-location cellier-${l.zone}">C${l.zone} • R${l.rangee} • ${l.espace}</div></div></div>`).join('')}else{ll.innerHTML='<div style="color: var(--text-light); padding: 20px; text-align: center;">Aucun emplacement défini pour ce vin</div>'}document.getElementById('removeModal').classList.add('active')},selectRemoveLocation(i){this.selectedRemoveLocationIndex=i;document.querySelectorAll('#removeLocationsList .location-entry').forEach((e,idx)=>{if(idx===i){e.style.background='rgba(30, 58, 95, 0.1)';e.querySelector('input[type="radio"]').checked=true}else{e.style.background='transparent';e.querySelector('input[type="radio"]').checked=false}});document.getElementById('confirmRemoveBtn').disabled=false},closeRemoveModal(){document.getElementById('removeModal').classList.remove('active');this.currentRemoveWineId=null;this.selectedRemoveLocationIndex=null},confirmRemoveBottle(){if(this.selectedRemoveLocationIndex===null){alert('Veuillez sélectionner un emplacement');return}const w=this.wines.find(x=>x.id===this.currentRemoveWineId);if(!w)return;if(w.locations&&w.locations.length>0){w.locations.splice(this.selectedRemoveLocationIndex,1);w.quantity=w.locations.length}else{w.quantity=Math.max(0,w.quantity-1)}this.save();this.closeRemoveModal();this.closeDetailModal();this.render();this.showToast('Bouteille retirée !')},showLocations(){const z=document.getElementById('viewZone').value;const c=document.getElementById('locationView');const wz=this.wines.filter(w=>w.locations&&w.locations.some(l=>l.zone===z));if(wz.length===0){c.innerHTML='<div class="empty">Aucun vin dans ce cellier</div>';return}c.innerHTML=wz.map(w=>{const lz=w.locations.filter(l=>l.zone===z);return`<div class="wine-card" onclick="app.showDetail(${w.id})"><div class="wine-name">${this.getWineTypeIcon(w.type)}${w.name}</div><div class="wine-info">${lz.map(l=>`<div class="wine-location cellier-${l.zone}">R${l.rangee} • ${l.espace}</div>`).join('')}</div></div>`}).join('')},showCepagesByCellier(){const zone=document.getElementById('cepageZone').value;const container=document.getElementById('cepageView');const cepageCounts={};const allCepages=[...this.cepagesBlancs,...this.cepagesRouges];this.wines.forEach(wine=>{if(wine.cepages&&wine.cepages.length>0){let count=0;if(zone==='0'){count=wine.locations?wine.locations.length:wine.quantity}else{if(wine.locations){count=wine.locations.filter(loc=>loc.zone===zone).length}}if(count>0){wine.cepages.forEach(cepage=>{cepageCounts[cepage]=(cepageCounts[cepage]||0)+count})}}});const presentCepages=Object.keys(cepageCounts);const missingCepages=allCepages.filter(c=>!presentCepages.includes(c)).sort();let html='';if(missingCepages.length>0){html+=`<div class="missing-cepages"><h3>🚫 Cépages absents (${missingCepages.length})</h3><div class="missing-list">${missingCepages.map(c=>`<span class="missing-badge">${c}</span>`).join('')}</div></div>`}if(Object.keys(cepageCounts).length===0){html+='<div class="empty">Aucun cépage trouvé</div>'}else{const sortedCepages=Object.entries(cepageCounts).sort((a,b)=>b[1]-a[1]);html+=sortedCepages.map(([cepage,count])=>`<div class="cepage-summary"><h3>${cepage}</h3><div style="font-size: 14px; color: var(--text-light);">${count} bouteille(s)</div></div>`).join('')}container.innerHTML=html},quickScan(){this.scanMode='add';this.startScan()},startScan(){const sc=document.getElementById('scanner');sc.classList.add('active');this.scannerActive=true;Quagga.init({inputStream:{name:"Live",type:"LiveStream",target:document.querySelector('#scannerVideo'),constraints:{facingMode:"environment",aspectRatio:{min:1,max:2}}},locator:{patchSize:"medium",halfSample:true},numOfWorkers:2,decoder:{readers:["ean_reader","ean_8_reader","code_128_reader","code_39_reader","upc_reader","upc_e_reader"]},locate:true},(err)=>{if(err){console.error(err);alert('Erreur caméra: '+err);this.stopScan();return}Quagga.start()});Quagga.onDetected((res)=>{const bc=res.codeResult.code;if(this.scanMode==='add'){this.stopScan();setTimeout(()=>{const ex=this.wines.find(w=>w.barcode===bc);if(ex){this.showDetail(ex.id)}else{this.showWineModal();setTimeout(()=>{document.getElementById('barcode').value=bc;this.copyToClipboard(bc)},150)}},100)}})},stopScan(){if(this.scannerActive){Quagga.stop();this.scannerActive=false}document.getElementById('scanner').classList.remove('active');document.querySelector('#scannerVideo').innerHTML=''},exportToJSON(){const d=JSON.stringify(this.wines,null,2);const b=new Blob([d],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='vino_export_'+new Date().toISOString().split('T')[0]+'.json';a.click();this.showToast('Export JSON réussi !')},exportToExcel(){const d=this.wines.map(w=>({'Nom':w.name,'Type':w.type,'Pays':w.country||'','Région':w.region||'','Appellation':w.appellation||'','Particularité':w.particularity||'','Cépages':w.cepages?w.cepages.join(', '):'','Accords':w.accords?w.accords.join(', '):'','Quantité':w.locations?w.locations.length:w.quantity,'Code-barres':w.barcode||'','Importateur':w.importateur||'','Lieu d\'achat':w.lieuAchat||''}));const ws=XLSX.utils.json_to_sheet(d);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Vins");XLSX.writeFile(wb,'vino_export_'+new Date().toISOString().split('T')[0]+'.xlsx');this.showToast('Export Excel réussi !')},handleImport(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();if(f.name.endsWith('.json')){r.onload=(ev)=>{try{const im=JSON.parse(ev.target.result);if(confirm(`Importer ${im.length} vins? Cela remplacera vos données actuelles.`)){this.wines=im;this.save();this.render();this.showToast('Import réussi !')}}catch(err){alert('Erreur lors de l\'import: '+err.message)}};r.readAsText(f)}else if(f.name.endsWith('.xlsx')||f.name.endsWith('.xls')){r.onload=(ev)=>{try{const d=new Uint8Array(ev.target.result);const wb=XLSX.read(d,{type:'array'});const fs=wb.Sheets[wb.SheetNames[0]];const im=XLSX.utils.sheet_to_json(fs);const cv=im.map(row=>({id:Date.now()+Math.random(),name:row['Nom']||'',type:row['Type']||'',country:row['Pays']||'',region:row['Région']||'',appellation:row['Appellation']||'',particularity:row['Particularité']||'',cepages:row['Cépages']?row['Cépages'].split(',').map(c=>c.trim()):[],accords:row['Accords']?row['Accords'].split(',').map(a=>a.trim()):[],quantity:row['Quantité']||0,barcode:row['Code-barres']||'',importateur:row['Importateur']||'',lieuAchat:row['Lieu d\'achat']||'',locations:[]}));if(confirm(`Importer ${cv.length} vins? Cela remplacera vos données actuelles.`)){this.wines=cv;this.save();this.render();this.showToast('Import réussi !')}}catch(err){alert('Erreur lors de l\'import Excel: '+err.message)}};r.readAsArrayBuffer(f)}e.target.value=''}};document.addEventListener('DOMContentLoaded',()=>{app.init()});
     </script>
 </body>
 </html>

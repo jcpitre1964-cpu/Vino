@@ -2405,32 +2405,42 @@ function save() {
 }
 
 // Initialiser Google Drive au démarrage
-       
-       function initGoogleDrive() {
+
+function initGoogleDrive() {
     if (!isGoogleDriveEnabled) return;
     
     // Mettre à jour le statut
     const statusDiv = document.getElementById('sync-status');
     if (statusDiv) statusDiv.textContent = 'Chargement de Google API...';
     
-    gapi.load('client:auth2', () => { 
-        
-        
-        
-        function initGoogleAPI() {
-            if (typeof gapi === 'undefined') {
-                console.log('⏳ En attente du chargement de Google API...');
-                setTimeout(initGoogleAPI, 500);
-                return;
+    gapi.load('client:auth2', () => {
+        gapi.client.init({
+            clientId: GOOGLE_CLIENT_ID,
+            scope: GOOGLE_DRIVE_SCOPE,
+            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+        }).then(() => {
+            const authInstance = gapi.auth2.getAuthInstance();
+            if (authInstance.isSignedIn.get()) {
+                handleGoogleSignIn();
             }
-            initGoogleDrive();
-        }
+        });
+    });
+}
 
-        window.addEventListener('load', () => {
+function initGoogleAPI() {
+    if (typeof gapi === 'undefined') {
+        console.log('⏳ En attente du chargement de Google API...');
+        setTimeout(initGoogleAPI, 500);
+        return;
+    }
+    initGoogleDrive();
+}
+
+window.addEventListener('load', () => {
     setTimeout(initGoogleAPI, 5000);
 });
-      
 
-        init();
-    </script>
+init();
+</script>
 </body>
+</html>

@@ -2405,21 +2405,19 @@ function save() {
 }
 
 // Initialiser Google Drive au démarrage
-function initGoogleAPI() {
-    if (typeof gapi === 'undefined') {
-        console.log('⏳ En attente du chargement de Google API...');
-        setTimeout(initGoogleAPI, 500);
-        return;
-    }
-    initGoogleDrive();
-}
+        function initGoogleAPI() {
+            if (typeof gapi === 'undefined') {
+                console.log('⏳ En attente du chargement de Google API...');
+                setTimeout(initGoogleAPI, 500);
+                return;
+            }
+            initGoogleDrive();
+        }
 
-window.addEventListener('load', () => {
-    setTimeout(initGoogleAPI, 2000);
-});
+        window.addEventListener('load', () => {
+            setTimeout(initGoogleAPI, 2000);
+        });
 
-
-        
+        init();
     </script>
 </body>
-</html>

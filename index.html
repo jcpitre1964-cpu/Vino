@@ -2394,15 +2394,7 @@ async function loadFromGoogleDrive() {
     }
 }
 
-// Modifier la fonction save() existante
-const originalSave = save;
-function save() {
-    originalSave();
-    // Sauvegarder aussi sur Google Drive si activé
-    if (isGoogleDriveEnabled) {
-        saveToGoogleDrive();
-    }
-}
+
 
 // Initialiser Google Drive au démarrage
 

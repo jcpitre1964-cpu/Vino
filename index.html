@@ -21,6 +21,8 @@
             --rouge: #800020;
             --blanc: #f3e5ab;
             --rose: #ffc0cb;
+            --cellier1: #8B4513;
+            --cellier2: #2F4F4F;
         }
 
         body {
@@ -30,25 +32,22 @@
             background-size: cover;
             background-position: center;
             color: var(--text-dark);
-            line-height: 1.6;
             min-height: 100vh;
         }
 
-        /* Effet de verre pour les pages */
         .page {
             display: none;
             padding: 20px;
             padding-bottom: 100px;
-            background: rgba(248, 246, 243, 0.94);
+            background: rgba(248, 246, 243, 0.92); /* Voile de lisibilité */
             min-height: 100vh;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(3px);
         }
-
         .page.active { display: block; }
 
-        h1, h2, h3 { font-family: 'Playfair Display', serif; margin-bottom: 15px; }
+        h1, h2 { font-family: 'Playfair Display', serif; color: var(--primary); margin-bottom: 20px; }
 
-        /* Styles des Cartes avec bordures dynamiques */
+        /* Cartes de vin avec bordures dynamiques */
         .wine-card {
             background: white;
             border-radius: 12px;
@@ -56,74 +55,38 @@
             margin-bottom: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             position: relative;
-            transition: transform 0.2s;
         }
-        
-        /* Classes de bordures par type */
-        .card-rouge { border-left: 8px solid var(--rouge) !important; }
-        .card-blanc { border-left: 8px solid var(--blanc) !important; }
-        .card-rose { border-left: 8px solid var(--rose) !important; }
-        .card-default { border-left: 8px solid var(--secondary) !important; }
+        .card-rouge { border-left: 10px solid var(--rouge); }
+        .card-blanc { border-left: 10px solid var(--blanc); }
+        .card-rose { border-left: 10px solid var(--rose); }
+        .card-default { border-left: 10px solid var(--secondary); }
 
-        .wine-card h3 { margin-bottom: 5px; color: var(--primary); font-size: 1.2rem; }
-        .wine-info { font-size: 0.9rem; color: var(--text-light); margin-bottom: 10px; }
-
-        /* Boutons et Inputs */
         .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            font-weight: 600;
-            margin-bottom: 10px;
+            background: var(--primary); color: white; border: none;
+            padding: 12px; border-radius: 8px; width: 100%; font-weight: 600; margin-bottom: 10px;
         }
+        .btn-secondary { background: white; color: var(--primary); border: 1px solid var(--primary); }
 
-        .btn-secondary {
-            background: white;
-            color: var(--primary);
-            border: 1px solid var(--primary);
-        }
+        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 8px; }
 
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-family: inherit;
-        }
-
-        /* Navigation */
         .nav-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            display: flex;
-            justify-content: space-around;
-            padding: 15px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: white; display: flex; justify-content: space-around;
+            padding: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000;
         }
-
         .nav-item { text-decoration: none; color: var(--text-light); font-size: 0.8rem; text-align: center; }
         .nav-item.active { color: var(--primary); font-weight: bold; }
 
+        /* Badge Cellier */
+        .cellier-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 4px; 
+            color: white; font-size: 0.7rem; margin-top: 5px;
+        }
+
         .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(30, 58, 95, 0.9);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            display: none;
-            z-index: 2000;
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--primary); color: white; padding: 10px 20px;
+            border-radius: 20px; display: none; z-index: 2000;
         }
     </style>
 </head>
@@ -133,36 +96,32 @@
 
     <div id="page1" class="page active">
         <h1>Ma Cave</h1>
-        <div id="statsSummary"></div>
-        <button class="btn" onclick="app.showPage(3)">+ Ajouter un vin</button>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn btn-secondary" onclick="app.exportData()">Exporter JSON</button>
-            <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">Importer</button>
+        <div id="statsDashboard" style="display:flex; gap:10px; margin-bottom:20px;"></div>
+        <button class="btn" onclick="app.showPage(3)">+ Ajouter une bouteille</button>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button class="btn btn-secondary" onclick="app.exportData()">Exporter</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('fileIn').click()">Importer</button>
         </div>
-        <input type="file" id="importFile" style="display:none" onchange="app.handleImport(e)" accept=".json,.xlsx,.xls">
+        <input type="file" id="fileIn" style="display:none">
     </div>
 
     <div id="page2" class="page">
-        <h1>Recherche</h1>
-        <button class="btn-secondary" onclick="app.clearSearch()" style="margin-bottom: 15px; padding: 8px; font-size: 0.8rem;">
-            🔄 Réinitialiser tous les filtres
-        </button>
-        
-        <select id="filterType" onchange="app.applyFilters()">
+        <h1>Inventaire</h1>
+        <button class="btn-secondary" onclick="app.resetFilters()" style="margin-bottom:10px; padding:5px; font-size:0.8rem;">🔄 Réinitialiser filtres</button>
+        <select id="fType" onchange="app.renderList()">
             <option value="">Tous les types</option>
             <option value="Rouge">Rouge</option>
             <option value="Blanc">Blanc</option>
             <option value="Rosé">Rosé</option>
         </select>
-        
-        <input type="text" id="searchWine" placeholder="Nom, pays, région..." onkeyup="app.applyFilters()">
+        <input type="text" id="fSearch" placeholder="Rechercher nom, pays..." onkeyup="app.renderList()">
         <div id="wineList"></div>
     </div>
 
     <div id="page3" class="page">
         <h1 id="formTitle">Nouveau Vin</h1>
-        <button class="btn btn-secondary" onclick="app.startScanner()">📷 Scanner Code-barres</button>
-        <div id="interactive" class="viewport" style="display:none; width: 100%; height: 200px; background: #000; margin-bottom: 15px;"></div>
+        <button class="btn btn-secondary" onclick="app.startScanner()">📷 Scanner</button>
+        <div id="scanner-ui" style="display:none; height:150px; background:#000; margin-bottom:10px;"></div>
         
         <input type="text" id="wName" placeholder="Nom du vin *">
         <select id="wType">
@@ -172,176 +131,123 @@
         </select>
         <input type="text" id="wCountry" placeholder="Pays">
         <input type="number" id="wQty" placeholder="Quantité" value="1">
-        <input type="text" id="wBarcode" placeholder="Code-barres">
-        
+        <select id="wCellier">
+            <option value="Cellier 1">Cellier 1</option>
+            <option value="Cellier 2">Cellier 2</option>
+        </select>
         <button class="btn" onclick="app.saveWine()">Enregistrer</button>
         <button class="btn btn-secondary" onclick="app.showPage(1)">Annuler</button>
     </div>
 
     <nav class="nav-bar">
         <a href="#" class="nav-item active" onclick="app.showPage(1)">🏠 Cave</a>
-        <a href="#" class="nav-item" onclick="app.showPage(2)">🔍 Chercher</a>
+        <a href="#" class="nav-item" onclick="app.showPage(2)">🔍 Liste</a>
         <a href="#" class="nav-item" onclick="app.showPage(3)">➕ Ajout</a>
     </nav>
 
     <script>
         const app = {
             wines: JSON.parse(localStorage.getItem('vino_db')) || [],
-            currentEditId: null,
+            currentId: null,
 
             init() {
-                this.render();
-                // Correction pour l'input file
-                document.getElementById('importFile').addEventListener('change', (e) => this.handleImport(e));
+                document.getElementById('fileIn').addEventListener('change', (e) => this.handleImport(e));
+                this.renderAll();
             },
 
-            showPage(num) {
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.getElementById('page' + num).classList.add('active');
-                document.querySelectorAll('.nav-item').forEach((n, idx) => {
-                    n.classList.toggle('active', idx === num - 1);
-                });
-                if(num === 1) this.render();
+            showPage(p) {
+                document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
+                document.getElementById('page'+p).classList.add('active');
+                document.querySelectorAll('.nav-item').forEach((n, i) => n.classList.toggle('active', i === p-1));
+                this.renderAll();
             },
 
-            save() {
-                localStorage.setItem('vino_db', JSON.stringify(this.wines));
+            save() { localStorage.setItem('vino_db', JSON.stringify(this.wines)); },
+
+            resetFilters() {
+                document.getElementById('fSearch').value = '';
+                document.getElementById('fType').value = '';
+                this.renderList();
             },
 
-            showToast(msg) {
-                const t = document.getElementById('toast');
-                t.textContent = msg;
-                t.style.display = 'block';
-                setTimeout(() => t.style.display = 'none', 2500);
+            renderAll() {
+                this.renderStats();
+                this.renderList();
             },
 
-            clearSearch() {
-                document.getElementById('searchWine').value = '';
-                document.getElementById('filterType').value = '';
-                this.applyFilters();
-                this.showToast('Filtres réinitialisés');
-            },
-
-            applyFilters() {
-                const query = document.getElementById('searchWine').value.toLowerCase();
-                const type = document.getElementById('filterType').value;
-                const filtered = this.wines.filter(w => {
-                    const matchText = w.name.toLowerCase().includes(query) || w.country.toLowerCase().includes(query);
-                    const matchType = type === "" || w.type === type;
-                    return matchText && matchType;
-                });
-                this.renderList(filtered);
-            },
-
-            renderWineCard(wine) {
-                let typeClass = 'card-default';
-                const type = (wine.type || '').toLowerCase();
-                if (type.includes('rouge')) typeClass = 'card-rouge';
-                else if (type.includes('blanc')) typeClass = 'card-blanc';
-                else if (type.includes('rosé') || type.includes('rose')) typeClass = 'card-rose';
-
-                const div = document.createElement('div');
-                div.className = `wine-card ${typeClass}`;
-                div.innerHTML = `
-                    <h3>${wine.name}</h3>
-                    <div class="wine-info">${wine.type} | ${wine.country}</div>
-                    <div style="font-weight: bold;">Quantité: ${wine.quantity}</div>
-                    <div style="margin-top: 10px;">
-                        <button onclick="app.editWine('${wine.id}')" style="border:none; background:none; color:var(--primary); cursor:pointer;">Modifier</button>
+            renderStats() {
+                const total = this.wines.reduce((s, w) => s + Number(w.quantity), 0);
+                document.getElementById('statsDashboard').innerHTML = `
+                    <div style="background:white; padding:15px; border-radius:12px; flex:1; text-align:center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                        <small>Total</small><br><strong>${total} bouteilles</strong>
                     </div>
                 `;
-                return div;
             },
 
-            renderList(data) {
+            renderList() {
+                const search = document.getElementById('fSearch').value.toLowerCase();
+                const typeF = document.getElementById('fType').value;
                 const container = document.getElementById('wineList');
                 container.innerHTML = '';
-                data.forEach(w => container.appendChild(this.renderWineCard(w)));
-            },
 
-            render() {
-                this.renderList(this.wines);
-                const total = this.wines.reduce((sum, w) => sum + parseInt(w.quantity || 0), 0);
-                document.getElementById('statsSummary').innerHTML = `
-                    <div style="background:white; padding:20px; border-radius:12px; margin-bottom:20px; text-align:center;">
-                        <div style="font-size:0.9rem; color:var(--text-light)">Total Bouteilles</div>
-                        <div style="font-size:2rem; font-weight:bold; color:var(--primary)">${total}</div>
-                    </div>
-                `;
+                this.wines
+                    .filter(w => (w.name.toLowerCase().includes(search) || w.country.toLowerCase().includes(search)) && (typeF === "" || w.type === typeF))
+                    .forEach(w => {
+                        const card = document.createElement('div');
+                        let tCls = 'card-default';
+                        if(w.type.includes('Rouge')) tCls = 'card-rouge';
+                        if(w.type.includes('Blanc')) tCls = 'card-blanc';
+                        if(w.type.includes('Rosé')) tCls = 'card-rose';
+
+                        card.className = `wine-card ${tCls}`;
+                        card.innerHTML = `
+                            <strong>${w.name}</strong><br>
+                            <small>${w.type} | ${w.country}</small><br>
+                            <div class="cellier-badge" style="background:${w.wCellier === 'Cellier 1' ? 'var(--cellier1)' : 'var(--cellier2)'}">${w.wCellier || 'Cave'}</div>
+                            <div style="float:right">Qté: <b>${w.quantity}</b></div>
+                        `;
+                        container.appendChild(card);
+                    });
             },
 
             saveWine() {
-                const wine = {
-                    id: this.currentEditId || crypto.randomUUID(),
+                const w = {
+                    id: this.currentId || crypto.randomUUID(),
                     name: document.getElementById('wName').value,
                     type: document.getElementById('wType').value,
                     country: document.getElementById('wCountry').value,
                     quantity: document.getElementById('wQty').value,
-                    barcode: document.getElementById('wBarcode').value
+                    wCellier: document.getElementById('wCellier').value
                 };
-
-                if(!wine.name) return alert("Le nom est obligatoire");
-
-                if(this.currentEditId) {
-                    const idx = this.wines.findIndex(w => w.id === this.currentEditId);
-                    this.wines[idx] = wine;
-                } else {
-                    this.wines.push(wine);
-                }
-
+                if(!w.name) return alert("Nom requis");
+                this.wines.push(w);
                 this.save();
-                this.currentEditId = null;
                 this.showPage(1);
-                this.showToast("Vin enregistré !");
             },
 
             handleImport(e) {
                 const f = e.target.files[0];
-                if (!f) return;
                 const r = new FileReader();
-
                 r.onload = (ev) => {
-                    try {
-                        let importedWines = [];
-                        if (f.name.endsWith('.json')) {
-                            importedWines = JSON.parse(ev.target.result);
-                        } else {
-                            const d = new Uint8Array(ev.target.result);
-                            const wb = XLSX.read(d, { type: 'array' });
-                            const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-                            importedWines = data.map(row => ({
-                                id: crypto.randomUUID(),
-                                name: row['Nom'] || 'Inconnu',
-                                type: row['Type'] || 'Rouge',
-                                country: row['Pays'] || '',
-                                quantity: row['Quantité'] || 1,
-                                barcode: row['Code-barres'] || ''
-                            }));
-                        }
-
-                        const mode = confirm(`Fusionner ${importedWines.length} vins ?\nOK = Ajouter / Annuler = Remplacer tout`);
-                        
-                        if (mode) {
-                            importedWines.forEach(newW => {
-                                const exists = this.wines.some(w => (w.barcode && w.barcode === newW.barcode) || (w.name === newW.name));
-                                if (!exists) this.wines.push(newW);
-                            });
-                        } else {
-                            if(confirm("Écraser toute votre cave ?")) this.wines = importedWines;
-                        }
-
-                        this.save();
-                        this.render();
-                        this.showToast('Import réussi !');
-                    } catch (err) { alert('Erreur: ' + err.message); }
+                    const imported = JSON.parse(ev.target.result);
+                    if(confirm("Fusionner avec votre cave actuelle ?")) {
+                        this.wines = [...this.wines, ...imported];
+                    } else {
+                        this.wines = imported;
+                    }
+                    this.save(); this.renderAll();
                 };
+                r.readAsText(f);
+            },
 
-                if (f.name.endsWith('.json')) r.readAsText(f);
-                else r.readAsArrayBuffer(f);
+            showToast(m) {
+                const t = document.getElementById('toast');
+                t.textContent = m; t.style.display = 'block';
+                setTimeout(()=> t.style.display='none', 2000);
             }
         };
-
         app.init();
     </script>
 </body>
 </html>
+

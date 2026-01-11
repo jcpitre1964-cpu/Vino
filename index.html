@@ -1,10 +1,10 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>VINO v2.6 Premium</title>
+    <title>VINO v2.6 r</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -12,17 +12,13 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
             --primary: #1E3A5F;
-            --primary-dark: #0F2744;
             --secondary: #D4AF37;
-            --bg-light: #F8F6F3;
-            --text-dark: #2C2C2C;
-            --text-light: #6B6B6B;
-            --border: #E8E3DC;
-            --cellier1: #8B4513; --cellier2: #2F4F4F; --cellier3: #8B0000;
-            --rouge: #800020; --blanc: #f3e5ab; --rose: #ffc0cb;
+            --bg-page: rgba(248, 246, 243, 0.92);
+            --rouge: #800020;
+            --blanc: #f3e5ab;
+            --rose: #ffc0cb;
         }
 
-        /* PHOTO D'ARRIÈRE-PLAN FIXE */
         body {
             font-family: 'Lato', sans-serif;
             background-image: url('https://images.unsplash.com/photo-1506377247377-2a5b3b0ca7df?q=80&w=2070&auto=format&fit=crop');
@@ -30,7 +26,6 @@
             background-size: cover;
             background-position: center;
             min-height: 100vh;
-            color: var(--text-dark);
         }
 
         .header {
@@ -42,16 +37,14 @@
 
         .container { max-width: 1200px; margin: 0 auto; padding-bottom: 100px; }
 
-        /* VOILE DE LISIBILITÉ SUR LES PAGES */
         .page {
             display: none; padding: 20px;
-            background: rgba(248, 246, 243, 0.92);
+            background: var(--bg-page);
             min-height: calc(100vh - 70px);
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
         }
         .page.active { display: block; }
 
-        /* CARTES DE VIN AVEC BORDURES DYNAMIQUES */
         .wine-card {
             background: white; padding: 16px; margin-bottom: 12px;
             border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -64,7 +57,7 @@
         .btn-primary { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: 700; cursor: pointer; margin-bottom: 15px; }
         .btn-secondary { background: white; color: var(--primary); border: 1.5px solid var(--primary); padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; margin-bottom: 10px; }
 
-        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
 
         .nav {
             position: fixed; bottom: 0; left: 0; right: 0;
@@ -72,14 +65,13 @@
             padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
             box-shadow: 0 -2px 15px rgba(0,0,0,0.1); z-index: 1000;
         }
-        .nav-item { flex: 1; text-align: center; color: var(--text-light); font-size: 10px; font-weight: 600; text-transform: uppercase; }
+        .nav-item { flex: 1; text-align: center; color: #666; font-size: 10px; font-weight: 600; text-transform: uppercase; }
         .nav-item.active { color: var(--primary); }
         .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; }
 
         #scanner { display: none; position: fixed; inset: 0; background: black; z-index: 2000; }
         #scanner.active { display: block; }
         #scannerVideo { width: 100%; height: 100%; }
-        #scannerVideo video { width: 100%; height: 100%; object-fit: cover; }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; padding: 20px; overflow-y: auto; }
         .modal.active { display: block; }
@@ -115,11 +107,8 @@
     </div>
 
     <div id="page3" class="page"><h2>Celliers</h2><div id="cellierContent"></div></div>
-
     <div id="page4" class="page"><h2>Cépages</h2><div id="cepageContent"></div></div>
-
     <div id="page5" class="page"><h2>À Racheter</h2><div id="shoppingContent"></div></div>
-
     <div id="page6" class="page">
         <h2>Gestion</h2>
         <button class="btn-secondary" onclick="app.exportExcel()">📥 EXPORTER VERS EXCEL</button>
@@ -180,7 +169,6 @@ const app = {
         const t = document.getElementById('fType').value;
         const out = document.getElementById('listOutput');
         out.innerHTML = '';
-
         this.wines.filter(w => w.name.toLowerCase().includes(q) && (!t || w.type === t)).forEach(w => {
             const div = document.createElement('div');
             div.className = `wine-card card-${w.type}`;
@@ -209,19 +197,11 @@ const app = {
     saveWine() {
         const name = document.getElementById('wName').value;
         if(!name) return;
-        const data = {
-            id: this.currentId || Date.now(),
-            name: name,
-            barcode: document.getElementById('wBarcode').value,
-            type: document.getElementById('wType').value,
-            qty: document.getElementById('wQty').value
-        };
+        const data = { id: this.currentId || Date.now(), name, barcode: document.getElementById('wBarcode').value, type: document.getElementById('wType').value, qty: document.getElementById('wQty').value };
         if(this.currentId) {
-            const i = this.wines.findIndex(w => w.id === this.currentId);
-            this.wines[i] = data;
-        } else {
-            this.wines.push(data);
-        }
+            const idx = this.wines.findIndex(w => w.id === this.currentId);
+            this.wines[idx] = data;
+        } else { this.wines.push(data); }
         localStorage.setItem('vino_db', JSON.stringify(this.wines));
         this.updateStats(); this.closeModal(); this.renderList();
     },
@@ -250,7 +230,7 @@ const app = {
         const reader = new FileReader();
         reader.onload = (ev) => {
             const imported = JSON.parse(ev.target.result);
-            if(confirm("Fusionner avec vos données ?")) {
+            if(confirm("Fusionner les données ?")) {
                 imported.forEach(newW => { if(!this.wines.some(w => w.name === newW.name)) this.wines.push(newW); });
             } else { this.wines = imported; }
             localStorage.setItem('vino_db', JSON.stringify(this.wines));

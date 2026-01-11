@@ -4,16 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>VINO v2.6.4</title>
+    <title>VINO v2.6.5 - Expert Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            --primary: #1E3A5F;
-            --secondary: #D4AF37;
-            --bg-overlay: rgba(255, 255, 255, 0.88);
+            --primary: #1E3A5F; --secondary: #D4AF37;
+            --bg-overlay: rgba(255, 255, 255, 0.90);
             --rouge: #800020; --blanc: #f3e5ab; --rose: #ffc0cb;
         }
 
@@ -25,20 +24,17 @@
         }
 
         .header {
-            background: rgba(30, 58, 95, 0.96);
-            padding: 15px; text-align: center; color: white;
+            background: rgba(30, 58, 95, 0.96); padding: 15px; text-align: center; color: white;
             position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
             border-bottom: 2px solid var(--secondary);
         }
-        .header h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--secondary); letter-spacing: 3px; }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--secondary); letter-spacing: 3px; }
 
-        .container { max-width: 1200px; margin: 0 auto; padding-bottom: 100px; }
+        .container { max-width: 1200px; margin: 0 auto; padding-bottom: 110px; }
 
         .page {
-            display: none; padding: 15px;
-            background: var(--bg-overlay);
-            min-height: calc(100vh - 70px);
-            backdrop-filter: blur(8px);
+            display: none; padding: 15px; background: var(--bg-overlay);
+            min-height: calc(100vh - 70px); backdrop-filter: blur(8px);
         }
         .page.active { display: block; }
 
@@ -47,33 +43,28 @@
             border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             border-left: 10px solid var(--primary);
         }
-        .card-Rouge { border-left-color: var(--rouge) !important; }
-        .card-Blanc { border-left-color: var(--blanc) !important; }
-        .card-Rosé { border-left-color: var(--rose) !important; }
+        .card-Rouge { border-left-color: var(--rouge); }
+        .card-Blanc { border-left-color: var(--blanc); }
+        .card-Rosé { border-left-color: var(--rose); }
 
-        .btn-primary { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: 700; cursor: pointer; margin-bottom: 12px; }
-        .btn-secondary { background: white; color: var(--primary); border: 2px solid var(--primary); padding: 10px; width: 100%; border-radius: 8px; font-weight: 600; margin-bottom: 10px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 3px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; background: white; }
 
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 4px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; background: white; }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+        .btn-secondary { background: white; color: var(--primary); border: 2px solid var(--primary); padding: 10px; width: 100%; border-radius: 8px; font-weight: 600; }
 
         /* SCANNER INTERFACE */
         #scanner { display: none; position: fixed; inset: 0; background: black; z-index: 2000; }
         #scanner.active { display: block; }
         #scannerVideo { width: 100%; height: 100%; position: relative; }
         #scannerVideo video { width: 100%; height: 100%; object-fit: cover; }
-        
         .scan-target {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%; height: 200px;
-            border: 2px solid rgba(255,255,255,0.5);
-            border-radius: 15px; box-sizing: border-box;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 80%; height: 150px; border: 2px solid rgba(255,255,255,0.5); border-radius: 15px;
         }
         .scan-line {
-            position: absolute; top: 50%; left: 0; width: 100%;
-            height: 2px; background: red; box-shadow: 0 0 8px red;
+            position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: red; box-shadow: 0 0 8px red;
             animation: scanAnim 2s infinite;
         }
         @keyframes scanAnim { 0%, 100% { top: 10%; } 50% { top: 90%; } }
@@ -81,16 +72,14 @@
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3000; padding: 15px; overflow-y: auto; }
         .modal.active { display: block; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; max-width: 600px; margin: 0 auto; }
-        
+
         .nav {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: white; display: flex; justify-content: space-around;
-            padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
-            box-shadow: 0 -2px 15px rgba(0,0,0,0.1); z-index: 1000;
+            position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around;
+            padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); z-index: 1000;
         }
         .nav-item { flex: 1; text-align: center; color: #444; font-size: 10px; font-weight: 700; }
         .nav-item.active { color: var(--primary); }
-        .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; }
+        .nav-icon { font-size: 20px; display: block; margin-bottom: 2px; }
     </style>
 </head>
 <body>
@@ -99,93 +88,147 @@
 
 <div class="container">
     <div id="page1" class="page active">
-        <div style="text-align: center; padding: 60px 0;">
+        <div style="text-align: center; padding: 50px 0;">
             <div style="font-size: 72px; font-family: 'Playfair Display'; color: var(--primary); font-weight: 700;" id="mainQty">0</div>
-            <p style="letter-spacing: 4px; font-size: 14px; margin-bottom: 50px;">BOUTEILLES</p>
+            <p style="letter-spacing: 4px; font-size: 14px; margin-bottom: 40px;">BOUTEILLES</p>
             <button class="btn-primary" onclick="app.startScan()">📷 SCANNER UN CODE</button>
-            <button class="btn-secondary" onclick="app.openModal()">➕ AJOUT MANUEL</button>
+            <button class="btn-secondary" onclick="app.openModal()">➕aaa AJOUT MANUEL</button>
         </div>
     </div>
 
     <div id="page2" class="page">
-        <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <input type="text" id="fSearch" placeholder="Rechercher..." onkeyup="app.renderList()">
-            <button class="btn-secondary" style="width:50px; margin:0" onclick="app.resetFilters()">🔄</button>
-        </div>
+        <input type="text" id="fSearch" placeholder="Rechercher nom, pays, région..." onkeyup="app.renderList()" style="margin-bottom:10px;">
         <div id="listOutput"></div>
+    </div>
+
+    <div id="page3" class="page">
+        <h2>Emplacements & Celliers</h2>
+        <div id="cellierStats" style="margin-top:20px;"></div>
     </div>
 
     <div id="page6" class="page">
         <h2>Gestion</h2>
-        <button class="btn-secondary" onclick="app.exportExcel()">📥 EXPORTER EXCEL</button>
-        <button class="btn-secondary" onclick="document.getElementById('importTrigger').click()">📤 IMPORTER DONNÉES</button>
+        <button class="btn-secondary" onclick="app.exportExcel()" style="margin-bottom:10px; width:100%">📥 EXPORTER EXCEL</button>
+        <button class="btn-secondary" onclick="document.getElementById('importTrigger').click()" style="width:100%">📤 IMPORTER DONNÉES</button>
         <input type="file" id="importTrigger" style="display:none" onchange="app.handleImport(event)">
     </div>
 </div>
 
 <div id="modal" class="modal">
     <div class="modal-content">
-        <h2 style="margin-bottom:20px; font-family:'Playfair Display'">Fiche Vin</h2>
+        <h2 style="margin-bottom:15px; font-family:'Playfair Display'">Fiche du Vin</h2>
+        
         <div class="form-group"><label>Code-barres</label><input type="text" id="wBarcode"></div>
         <div class="form-group"><label>Nom du vin *</label><input type="text" id="wName"></div>
+
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <div class="form-group"><label>Type</label><select id="wType"><option value="Rouge">Rouge</option><option value="Blanc">Blanc</option><option value="Rosé">Rosé</option></select></div>
-            <div class="form-group"><label>Millésime</label><input type="number" id="wYear"></div>
+            <div class="form-group">
+                <label>Type</label>
+                <select id="wType">
+                    <option value="Rouge">Rouge</option>
+                    <option value="Blanc">Blanc</option>
+                    <option value="Rosé">Rosé</option>
+                    <option value="Mousseux">Mousseux</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Millésime</label><input type="number" id="wYear" placeholder="2022"></div>
         </div>
+
+        <div class="form-group">
+            <label>Emplacement (Cellier)</label>
+            <select id="wLocation">
+                <option value="Cellier A">Cellier A</option>
+                <option value="Cellier B">Cellier B</option>
+                <option value="Cuisine">Cuisine</option>
+                <option value="Autre">Autre</option>
+            </select>
+        </div>
+
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <div class="form-group"><label>Pays</label><input type="text" id="wCountry"></div>
+            <div class="form-group">
+                <label>Pays</label>
+                <select id="wCountry">
+                    <option value="France">France</option>
+                    <option value="Italie">Italie</option>
+                    <option value="Espagne">Espagne</option>
+                    <option value="Canada">Canada</option>
+                    <option value="USA">USA</option>
+                    <option value="Autre">Autre</option>
+                </select>
+            </div>
             <div class="form-group"><label>Région</label><input type="text" id="wRegion"></div>
         </div>
+
         <div class="form-group"><label>Quantité</label><input type="number" id="wQty" value="1"></div>
-        <div class="form-group"><label>Notes</label><textarea id="wNotes" rows="2"></textarea></div>
+        <div class="form-group"><label>Notes & Accords</label><textarea id="wNotes" rows="2"></textarea></div>
+
         <button class="btn-primary" onclick="app.saveWine()">ENREGISTRER</button>
-        <button class="btn-secondary" onclick="app.closeModal()">ANNULER</button>
+        <button class="btn-secondary" onclick="app.closeModal()" style="width:100%">ANNULER</button>
     </div>
 </div>
 
 <div id="scanner">
-    <div id="scannerVideo">
-        <div class="scan-target"><div class="scan-line"></div></div>
-    </div>
+    <div id="scannerVideo"><div class="scan-target"><div class="scan-line"></div></div></div>
     <div style="position:fixed; bottom:40px; width:100%; display:flex; justify-content:center; gap:15px; z-index:2001">
         <button class="btn-secondary" style="width:40%;" onclick="app.stopScan()">QUITTER</button>
-        <button class="btn-primary" style="width:40%; margin-bottom:0" onclick="app.startScan()">REESSAYER</button>
+        <button class="btn-primary" style="width:40%; margin-bottom:0" onclick="app.startScan()">RÉESSAYER</button>
     </div>
 </div>
 
 <nav class="nav">
     <div class="nav-item active" onclick="app.showPage(1, this)"><span class="nav-icon">🏠</span>Accueil</div>
     <div class="nav-item" onclick="app.showPage(2, this)"><span class="nav-icon">🔍</span>Liste</div>
+    <div class="nav-item" onclick="app.showPage(3, this)"><span class="nav-icon">🍾</span>Celliers</div>
     <div class="nav-item" onclick="app.showPage(6, this)"><span class="nav-icon">⚙️</span>Gestion</div>
 </nav>
 
 <script>
 const app = {
     wines: JSON.parse(localStorage.getItem('vino_db')) || [],
+    currentId: null,
     scanHistory: [],
 
-    init() { this.updateStats(); this.renderList(); },
+    init() { this.updateStats(); this.renderList(); this.renderCelliers(); },
 
     showPage(n, el) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         document.getElementById('page'+n).classList.add('active');
         el.classList.add('active');
+        if(n===3) this.renderCelliers();
     },
 
-    updateStats() { document.getElementById('mainQty').textContent = this.wines.reduce((s, w) => s + parseInt(w.qty||0), 0); },
+    updateStats() { 
+        const total = this.wines.reduce((s, w) => s + parseInt(w.qty||0), 0);
+        document.getElementById('mainQty').textContent = total;
+    },
 
     renderList() {
         const q = document.getElementById('fSearch').value.toLowerCase();
         const out = document.getElementById('listOutput');
         out.innerHTML = '';
-        this.wines.filter(w => w.name.toLowerCase().includes(q)).forEach(w => {
+        this.wines.filter(w => w.name.toLowerCase().includes(q) || w.country.toLowerCase().includes(q)).forEach(w => {
             const div = document.createElement('div');
             div.className = `wine-card card-${w.type}`;
             div.onclick = () => this.openModal(w.barcode, w);
-            div.innerHTML = `<strong>${w.name}</strong><br><small>${w.country || ''} - Qté: ${w.qty}</small>`;
+            div.innerHTML = `<div style="display:flex; justify-content:space-between">
+                <div><strong>${w.name}</strong><br><small>${w.country} - ${w.location}</small></div>
+                <div style="font-size:20px; font-weight:bold">${w.qty}</div>
+            </div>`;
             out.appendChild(div);
         });
+    },
+
+    renderCelliers() {
+        const stats = {};
+        this.wines.forEach(w => { stats[w.location] = (stats[w.location]||0) + parseInt(w.qty||0); });
+        const out = document.getElementById('cellierStats');
+        out.innerHTML = '';
+        for(let loc in stats) {
+            out.innerHTML += `<div style="background:white; padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between">
+                <strong>${loc}</strong> <span>${stats[loc]} bouteilles</span>
+            </div>`;
+        }
     },
 
     openModal(bc = '', wine = null) {
@@ -194,7 +237,8 @@ const app = {
         document.getElementById('wName').value = wine ? wine.name : '';
         document.getElementById('wType').value = wine ? wine.type : 'Rouge';
         document.getElementById('wYear').value = wine ? wine.year : '';
-        document.getElementById('wCountry').value = wine ? wine.country : '';
+        document.getElementById('wLocation').value = wine ? wine.location : 'Cellier A';
+        document.getElementById('wCountry').value = wine ? wine.country : 'France';
         document.getElementById('wRegion').value = wine ? wine.region : '';
         document.getElementById('wQty').value = wine ? wine.qty : '1';
         document.getElementById('wNotes').value = wine ? wine.notes : '';
@@ -210,11 +254,13 @@ const app = {
             barcode: document.getElementById('wBarcode').value,
             type: document.getElementById('wType').value,
             year: document.getElementById('wYear').value,
+            location: document.getElementById('wLocation').value,
             country: document.getElementById('wCountry').value,
             region: document.getElementById('wRegion').value,
             qty: document.getElementById('wQty').value,
             notes: document.getElementById('wNotes').value
         };
+        if(!data.name) return alert("Nom obligatoire");
         if(this.currentId) {
             const idx = this.wines.findIndex(w => w.id === this.currentId);
             this.wines[idx] = data;
@@ -226,58 +272,44 @@ const app = {
     startScan() {
         this.scanHistory = [];
         document.getElementById('scanner').classList.add('active');
-        
         Quagga.init({
-            inputStream: {
-                name: "Live",
-                type: "LiveStream",
-                target: document.querySelector('#scannerVideo'),
-                constraints: {
-                    width: { min: 640 },
-                    height: { min: 480 },
-                    facingMode: "environment",
-                    aspectRatio: { min: 1, max: 2 }
-                }
-            },
-            decoder: { readers: ["ean_reader", "upc_reader", "code_128_reader"] },
+            inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#scannerVideo'), constraints: { facingMode: "environment" } },
+            decoder: { readers: ["ean_reader", "upc_reader"] },
             locate: true
-        }, (err) => {
-            if (err) {
-                alert("Erreur Caméra : Assurez-vous d'avoir autorisé l'accès.");
-                this.stopScan();
-                return;
-            }
-            Quagga.start();
-        });
+        }, (err) => { if(err) return; Quagga.start(); });
 
         Quagga.onDetected((res) => {
             const bc = res.codeResult.code;
             this.scanHistory.push(bc);
-            if(this.scanHistory.length > 5) {
-                const counts = {};
-                this.scanHistory.forEach(x => counts[x] = (counts[x]||0)+1);
-                const best = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-                
-                if(counts[best] >= 3) {
+            if(this.scanHistory.length >= 3) {
+                const last3 = this.scanHistory.slice(-3);
+                if(last3.every(v => v === last3[0])) {
                     Quagga.stop();
                     document.getElementById('scanner').classList.remove('active');
-                    const wine = this.wines.find(w => w.barcode === best);
-                    this.openModal(best, wine);
+                    const wine = this.wines.find(w => w.barcode === bc);
+                    this.openModal(bc, wine);
                 }
             }
         });
     },
 
-    stopScan() {
-        Quagga.stop();
-        document.getElementById('scanner').classList.remove('active');
-    },
+    stopScan() { Quagga.stop(); document.getElementById('scanner').classList.remove('active'); },
 
     exportExcel() {
         const ws = XLSX.utils.json_to_sheet(this.wines);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Cave");
-        XLSX.writeFile(wb, "MaCave.xlsx");
+        XLSX.writeFile(wb, "MaCave_Vino.xlsx");
+    },
+
+    handleImport(e) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            this.wines = JSON.parse(ev.target.result);
+            localStorage.setItem('vino_db', JSON.stringify(this.wines));
+            this.init();
+        };
+        reader.readAsText(e.target.files[0]);
     }
 };
 app.init();

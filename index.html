@@ -4,21 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>VINO v2.6 r</title>
+    <title>VINO v2.6.1 Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        :root { 
+        :root {
             --primary: #1E3A5F;
             --secondary: #D4AF37;
-            --bg-page: rgba(248, 246, 243, 0.92);
+            --bg-page: rgba(248, 246, 243, 0.94);
             --rouge: #800020;
             --blanc: #f3e5ab;
             --rose: #ffc0cb;
         }
 
+        /* IMAGE DE FOND */
         body {
             font-family: 'Lato', sans-serif;
             background-image: url('https://images.unsplash.com/photo-1506377247377-2a5b3b0ca7df?q=80&w=2070&auto=format&fit=crop');
@@ -29,7 +30,7 @@
         }
 
         .header {
-            background: rgba(30, 58, 95, 0.95);
+            background: rgba(30, 58, 95, 0.96);
             padding: 15px; text-align: center; color: white;
             position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
         }
@@ -41,7 +42,7 @@
             display: none; padding: 20px;
             background: var(--bg-page);
             min-height: calc(100vh - 70px);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
         }
         .page.active { display: block; }
 
@@ -72,6 +73,7 @@
         #scanner { display: none; position: fixed; inset: 0; background: black; z-index: 2000; }
         #scanner.active { display: block; }
         #scannerVideo { width: 100%; height: 100%; }
+        #scannerVideo video { width: 100%; height: 100%; object-fit: cover; }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; padding: 20px; overflow-y: auto; }
         .modal.active { display: block; }
@@ -148,6 +150,7 @@
 const app = {
     wines: JSON.parse(localStorage.getItem('vino_db')) || [],
     currentId: null,
+    scanHistory: [], // Pour le filtrage de stabilité
 
     init() { this.updateStats(); this.renderList(); },
 
@@ -174,7 +177,7 @@ const app = {
             div.className = `wine-card card-${w.type}`;
             div.onclick = () => this.openModal(w.barcode, w);
             div.innerHTML = `<div style="display:flex; justify-content:space-between">
-                <div><strong>${w.name}</strong><br><small>${w.type}</small></div>
+                <div><strong>${w.name}</strong><br><small>${w.type} | ${w.barcode || ''}</small></div>
                 <div style="font-size:20px; font-weight:bold">${w.qty}</div>
             </div>`;
             out.appendChild(div);
@@ -207,20 +210,35 @@ const app = {
     },
 
     startScan() {
+        this.scanHistory = [];
         document.getElementById('scanner').classList.add('active');
         Quagga.init({
-            inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#scannerVideo'), constraints: { facingMode: "environment" } },
+            inputStream: { 
+                name: "Live", 
+                type: "LiveStream", 
+                target: document.querySelector('#scannerVideo'), 
+                constraints: { facingMode: "environment" } 
+            },
             decoder: { readers: ["ean_reader", "upc_reader"] },
             locate: true
         }, (err) => { if (err) return; Quagga.start(); });
 
         Quagga.onDetected((res) => {
             const bc = res.codeResult.code;
-            Quagga.stop();
-            document.getElementById('scanner').classList.remove('active');
-            const wine = this.wines.find(w => w.barcode === bc);
-            if(wine) this.openModal(bc, wine);
-            else this.openModal(bc);
+            
+            // Logique de stabilité : il faut lire le même code 3 fois
+            this.scanHistory.push(bc);
+            if (this.scanHistory.length >= 3) {
+                const lastThree = this.scanHistory.slice(-3);
+                if (lastThree.every(v => v === lastThree[0])) {
+                    Quagga.stop();
+                    document.getElementById('scanner').classList.remove('active');
+                    if (navigator.vibrate) navigator.vibrate(100);
+                    
+                    const wine = this.wines.find(w => w.barcode === bc);
+                    this.openModal(bc, wine);
+                }
+            }
         });
     },
 
@@ -252,4 +270,3 @@ app.init();
 </script>
 </body>
 </html>
-

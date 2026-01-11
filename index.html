@@ -2405,6 +2405,18 @@ function save() {
 }
 
 // Initialiser Google Drive au démarrage
+       
+       function initGoogleDrive() {
+    if (!isGoogleDriveEnabled) return;
+    
+    // Mettre à jour le statut
+    const statusDiv = document.getElementById('sync-status');
+    if (statusDiv) statusDiv.textContent = 'Chargement de Google API...';
+    
+    gapi.load('client:auth2', () => { 
+        
+        
+        
         function initGoogleAPI() {
             if (typeof gapi === 'undefined') {
                 console.log('⏳ En attente du chargement de Google API...');
@@ -2415,8 +2427,9 @@ function save() {
         }
 
         window.addEventListener('load', () => {
-            setTimeout(initGoogleAPI, 2000);
-        });
+    setTimeout(initGoogleAPI, 5000);
+});
+      
 
         init();
     </script>

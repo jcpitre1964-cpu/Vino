@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>VINO v2.6.1 Premium</title>
+    <title>VINO v2.6.3 Sunset</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -13,16 +13,15 @@
         :root {
             --primary: #1E3A5F;
             --secondary: #D4AF37;
-            --bg-page: rgba(248, 246, 243, 0.94);
-            --rouge: #800020;
-            --blanc: #f3e5ab;
-            --rose: #ffc0cb;
+            --bg-overlay: rgba(255, 255, 255, 0.85); /* Plus transparent pour voir le fond */
+            --rouge: #800020; --blanc: #f3e5ab; --rose: #ffc0cb;
         }
 
-        /* IMAGE DE FOND */
+        /* IMAGE DE FOND MONTAGNES COUCHER DE SOLEIL */
         body {
             font-family: 'Lato', sans-serif;
-            background-image: url('https://images.unsplash.com/photo-1506377247377-2a5b3b0ca7df?q=80&w=2070&auto=format&fit=crop');
+            background-color: #000;
+            background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop');
             background-attachment: fixed;
             background-size: cover;
             background-position: center;
@@ -30,54 +29,58 @@
         }
 
         .header {
-            background: rgba(30, 58, 95, 0.96);
+            background: rgba(30, 58, 95, 0.9);
             padding: 15px; text-align: center; color: white;
             position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--secondary);
         }
-        .header h1 { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--secondary); letter-spacing: 4px; }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--secondary); letter-spacing: 3px; }
 
         .container { max-width: 1200px; margin: 0 auto; padding-bottom: 100px; }
 
         .page {
-            display: none; padding: 20px;
-            background: var(--bg-page);
+            display: none; padding: 15px;
+            background: var(--bg-overlay);
             min-height: calc(100vh - 70px);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(5px);
         }
         .page.active { display: block; }
 
         .wine-card {
-            background: white; padding: 16px; margin-bottom: 12px;
-            border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: white; padding: 15px; margin-bottom: 10px;
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             border-left: 10px solid var(--primary);
         }
         .card-Rouge { border-left-color: var(--rouge) !important; }
         .card-Blanc { border-left-color: var(--blanc) !important; }
         .card-Rosé { border-left-color: var(--rose) !important; }
 
-        .btn-primary { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: 700; cursor: pointer; margin-bottom: 15px; }
-        .btn-secondary { background: white; color: var(--primary); border: 1.5px solid var(--primary); padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; margin-bottom: 10px; }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: 700; cursor: pointer; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .btn-secondary { background: white; color: var(--primary); border: 2px solid var(--primary); padding: 10px; width: 100%; border-radius: 8px; font-weight: 600; margin-bottom: 10px; }
 
-        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 4px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; background: white; }
 
         .nav {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: white; display: flex; justify-content: space-around;
+            background: rgba(255,255,255,0.95); display: flex; justify-content: space-around;
             padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
-            box-shadow: 0 -2px 15px rgba(0,0,0,0.1); z-index: 1000;
+            box-shadow: 0 -2px 15px rgba(0,0,0,0.2); z-index: 1000;
         }
-        .nav-item { flex: 1; text-align: center; color: #666; font-size: 10px; font-weight: 600; text-transform: uppercase; }
+        .nav-item { flex: 1; text-align: center; color: #444; font-size: 10px; font-weight: 700; }
         .nav-item.active { color: var(--primary); }
         .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; }
 
         #scanner { display: none; position: fixed; inset: 0; background: black; z-index: 2000; }
         #scanner.active { display: block; }
         #scannerVideo { width: 100%; height: 100%; }
-        #scannerVideo video { width: 100%; height: 100%; object-fit: cover; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; padding: 20px; overflow-y: auto; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3000; padding: 15px; overflow-y: auto; }
         .modal.active { display: block; }
-        .modal-content { background: white; padding: 25px; border-radius: 12px; max-width: 600px; margin: 0 auto; }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; max-width: 600px; margin: 0 auto; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     </style>
 </head>
 <body>
@@ -86,20 +89,20 @@
 
 <div class="container">
     <div id="page1" class="page active">
-        <div style="text-align: center; padding: 40px 0;">
-            <div style="font-size: 60px; font-family: 'Playfair Display'; color: var(--primary); font-weight: 700;" id="mainQty">0</div>
-            <p style="letter-spacing: 3px; font-size: 14px; margin-bottom: 40px;">BOUTEILLES EN CAVE</p>
-            <button class="btn-primary" onclick="app.startScan()">📷 SCANNER CODE-BARRES</button>
-            <button class="btn-secondary" onclick="app.openModal()">➕ aaaaAJOUT MANUEL</button>
+        <div style="text-align: center; padding: 60px 0;">
+            <div style="font-size: 72px; font-family: 'Playfair Display'; color: var(--primary); font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.1);" id="mainQty">0</div>
+            <p style="letter-spacing: 4px; font-size: 14px; margin-bottom: 50px; font-weight:600;">BOUTEILLES EN CAVE</p>
+            <button class="btn-primary" onclick="app.startScan()">📷 SCANNER UN CODE-BARRES</button>
+            <button class="btn-secondary" onclick="app.openModal()">➕ AJOUT MANUEL</button>
         </div>
     </div>
 
     <div id="page2" class="page">
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <input type="text" id="fSearch" placeholder="Rechercher..." onkeyup="app.renderList()">
-            <button class="btn-secondary" style="width:50px; margin:0" onclick="app.resetFilters()">🔄</button>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <input type="text" id="fSearch" placeholder="Nom, pays, cépage..." onkeyup="app.renderList()">
+            <button class="btn-secondary" style="width:50px; margin:0; padding:0;" onclick="app.resetFilters()">🔄</button>
         </div>
-        <select id="fType" onchange="app.renderList()">
+        <select id="fType" onchange="app.renderList()" style="margin-bottom:20px;">
             <option value="">Tous les types</option>
             <option value="Rouge">Rouge</option>
             <option value="Blanc">Blanc</option>
@@ -108,33 +111,66 @@
         <div id="listOutput"></div>
     </div>
 
-    <div id="page3" class="page"><h2>Celliers</h2><div id="cellierContent"></div></div>
-    <div id="page4" class="page"><h2>Cépages</h2><div id="cepageContent"></div></div>
+    <div id="page3" class="page"><h2>Mes Celliers</h2><div id="cellierContent"></div></div>
+    <div id="page4" class="page"><h2>Statistiques Cépages</h2><div id="cepageContent"></div></div>
     <div id="page5" class="page"><h2>À Racheter</h2><div id="shoppingContent"></div></div>
     <div id="page6" class="page">
         <h2>Gestion</h2>
-        <button class="btn-secondary" onclick="app.exportExcel()">📥 EXPORTER VERS EXCEL</button>
-        <button class="btn-secondary" onclick="document.getElementById('importFile').click()">📤 IMPORTER (FUSION)</button>
-        <input type="file" id="importFile" style="display:none" onchange="app.handleImport(event)">
-        <button class="btn-secondary" style="color:red; border-color:red; margin-top:40px" onclick="app.clearDB()">⚠️ TOUT EFFACER</button>
+        <button class="btn-secondary" onclick="app.exportExcel()">📥 EXPORTER EXCEL</button>
+        <button class="btn-secondary" onclick="document.getElementById('importTrigger').click()">📤 IMPORTER DONNÉES</button>
+        <input type="file" id="importTrigger" style="display:none" onchange="app.handleImport(event)">
+        <button class="btn-secondary" style="color:red; border-color:red; margin-top:50px" onclick="app.clearDB()">⚠️ TOUT EFFACER</button>
     </div>
 </div>
 
 <div id="modal" class="modal">
     <div class="modal-content">
-        <h2 id="modalTitle" style="margin-bottom:20px;">Fiche Vin</h2>
-        <label>Code-Barres</label><input type="text" id="wBarcode">
-        <label>Nom du Vin *</label><input type="text" id="wName">
-        <label>Type</label><select id="wType"><option value="Rouge">Rouge</option><option value="Blanc">Blanc</option><option value="Rosé">Rosé</option></select>
-        <label>Quantité</label><input type="number" id="wQty" value="1">
-        <button class="btn-primary" onclick="app.saveWine()">ENREGISTRER</button>
+        <h2 style="margin-bottom:20px; font-family:'Playfair Display'; border-bottom: 2px solid var(--secondary); padding-bottom:10px;">Fiche du Vin</h2>
+        
+        <div class="grid-2">
+            <div class="form-group"><label>Code-barres</label><input type="text" id="wBarcode"></div>
+            <div class="form-group"><label>Quantité</label><input type="number" id="wQty" value="1"></div>
+        </div>
+
+        <div class="form-group"><label>Nom du vin *</label><input type="text" id="wName"></div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Type</label>
+                <select id="wType">
+                    <option value="Rouge">Rouge</option>
+                    <option value="Blanc">Blanc</option>
+                    <option value="Rosé">Rosé</option>
+                    <option value="Mousseux">Mousseux</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Millésime</label><input type="number" id="wYear" placeholder="Année"></div>
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group"><label>Pays</label><input type="text" id="wCountry"></div>
+            <div class="form-group"><label>Région</label><input type="text" id="wRegion"></div>
+        </div>
+
+        <div class="form-group"><label>Appellation</label><input type="text" id="wAppellation"></div>
+        <div class="form-group"><label>Cépages</label><input type="text" id="wCepages" placeholder="Merlot, Syrah..."></div>
+        <div class="form-group"><label>Accords Mets-Vins</label><input type="text" id="wAccords" placeholder="Viande rouge, Poisson..."></div>
+        
+        <div class="grid-2">
+            <div class="form-group"><label>Prix Payé</label><input type="text" id="wPrice"></div>
+            <div class="form-group"><label>Agent / Importateur</label><input type="text" id="wImportateur"></div>
+        </div>
+
+        <div class="form-group"><label>Notes personnelles</label><textarea id="wNotes" rows="3"></textarea></div>
+
+        <button class="btn-primary" onclick="app.saveWine()">SAUVEGARDER</button>
         <button class="btn-secondary" onclick="app.closeModal()">ANNULER</button>
     </div>
 </div>
 
 <div id="scanner">
     <div id="scannerVideo"></div>
-    <button class="btn-secondary" style="position:fixed; bottom:30px; left:10%; width:80%; z-index:2001" onclick="app.stopScan()">FERMER</button>
+    <button class="btn-secondary" style="position:fixed; bottom:40px; left:10%; width:80%; z-index:2001" onclick="app.stopScan()">ANNULER LE SCAN</button>
 </div>
 
 <nav class="nav">
@@ -150,7 +186,7 @@
 const app = {
     wines: JSON.parse(localStorage.getItem('vino_db')) || [],
     currentId: null,
-    scanHistory: [], // Pour le filtrage de stabilité
+    scanHistory: [],
 
     init() { this.updateStats(); this.renderList(); },
 
@@ -176,10 +212,16 @@ const app = {
             const div = document.createElement('div');
             div.className = `wine-card card-${w.type}`;
             div.onclick = () => this.openModal(w.barcode, w);
-            div.innerHTML = `<div style="display:flex; justify-content:space-between">
-                <div><strong>${w.name}</strong><br><small>${w.type} | ${w.barcode || ''}</small></div>
-                <div style="font-size:20px; font-weight:bold">${w.qty}</div>
-            </div>`;
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:start">
+                    <div style="flex:1">
+                        <div style="font-weight:700; font-size:17px; color:var(--primary)">${w.name} ${w.year || ''}</div>
+                        <div style="font-size:11px; color:#555; text-transform:uppercase; margin-top:3px">
+                            ${w.country || 'Pays?'} • ${w.region || ''} • ${w.type}
+                        </div>
+                    </div>
+                    <div style="font-size:22px; font-weight:900; color:var(--primary); margin-left:10px;">${w.qty}</div>
+                </div>`;
             out.appendChild(div);
         });
     },
@@ -191,7 +233,16 @@ const app = {
         document.getElementById('wBarcode').value = bc || (wine ? wine.barcode : '');
         document.getElementById('wName').value = wine ? wine.name : '';
         document.getElementById('wType').value = wine ? wine.type : 'Rouge';
+        document.getElementById('wYear').value = wine ? wine.year : '';
+        document.getElementById('wCountry').value = wine ? wine.country : '';
+        document.getElementById('wRegion').value = wine ? wine.region : '';
+        document.getElementById('wAppellation').value = wine ? wine.appellation : '';
+        document.getElementById('wCepages').value = wine ? wine.cepages : '';
+        document.getElementById('wAccords').value = wine ? wine.accords : '';
         document.getElementById('wQty').value = wine ? wine.qty : '1';
+        document.getElementById('wPrice').value = wine ? wine.price : '';
+        document.getElementById('wImportateur').value = wine ? wine.importateur : '';
+        document.getElementById('wNotes').value = wine ? wine.notes : '';
         document.getElementById('modal').classList.add('active');
     },
 
@@ -199,8 +250,22 @@ const app = {
 
     saveWine() {
         const name = document.getElementById('wName').value;
-        if(!name) return;
-        const data = { id: this.currentId || Date.now(), name, barcode: document.getElementById('wBarcode').value, type: document.getElementById('wType').value, qty: document.getElementById('wQty').value };
+        if(!name) return alert("Veuillez saisir un nom");
+        const data = {
+            id: this.currentId || Date.now(),
+            name, barcode: document.getElementById('wBarcode').value,
+            type: document.getElementById('wType').value,
+            year: document.getElementById('wYear').value,
+            country: document.getElementById('wCountry').value,
+            region: document.getElementById('wRegion').value,
+            appellation: document.getElementById('wAppellation').value,
+            cepages: document.getElementById('wCepages').value,
+            accords: document.getElementById('wAccords').value,
+            qty: document.getElementById('wQty').value,
+            price: document.getElementById('wPrice').value,
+            importateur: document.getElementById('wImportateur').value,
+            notes: document.getElementById('wNotes').value
+        };
         if(this.currentId) {
             const idx = this.wines.findIndex(w => w.id === this.currentId);
             this.wines[idx] = data;
@@ -213,20 +278,13 @@ const app = {
         this.scanHistory = [];
         document.getElementById('scanner').classList.add('active');
         Quagga.init({
-            inputStream: { 
-                name: "Live", 
-                type: "LiveStream", 
-                target: document.querySelector('#scannerVideo'), 
-                constraints: { facingMode: "environment" } 
-            },
+            inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#scannerVideo'), constraints: { facingMode: "environment" } },
             decoder: { readers: ["ean_reader", "upc_reader"] },
             locate: true
         }, (err) => { if (err) return; Quagga.start(); });
 
         Quagga.onDetected((res) => {
             const bc = res.codeResult.code;
-            
-            // Logique de stabilité : il faut lire le même code 3 fois
             this.scanHistory.push(bc);
             if (this.scanHistory.length >= 3) {
                 const lastThree = this.scanHistory.slice(-3);
@@ -234,7 +292,6 @@ const app = {
                     Quagga.stop();
                     document.getElementById('scanner').classList.remove('active');
                     if (navigator.vibrate) navigator.vibrate(100);
-                    
                     const wine = this.wines.find(w => w.barcode === bc);
                     this.openModal(bc, wine);
                 }
@@ -248,8 +305,8 @@ const app = {
         const reader = new FileReader();
         reader.onload = (ev) => {
             const imported = JSON.parse(ev.target.result);
-            if(confirm("Fusionner les données ?")) {
-                imported.forEach(newW => { if(!this.wines.some(w => w.name === newW.name)) this.wines.push(newW); });
+            if(confirm("Fusionner les données importées?")) {
+                imported.forEach(n => { if(!this.wines.some(w => w.name === n.name)) this.wines.push(n); });
             } else { this.wines = imported; }
             localStorage.setItem('vino_db', JSON.stringify(this.wines));
             this.updateStats(); this.renderList();
@@ -261,10 +318,10 @@ const app = {
         const ws = XLSX.utils.json_to_sheet(this.wines);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Cave");
-        XLSX.writeFile(wb, "Vino_Export.xlsx");
+        XLSX.writeFile(wb, "Ma_Cave_Vino.xlsx");
     },
 
-    clearDB() { if(confirm("Supprimer TOUT ?")) { localStorage.clear(); location.reload(); } }
+    clearDB() { if(confirm("Supprimer TOUT définitivement ?")) { localStorage.clear(); location.reload(); } }
 };
 app.init();
 </script>

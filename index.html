@@ -2394,12 +2394,14 @@ async function loadFromGoogleDrive() {
     }
 }
 
-// Modifier la fonction save() existante
-const originalSave = save;
+// Sauvegarder les données
 function save() {
-    originalSave();
+    localStorage.setItem('wines', JSON.stringify(wines));
+    updateHomePage();
+    updateShoppingList();
+    
     // Sauvegarder aussi sur Google Drive si activé
-    if (isGoogleDriveEnabled) {
+    if (isGoogleDriveEnabled && typeof saveToGoogleDrive === 'function') {
         saveToGoogleDrive();
     }
 }

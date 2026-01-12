@@ -728,7 +728,7 @@
 </div>
 
 <div class="header">
-    <div class="version">71</div>
+    <div class="version">123</div>
     <h1>VINO</h1>
     <div class="subtitle">Collections Privée</div>
 </div>
@@ -1056,49 +1056,47 @@
 function showWineModal(id = null) {
     editingId = id;
     const modal = document.getElementById('wineModal');
-    const entries = document.getElementById('locationEntries');
-    entries.innerHTML = '';
+    
+    // 1. On affiche la fenêtre d'abord
+    modal.style.display = 'block';
 
-    // Remplit la liste des pays dès l'ouverture
-    if (typeof populateCountries === "function") populateCountries();
+    // 2. On vide les emplacements pour repartir à neuf
+    const entries = document.getElementById('locationEntries');
+    if (entries) entries.innerHTML = '';
+
+    // 3. REMPLISSAGE DES LISTES (C'est ici que ça se passe)
+    if (typeof populateCountries === "function") {
+        populateCountries();
+    }
 
     if (id) {
         const wine = wines.find(w => w.id === id);
         document.getElementById('modalTitle').textContent = "Modifier le vin";
         document.getElementById('wineName').value = wine.name;
         document.getElementById('wineType').value = wine.type;
-        document.getElementById('country').value = wine.country || '';
         
-        // Charge les régions du pays enregistré
-        if (typeof updateRegions === "function") updateRegions();
-        
-        updateCepageList(wine.type);
-        
-        // Coche les cépages enregistrés
-        setTimeout(() => {
-            if (wine.cepages) {
-                wine.cepages.forEach(c => {
-                    const cb = document.querySelector(`input[value="${c}"]`);
-                    if (cb) cb.checked = true;
-                });
-            }
-        }, 50);
+        // On sélectionne le pays et on charge les régions
+        const countrySelect = document.getElementById('country');
+        if (countrySelect) {
+            countrySelect.value = wine.country || '';
+            if (typeof updateRegions === "function") updateRegions();
+        }
 
+        updateCepageList(wine.type);
         wine.locations.forEach(loc => addLocationEntry(loc));
     } else {
         document.getElementById('modalTitle').textContent = "Ajouter un vin";
-        document.getElementById('wineName').value = '';
-        document.getElementById('wineType').value = '';
-        document.getElementById('country').value = '';
+        document.getElementById('wineForm').reset();
         
-        // Réinitialise les régions et cépages
+        // Reset des listes pour un nouveau vin
         if (typeof updateRegions === "function") updateRegions();
         updateCepageList('');
         addLocationEntry();
     }
+}
     
     modal.style.display = 'block';
-}
+
 
 function closeWineModal() { 
     document.getElementById('wineModal').style.display = 'none'; 

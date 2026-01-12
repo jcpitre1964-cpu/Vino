@@ -57,7 +57,7 @@
     <div class="header">
         <div class="version">11/01/2026 v2.4 PRECISION</div>
         <h1>VINO</h1>
-        <div class="subtitle">Con Privée</div>
+        <div class="subtitle">Congggggg Privée</div>
     </div>
 
     <div class="container">
@@ -88,7 +88,7 @@
 
         <div id="page3" class="page">
             <select id="viewZone" onchange="app.showLocations()" style="width:100%; padding:15px; margin-bottom:20px;">
-                <option value="1">Cellier 1</option><option value="2">Cellier 2</option><option value="3">Cellier 3</option>
+                <option value="1">Cellier</option><option value="2">Étagère</option><option value="3">Réserve</option>
             </select>
             <div id="locationView"></div>
         </div>
@@ -209,95 +209,94 @@
             container.appendChild(div);
         },
 
-        quickScan() {
-    this.scanHistory = []; // Reset de l'historique
-    const scannerEl = document.getElementById('scanner');
-    scannerEl.classList.add('active');
+       quickScan() {
+            this.scanHistory = [];
+            const scannerEl = document.getElementById('scanner');
+            scannerEl.classList.add('active');
+            
+            // Délai pour éviter l'écran noir et laisser le DOM se mettre à jour
+            setTimeout(() => {
+                Quagga.init({
+                    inputStream: {
+                        name: "Live",
+                        type: "LiveStream",
+                        target: document.querySelector('#scannerVideo'),
+                        constraints: {
+                            facingMode: "environment"
+                        },
+                    },
+                    locator: { patchSize: "medium", halfSample: true },
+                    decoder: {
+                        // Optimisé : On ne cherche que les codes-barres de bouteilles
+                        readers: ["ean_reader"] 
+                    },
+                    locate: true
+                }, (err) => {
+                    if (err) {
+                        console.error(err);
+                        alert("Erreur caméra");
+                        this.stopScan();
+                        return;
+                    }
+                    Quagga.start();
+                });
+            }, 300);
 
-    // Délai de 300ms pour garantir l'affichage de la vidéo (évite l'écran noir)
-    setTimeout(() => {
-        Quagga.init({
-            inputStream: {
-                name: "Live",
-                type: "LiveStream",
-                target: document.querySelector('#scannerVideo'),
-                constraints: {
-                    facingMode: "environment",
-                    aspectRatio: { min: 1, max: 2 }
-                },
-            },
-            locator: {
-                patchSize: "medium",
-                halfSample: true
-            },
-            decoder: {
-                // On limite UNIQUEMENT à l'EAN-13 pour les bouteilles
-                readers: ["ean_reader"] 
-            },
-            locate: true
-        }, (err) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            Quagga.start();
-        });
-    }, 300);
+            Quagga.offDetected();
 
-    Quagga.offDetected(); // Nettoyage des anciens écouteurs
+            Quagga.onDetected((res) => {
+                const code = res.codeResult.code;
+                this.scanHistory.push(code);
+                
+                // Analyse de stabilité sur 6 échantillons
+                if (this.scanHistory.length >= 6) {
+                    const counts = {};
+                    let maxOccurrences = 0;
+                    let bestCode = null;
 
-    Quagga.onDetected((res) => {
-        const code = res.codeResult.code;
-        
-        // On accumule les lectures
-        this.scanHistory.push(code);
+                    this.scanHistory.forEach(c => {
+                        counts[c] = (counts[c] || 0) + 1;
+                        if (counts[c] > maxOccurrences) {
+                            maxOccurrences = counts[c];
+                            bestCode = c;
+                        }
+                    });
 
-        // Analyse après 6 lectures pour encore plus de certitude
-        if (this.scanHistory.length >= 6) {
-            const counts = {};
-            let maxOccurrences = 0;
-            let bestCode = null;
-
-            this.scanHistory.forEach(c => {
-                counts[c] = (counts[c] || 0) + 1;
-                if (counts[c] > maxOccurrences) {
-                    maxOccurrences = counts[c];
-                    bestCode = c;
+                    // Si on a au moins 4 fois le même code sur 6 lectures
+                    if (maxOccurrences >= 4) {
+                        this.stopScan();
+                        this.handleValidScan(bestCode);
+                    } else {
+                        // Sinon on continue de chercher en retirant le plus vieux
+                        this.scanHistory.shift();
+                    }
                 }
             });
+        },
 
-            // On valide si le code est apparu au moins 4 fois sur 6
-            if (maxOccurrences >= 4) {
-                this.stopScan();
-                
-                // 1. Inscription dans votre champ original
-                const barcodeInput = document.getElementById('barcode');
-                if (barcodeInput) {
-                    barcodeInput.value = bestCode;
-                }
-
-                // 2. Recherche et redirection automatique
-                const existing = this.wines.find(w => w.barcode === bestCode);
-                if (existing) {
-                    this.showDetail(existing.id);
-                } else {
-                    this.showWineModal();
-                    this.showToast("Nouveau vin : " + bestCode);
-                }
-            } else {
-                // Trop d'instabilité, on retire le plus vieux et on continue
-                this.scanHistory.shift();
-            }
-        }
-    });
-});
-
-        stopScan() { Quagga.stop(); document.getElementById('scanner').classList.remove('active'); },
+        stopScan() { 
+            Quagga.stop(); 
+            document.getElementById('scanner').classList.remove('active'); 
+            this.scanHistory = [];
+        },
 
         handleValidScan(code) {
-            const ex = this.wines.find(w => w.barcode === code);
-            if(ex) this.showDetail(ex.id);
-            else { this.showWineModal(); document.getElementById('barcode').value = code; this.showToast("Nouveau code : " + code); }
+            // Remplit le champ barcode de votre fiche originale
+            const barcodeInput = document.getElementById('barcode');
+            if (barcodeInput) {
+                barcodeInput.value = code;
+                barcodeInput.style.backgroundColor = "#e8f5e9";
+                setTimeout(() => barcodeInput.style.backgroundColor = "white", 700);
+            }
+
+            const existing = this.wines.find(w => w.barcode === code);
+            if (existing) {
+                this.showDetail(existing.id);
+                this.showToast("Vin trouvé dans la cave");
+            } else {
+                this.showWineModal();
+                this.showToast("Nouveau code : " + code);
+            }
         },
 
         saveWine() {

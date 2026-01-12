@@ -210,66 +210,87 @@
         },
 
         quickScan() {
-            this.scanHistory = [];
-            document.getElementById('scanner').classList.add('active');
-            setTimeout(() => {
-                Quagga.init({
-                    inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#scannerVideo'), constraints: { facingMode: "environment" } },
-                    decoder: { readers: ["ean_reader", "upc_reader", "code_128_reader"] },
-                    locator: { patchSize: "medium", halfSample: true }
-                }, (err) => { if(err) return; Quagga.start(); });
-            }, 300);
+    this.scanHistory = []; // Reset de l'historique
+    const scannerEl = document.getElementById('scanner');
+    scannerEl.classList.add('active');
 
-           // Remplacez tout le bloc Quagga.onDetected((res) => { ... }); par ceci :
-Quagga.onDetected((res) => {
-    const code = res.codeResult.code;
-    
-    // 1. On accumule les lectures dans un historique
-    if (!this.scanHistory) this.scanHistory = [];
-    this.scanHistory.push(code);
-
-    // 2. On attend d'avoir 5 échantillons pour filtrer les erreurs
-    if (this.scanHistory.length >= 5) {
-        const counts = {};
-        let maxOccurrences = 0;
-        let bestCode = null;
-
-        // On compte quel code est apparu le plus souvent
-        this.scanHistory.forEach(c => {
-            counts[c] = (counts[c] || 0) + 1;
-            if (counts[c] > maxOccurrences) {
-                maxOccurrences = counts[c];
-                bestCode = c;
+    // Délai de 300ms pour garantir l'affichage de la vidéo (évite l'écran noir)
+    setTimeout(() => {
+        Quagga.init({
+            inputStream: {
+                name: "Live",
+                type: "LiveStream",
+                target: document.querySelector('#scannerVideo'),
+                constraints: {
+                    facingMode: "environment",
+                    aspectRatio: { min: 1, max: 2 }
+                },
+            },
+            locator: {
+                patchSize: "medium",
+                halfSample: true
+            },
+            decoder: {
+                // On limite UNIQUEMENT à l'EAN-13 pour les bouteilles
+                readers: ["ean_reader"] 
+            },
+            locate: true
+        }, (err) => {
+            if (err) {
+                console.error(err);
+                return;
             }
+            Quagga.start();
         });
+    }, 300);
 
-        // 3. On ne valide que si le code est stable (au moins 3 fois sur 5)
-        if (maxOccurrences >= 3) {
-            this.stopScan();
-            this.scanHistory = []; // On vide l'historique pour le prochain scan
-            
-            // On l'inscrit dans le champ barcode de votre structure originale
-            const barcodeInput = document.getElementById('barcode');
-            if (barcodeInput) {
-                barcodeInput.value = bestCode;
-                // Petit retour visuel pour confirmer la lecture
-                barcodeInput.style.backgroundColor = "#e8f5e9"; 
-                setTimeout(() => barcodeInput.style.backgroundColor = "white", 500);
-            }
-            
-            // On vérifie s'il existe déjà dans votre liste 'wines'
-            const existing = this.wines.find(w => w.barcode === bestCode);
-            if (existing) {
-                this.showDetail(existing.id);
+    Quagga.offDetected(); // Nettoyage des anciens écouteurs
+
+    Quagga.onDetected((res) => {
+        const code = res.codeResult.code;
+        
+        // On accumule les lectures
+        this.scanHistory.push(code);
+
+        // Analyse après 6 lectures pour encore plus de certitude
+        if (this.scanHistory.length >= 6) {
+            const counts = {};
+            let maxOccurrences = 0;
+            let bestCode = null;
+
+            this.scanHistory.forEach(c => {
+                counts[c] = (counts[c] || 0) + 1;
+                if (counts[c] > maxOccurrences) {
+                    maxOccurrences = counts[c];
+                    bestCode = c;
+                }
+            });
+
+            // On valide si le code est apparu au moins 4 fois sur 6
+            if (maxOccurrences >= 4) {
+                this.stopScan();
+                
+                // 1. Inscription dans votre champ original
+                const barcodeInput = document.getElementById('barcode');
+                if (barcodeInput) {
+                    barcodeInput.value = bestCode;
+                }
+
+                // 2. Recherche et redirection automatique
+                const existing = this.wines.find(w => w.barcode === bestCode);
+                if (existing) {
+                    this.showDetail(existing.id);
+                } else {
+                    this.showWineModal();
+                    this.showToast("Nouveau vin : " + bestCode);
+                }
             } else {
-                this.showWineModal();
-                this.showToast("Nouveau code détecté : " + bestCode);
+                // Trop d'instabilité, on retire le plus vieux et on continue
+                this.scanHistory.shift();
             }
-        } else {
-            // Si les lectures sont trop instables, on retire la plus ancienne et on continue
-            this.scanHistory.shift();
         }
-    }
+    });
+}
 });
         },
 

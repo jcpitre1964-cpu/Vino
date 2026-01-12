@@ -57,7 +57,7 @@
     <div class="header">
         <div class="version">11/01/2026 v2.4 PRECISION</div>
         <h1>VINO</h1>
-        <div class="subtitle">Congggggg Privée</div>
+        <div class="subtitle">Con</div>
     </div>
 
     <div class="container">
@@ -281,20 +281,29 @@
         },
 
         handleValidScan(code) {
-            // Remplit le champ barcode de votre fiche originale
-            const barcodeInput = document.getElementById('barcode');
-            if (barcodeInput) {
-                barcodeInput.value = code;
-                barcodeInput.style.backgroundColor = "#e8f5e9";
-                setTimeout(() => barcodeInput.style.backgroundColor = "white", 700);
-            }
-
             const existing = this.wines.find(w => w.barcode === code);
+            
             if (existing) {
                 this.showDetail(existing.id);
                 this.showToast("Vin trouvé dans la cave");
             } else {
+                // 1. On ouvre d'abord la modale
                 this.showWineModal();
+                
+                // 2. On attend 100ms que le HTML de la modale soit prêt
+                setTimeout(() => {
+                    const barcodeInput = document.getElementById('barcode');
+                    if (barcodeInput) {
+                        barcodeInput.value = code;
+                        // Petit flash visuel pour confirmer
+                        barcodeInput.style.backgroundColor = "#fff9c4"; 
+                        setTimeout(() => barcodeInput.style.backgroundColor = "white", 800);
+                        barcodeInput.focus();
+                    } else {
+                        console.error("L'élément 'barcode' est introuvable");
+                    }
+                }, 150);
+
                 this.showToast("Nouveau code : " + code);
             }
         },

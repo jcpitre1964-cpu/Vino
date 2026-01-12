@@ -57,7 +57,7 @@
     <div class="header">
         <div class="version">11/01/2026 v2.4 PRECISION</div>
         <h1>VINO</h1>
-        <div class="subtitle">CollectionPrivée</div>
+        <div class="subtitle">Collection ddddd  Privée</div>
     </div>
 
     <div class="container">
@@ -220,16 +220,57 @@
                 }, (err) => { if(err) return; Quagga.start(); });
             }, 300);
 
-            Quagga.onDetected((res) => {
-                const code = res.codeResult.code;
-                this.scanHistory.push(code);
-                if(this.scanHistory.length >= 5) {
-                    const counts = {}; let max = 0, best = null;
-                    this.scanHistory.forEach(c => { counts[c] = (counts[c]||0)+1; if(counts[c] > max){ max = counts[c]; best = c; }});
-                    if(max >= 3) { this.stopScan(); this.handleValidScan(best); }
-                    else this.scanHistory.shift();
-                }
-            });
+           // Remplacez tout le bloc Quagga.onDetected((res) => { ... }); par ceci :
+Quagga.onDetected((res) => {
+    const code = res.codeResult.code;
+    
+    // 1. On accumule les lectures dans un historique
+    if (!this.scanHistory) this.scanHistory = [];
+    this.scanHistory.push(code);
+
+    // 2. On attend d'avoir 5 échantillons pour filtrer les erreurs
+    if (this.scanHistory.length >= 5) {
+        const counts = {};
+        let maxOccurrences = 0;
+        let bestCode = null;
+
+        // On compte quel code est apparu le plus souvent
+        this.scanHistory.forEach(c => {
+            counts[c] = (counts[c] || 0) + 1;
+            if (counts[c] > maxOccurrences) {
+                maxOccurrences = counts[c];
+                bestCode = c;
+            }
+        });
+
+        // 3. On ne valide que si le code est stable (au moins 3 fois sur 5)
+        if (maxOccurrences >= 3) {
+            this.stopScan();
+            this.scanHistory = []; // On vide l'historique pour le prochain scan
+            
+            // On l'inscrit dans le champ barcode de votre structure originale
+            const barcodeInput = document.getElementById('barcode');
+            if (barcodeInput) {
+                barcodeInput.value = bestCode;
+                // Petit retour visuel pour confirmer la lecture
+                barcodeInput.style.backgroundColor = "#e8f5e9"; 
+                setTimeout(() => barcodeInput.style.backgroundColor = "white", 500);
+            }
+            
+            // On vérifie s'il existe déjà dans votre liste 'wines'
+            const existing = this.wines.find(w => w.barcode === bestCode);
+            if (existing) {
+                this.showDetail(existing.id);
+            } else {
+                this.showWineModal();
+                this.showToast("Nouveau code détecté : " + bestCode);
+            }
+        } else {
+            // Si les lectures sont trop instables, on retire la plus ancienne et on continue
+            this.scanHistory.shift();
+        }
+    }
+});
         },
 
         stopScan() { Quagga.stop(); document.getElementById('scanner').classList.remove('active'); },

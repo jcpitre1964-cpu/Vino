@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>VINO v2.5 - Intégral & Précis</title>
+    <title>VINO v2.3 - Correction Scanner</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        /* TOUS VOS STYLES ORIGINAUX SONT PRÉSERVÉS ICI */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --primary: #1E3A5F; --primary-dark: #0F2744; --secondary: #D4AF37;
@@ -19,346 +18,246 @@
         body { font-family: 'Lato', sans-serif; background: #000; color: var(--text-dark); padding-bottom: 80px; position: relative; min-height: 100vh; }
         body::before {
             content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzJENEE2RTtzdG9wLW9wYWNpdHk6MSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzFBMjkzQztzdG9wLW9wYWNpdHk6MSIvPvbWzPjxyZWN0IGZpbGw9InVybCgjc2t5KSIgd2lkdGg9IjE5MjAiIGhlaWdodD0iMTA4MCIvPjxwYXRoIGZpbGw9IiMxQTI5M0MiIGQ9Ik0wLDUwMCBRNDgwLDQ1MCA5NjAsNTAwIFQxOTIwLDUwMCBMMTkyMCwxMDgwIEwwLDEwODAgWiIvPjxlbGxpcHNlIGN4PSI0MDAiIGN5PSI2MDAiIHJ4PSIxNTAiIHJ5PSI1MCIgZmlsbD0iIzFGM0UyRCIgb3BhY2l0eT0iMC42Ii8+PGVsbGlwc2UgY3g9IjEwMDAiIGN5PSI2NTAiIHJ4PSIyMDAiIHJ5PSI2MCIgZmlsbD0iIzFGM0UyRCIgb3BhY2l0eT0iMC41Ii8+PGVsbGlwc2UgY3g9IjE2MDAiIGN5PSI2MjAiIHJ4PSIxODAiIHJ5PSI1NSIgZmlsbD0iIzFGM0UyRCIgb3BhY2l0eT0iMC42Ii8+PC9zdmc+') center center / cover;
-            z-index: -1;
+            background: linear-gradient(rgba(30, 58, 95, 0.8), rgba(15, 39, 68, 0.9)), 
+                        url('https://images.unsplash.com/photo-1506377247377-2a5b3b0ca7df?auto=format&fit=crop&q=80&w=2000');
+            background-size: cover; background-position: center; z-index: -1;
         }
         .header { background: rgba(30, 58, 95, 0.95); backdrop-filter: blur(10px); padding: 16px 20px; text-align: center; box-shadow: 0 2px 20px rgba(0,0,0,0.3); position: relative; }
         .version { position: absolute; top: 8px; right: 12px; font-size: 9px; color: rgba(255, 255, 255, 0.5); }
-        .header h1 { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 700; color: var(--secondary); letter-spacing: 8px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 700; color: var(--secondary); letter-spacing: 8px; }
         .subtitle { font-size: 12px; color: rgba(255, 255, 255, 0.8); letter-spacing: 3px; text-transform: uppercase; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .page { display: none; }
         .page.active { display: block; }
-        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(30, 58, 95, 0.98); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 8px 0 max(8px, env(safe-area-inset-bottom)); z-index: 100; box-shadow: 0 -2px 20px rgba(0,0,0,0.3); }
-        .nav-item { flex: 1; text-align: center; color: rgba(255, 255, 255, 0.6); cursor: pointer; font-size: 20px; }
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(30, 58, 95, 0.98); display: flex; justify-content: space-around; padding: 8px 0 max(8px, env(safe-area-inset-bottom)); z-index: 100; border-top: 1px solid var(--secondary); }
+        .nav-item { flex: 1; text-align: center; color: rgba(255, 255, 255, 0.6); cursor: pointer; }
         .nav-item.active { color: var(--secondary); }
         .nav-label { font-size: 9px; margin-top: 2px; text-transform: uppercase; }
-        .scan-hero { text-align: center; padding: 60px 20px 40px; }
-        .btn-scan-large { width: 120px; height: 120px; border-radius: 50%; border: none; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; font-size: 52px; cursor: pointer; box-shadow: 0 8px 30px rgba(30, 58, 95, 0.4); }
-        .wine-card { background: rgba(255, 255, 255, 0.95); padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--primary); }
-        .wine-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-        .badge { background: var(--bg-light); padding: 4px 10px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; overflow-y: auto; padding: 20px; }
-        .modal.active { display: flex; align-items: flex-start; justify-content: center; }
-        .modal-content { background: white; padding: 24px; width: 100%; max-width: 600px; margin: 20px auto; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
-        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--border); }
-        .checkbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 300px; overflow-y: auto; border: 1px solid var(--border); padding: 12px; background: var(--bg-light); }
-        #scanner { display: none; position: fixed; inset: 0; background: black; z-index: 300; }
+        .wine-card { background: white; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--primary); cursor: pointer; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; padding: 20px; overflow-y: auto; }
+        .modal.active { display: flex; justify-content: center; align-items: flex-start; }
+        .modal-content { background: white; width: 100%; max-width: 600px; padding: 25px; margin-top: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; }
+        .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 150px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; }
+        .location-entry { background: #f9f9f9; padding: 10px; border: 1px solid #eee; margin-bottom: 10px; }
+        #scanner { display: none; position: fixed; inset: 0; background: black; z-index: 1000; }
         #scanner.active { display: block; }
         #scannerVideo { width: 100%; height: 100%; }
         #scannerVideo video { width: 100%; height: 100%; object-fit: cover; }
-        .home-stats { text-align: center; margin: 30px 0 20px; display: flex; align-items: baseline; justify-content: center; gap: 8px; }
-        .total-bottles { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; color: var(--secondary); }
-        .grape-summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 30px; }
-        .grape-summary-card { background: rgba(30, 58, 95, 0.9); padding: 12px; border-radius: 50%; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; cursor: pointer; }
-        .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 12px 24px; border-radius: 4px; opacity: 0; transition: opacity 0.3s; z-index: 1000; }
-        .toast.show { opacity: 1; }
-        .wine-location { display: inline-block; padding: 4px 10px; font-size: 11px; color: white; margin-right: 6px; }
-        .cellier-1 { background: var(--cellier1); } .cellier-2 { background: var(--cellier2); } .cellier-3 { background: var(--cellier3); }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 10px 20px; border-radius: 20px; z-index: 2000; display: none; }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="version">11/01/2026 v2.5</div>
+        <div class="version">11/01/2026 v2.6</div>
         <h1>VINO</h1>
-        <div class="subtitle">Collectionsssss Privée</div>
+        <div class="subtitle">Collectionaqwert Privée</div>
     </div>
 
     <div class="container">
         <div id="page1" class="page active">
-            <div class="scan-hero">
-                <div class="scan-buttons">
-                    <button class="btn-scan-large" onclick="app.quickScan()">📷</button>
-                    <button class="btn-scan-large" onclick="app.showWineModal()">⌨️</button>
-                </div>
+            <div style="text-align: center; padding: 40px 0;">
+                <button onclick="app.quickScan()" style="width:100px; height:100px; border-radius:50%; border:none; background:var(--secondary); font-size:40px; color:white; margin:10px;">📷</button>
+                <button onclick="app.showWineModal()" style="width:100px; height:100px; border-radius:50%; border:none; background:white; font-size:40px; margin:10px;">➕</button>
             </div>
-            <div class="home-stats">
-                <span class="total-bottles" id="totalBottles">0</span>
-                <span class="total-label">bouteilles</span>
+            <div style="text-align:center; color:white;">
+                <div style="font-size:60px; font-family:'Playfair Display';" id="totalBottles">0</div>
+                <div style="letter-spacing:3px; text-transform:uppercase;">Bouteilles</div>
             </div>
-            <div class="grape-summary-grid" id="grapeSummaryGrid"></div>
         </div>
 
         <div id="page2" class="page">
-            <div class="filter-bar" style="background: white; padding: 15px; margin-bottom: 15px;">
-                <select id="filterType" onchange="app.applyFilters()" style="width:100%; margin-bottom:10px; padding:10px;">
-                    <option value="">Tous les types</option>
-                    <option value="Rouge">Rouge</option>
-                    <option value="Blanc">Blanc</option>
-                    <option value="Rosé">Rosé</option>
-                    <option value="Mousseux">Mousseux</option>
-                </select>
-                <input type="text" id="searchWine" placeholder="Rechercher par nom..." onkeyup="app.applyFilters()" style="width:100%; padding:10px;">
+            <div style="background:white; padding:15px; margin-bottom:15px;">
+                <input type="text" id="searchWine" placeholder="Rechercher..." onkeyup="app.render()" style="width:100%; padding:10px;">
             </div>
             <div id="wineList"></div>
         </div>
 
         <div id="page3" class="page">
-            <div class="filter-bar" style="background: white; padding: 15px;">
-                <select id="viewZone" onchange="app.showLocations()" style="width:100%; padding:10px;">
-                    <option value="1">Cellier 1</option>
-                    <option value="2">Cellier 2</option>
-                    <option value="3">Cellier 3</option>
-                </select>
-            </div>
+            <select id="viewZone" onchange="app.showLocations()" style="width:100%; padding:10px; margin-bottom:15px;">
+                <option value="1">Cellier 1</option><option value="2">Cellier 2</option><option value="3">Cellier 3</option>
+            </select>
             <div id="locationView"></div>
         </div>
 
         <div id="page4" class="page">
-            <div class="filter-bar" style="background: white; padding: 15px;">
-                <select id="cepageZone" onchange="app.showCepagesByCellier()" style="width:100%; padding:10px;">
-                    <option value="0">Tous les celliers</option>
-                    <option value="1">Cellier 1</option>
-                    <option value="2">Cellier 2</option>
-                    <option value="3">Cellier 3</option>
-                </select>
-            </div>
             <div id="cepageView"></div>
         </div>
 
-        <div id="page5" class="page"><div id="shoppingList"></div></div>
+        <div id="page5" class="page">
+            <div id="shoppingList"></div>
+        </div>
 
         <div id="page6" class="page">
-            <div class="filter-bar" style="display: flex; flex-direction: column; gap: 10px; background: white; padding: 15px;">
-                <button class="btn-scan-large" style="width: 100%; height: auto; border-radius: 5px; font-size: 16px; padding: 15px;" onclick="app.exportToJSON()">📥 Exporter JSON</button>
-                <button class="btn-scan-large" style="width: 100%; height: auto; border-radius: 5px; font-size: 16px; padding: 15px;" onclick="app.exportToExcel()">📊 Exporter Excel</button>
-                <button class="btn-scan-large" style="width: 100%; height: auto; border-radius: 5px; font-size: 16px; padding: 15px; background: #eee; color: #333;" onclick="document.getElementById('importFile').click()">📤 Importer</button>
-            </div>
+            <button onclick="app.exportToExcel()" style="width:100%; padding:15px; margin-bottom:10px;">📊 EXPORTER EXCEL</button>
+            <input type="file" id="importFile" style="display:none" onchange="app.handleImport(event)">
+            <button onclick="document.getElementById('importFile').click()" style="width:100%; padding:15px;">📥 IMPORTER</button>
         </div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" onclick="app.showPage(1, this)"><div>🍷</div><div class="nav-label">Accueil</div></div>
-        <div class="nav-item" onclick="app.showPage(2, this)"><div>🔍</div><div class="nav-label">Recherche</div></div>
-        <div class="nav-item" onclick="app.showPage(3, this)"><div>🍾</div><div class="nav-label">Celliers</div></div>
-        <div class="nav-item" onclick="app.showPage(4, this)"><div>🍇</div><div class="nav-label">Cépages</div></div>
-        <div class="nav-item" onclick="app.showPage(5, this)"><div>🛒</div><div class="nav-label">Achats</div></div>
-        <div class="nav-item" onclick="app.showPage(6, this)"><div>⚙️</div><div class="nav-label">Gestion</div></div>
+        <div class="nav-item active" onclick="app.showPage(1, this)">🏠<div class="nav-label">Accueil</div></div>
+        <div class="nav-item" onclick="app.showPage(2, this)">🔍<div class="nav-label">Recherche</div></div>
+        <div class="nav-item" onclick="app.showPage(3, this)">📦<div class="nav-label">Celliers</div></div>
+        <div class="nav-item" onclick="app.showPage(4, this)">🍇<div class="nav-label">Cépages</div></div>
+        <div class="nav-item" onclick="app.showPage(5, this)">🛒<div class="nav-label">Achats</div></div>
+        <div class="nav-item" onclick="app.showPage(6, this)">⚙️<div class="nav-label">Gestion</div></div>
     </div>
 
     <div id="wineModal" class="modal">
         <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 id="modalTitle" style="font-family: 'Playfair Display', serif; color: var(--primary);">Ajouter un vin</h2>
-                <button onclick="app.closeWineModal()" style="background: none; border: none; font-size: 24px;">×</button>
-            </div>
-            <div class="form-group"><label>Code-barres</label><input type="text" id="barcode" placeholder="Scanner ou saisir"></div>
+            <h2 id="modalTitle">Nouveau Vin</h2>
+            <div class="form-group"><label>Code-barres</label><input type="text" id="barcode"></div>
             <div class="form-group"><label>Nom du vin *</label><input type="text" id="wineName"></div>
-            <div class="form-group"><label>Type *</label><select id="wineType" onchange="app.updateCepageList(this.value)"><option value="">Sélectionner</option><option value="Rouge">Rouge</option><option value="Blanc">Blanc</option><option value="Rosé">Rosé</option><option value="Mousseux">Mousseux</option></select></div>
-            <div class="form-group"><label>Pays</label><select id="country" onchange="app.updateRegions()"><option value="">Sélectionner</option></select></div>
+            <div class="form-group"><label>Type</label><select id="wineType" onchange="app.updateCepageList(this.value)"><option value="Rouge">Rouge</option><option value="Blanc">Blanc</option><option value="Rosé">Rosé</option></select></div>
+            <div class="form-group"><label>Pays</label><select id="country" onchange="app.updateRegions()"></select></div>
             <div class="form-group"><label>Région</label><select id="region"></select></div>
             <div class="form-group"><label>Cépages</label><div class="checkbox-grid" id="cepageList"></div></div>
-            <div class="form-group"><label>Accords mets</label><div class="checkbox-grid" id="accordList"></div></div>
-            <div class="form-group"><label>Emplacements</label><div id="locationEntries"></div><button type="button" onclick="app.addLocationEntry()" style="margin-top: 10px; width: 100%; padding: 10px;">+ Ajouter un emplacement</button></div>
-            <button class="btn-scan-large" style="width: 100%; height: auto; border-radius: 5px; font-size: 16px; padding: 15px; margin-top: 20px;" onclick="app.saveWine()" id="saveBtn">Enregistrer</button>
+            <div class="form-group"><label>Emplacements</label><div id="locationEntries"></div><button onclick="app.addLocationEntry()">+ Ajouter Emplacement</button></div>
+            <button onclick="app.saveWine()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; margin-top:20px;">ENREGISTRER</button>
+            <button onclick="app.closeWineModal()" style="width:100%; background:none; border:none; margin-top:10px;">Annuler</button>
         </div>
     </div>
-
-    <div id="detailModal" class="modal"><div class="modal-content" id="wineDetail"></div></div>
 
     <div id="scanner">
         <div id="scannerVideo"></div>
-        <div style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10;">
-            <button onclick="app.stopScan()" style="padding: 15px 30px; background: white; border: none; border-radius: 30px; font-weight: bold;">ANNULER</button>
-        </div>
+        <button onclick="app.stopScan()" style="position:absolute; bottom:30px; left:50%; transform:translateX(-50%); padding:15px 30px;">ANNULER</button>
     </div>
 
     <div id="toast" class="toast"></div>
-    <input type="file" id="importFile" accept=".json,.xlsx" style="display: none;" onchange="app.handleImport(event)">
 
     <script>
     const app = {
         wines: JSON.parse(localStorage.getItem('wines')) || [],
         scanHistory: [],
-        countries: ['France','Italie','Espagne','Portugal','Canada','États-Unis','Argentine','Chili','Australie','Nouvelle-Zélande','Afrique du Sud','Allemagne'].sort(),
-        regionsByCountry: {'France':['Alsace','Bordeaux','Bourgogne','Champagne','Languedoc','Loire','Provence','Rhône'],'Italie':['Piémont','Toscane','Sicile'],'Espagne':['Rioja','Priorat'],'Canada':['Québec','Ontario']},
-        cepagesBlancs: ['Chardonnay','Sauvignon Blanc','Riesling','Pinot Gris','Viognier'].sort(),
-        cepagesRouges: ['Cabernet Sauvignon','Pinot Noir','Merlot','Syrah','Grenache','Malbec'].sort(),
-        accords: ['Apéro','Asiatique','Grillades','Pizza','Poisson','Poulet','ZZZ - Ne pas racheter'].sort(),
+        countries: ['France','Italie','Espagne','Portugal','Canada','USA'].sort(),
+        cepagesRouges: ['Cabernet','Merlot','Syrah','Pinot Noir','Grenache'],
+        cepagesBlancs: ['Chardonnay','Sauvignon','Riesling','Pinot Gris'],
 
         init() {
             this.initForm();
+            this.render();
             this.updateHomePage();
         },
 
         initForm() {
-            const cs = document.getElementById('country');
-            cs.innerHTML = '<option value="">Sélectionner</option>' + this.countries.map(c => `<option value="${c}">${c}</option>`).join('');
-            const al = document.getElementById('accordList');
-            al.innerHTML = this.accords.map(a => `<div class="checkbox-item"><input type="checkbox" value="${a}"> ${a}</div>`).join('');
+            const cSel = document.getElementById('country');
+            cSel.innerHTML = this.countries.map(c => `<option value="${c}">${c}</option>`).join('');
             this.updateCepageList('Rouge');
+            this.updateRegions();
         },
 
         updateCepageList(type) {
-            const list = (type === 'Blanc') ? this.cepagesBlancs : this.cepagesRouges;
-            document.getElementById('cepageList').innerHTML = list.map(c => `<div class="checkbox-item"><input type="checkbox" value="${c}"> ${c}</div>`).join('');
+            const list = type === 'Blanc' ? this.cepagesBlancs : this.cepagesRouges;
+            document.getElementById('cepageList').innerHTML = list.map(c => `<label><input type="checkbox" value="${c}"> ${c}</label><br>`).join('');
         },
 
         updateRegions() {
-            const c = document.getElementById('country').value;
-            const rs = document.getElementById('region');
-            rs.innerHTML = '<option value="">Sélectionner</option>';
-            if(c && this.regionsByCountry[c]) this.regionsByCountry[c].forEach(r => rs.innerHTML += `<option value="${r}">${r}</option>`);
+            const rSel = document.getElementById('region');
+            rSel.innerHTML = '<option value="Autre">Autre</option>';
         },
 
-        // --- SECTION SCANNER CORRIGÉE (ÉCRAN NOIR + PRÉCISION) ---
+        // --- LOGIQUE EMPLACEMENT RESTAURÉE ---
+        addLocationEntry(data = null) {
+            const div = document.createElement('div');
+            div.className = 'location-entry';
+            div.innerHTML = `
+                <select class="loc-cellier"><option value="1">Cellier 1</option><option value="2">Cellier 2</option><option value="3">Cellier 3</option></select>
+                <input type="text" class="loc-tab" placeholder="Tablette" value="${data ? data.tab : ''}">
+                <input type="number" class="loc-qte" placeholder="Qté" value="${data ? data.qte : 1}">
+                <button onclick="this.parentElement.remove()">X</button>
+            `;
+            document.getElementById('locationEntries').appendChild(div);
+        },
+
+        // --- SCANNER CORRIGÉ (PRÉCISION ET ÉCRAN NOIR) ---
         quickScan() {
             this.scanHistory = [];
-            const scannerEl = document.getElementById('scanner');
-            scannerEl.style.display = 'block'; // On force l'affichage
-            
-            // Délai pour éviter l'écran noir
+            document.getElementById('scanner').classList.add('active');
             setTimeout(() => {
                 Quagga.init({
-                    inputStream: {
-                        name: "Live",
-                        type: "LiveStream",
-                        target: document.querySelector('#scannerVideo'),
-                        constraints: { facingMode: "environment" }
-                    },
+                    inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#scannerVideo'), constraints: { facingMode: "environment" } },
                     decoder: { readers: ["ean_reader", "upc_reader", "code_128_reader"] },
                     locator: { patchSize: "medium", halfSample: true }
-                }, (err) => {
-                    if (err) { alert("Erreur caméra : " + err); return; }
-                    Quagga.start();
-                });
+                }, (err) => { if(err) return; Quagga.start(); });
             }, 300);
 
             Quagga.onDetected((res) => {
                 const code = res.codeResult.code;
                 this.scanHistory.push(code);
-                
-                // On attend 5 lectures pour valider (Précision)
-                if (this.scanHistory.length >= 5) {
+                if(this.scanHistory.length >= 5) {
                     const counts = {}; let max = 0, best = null;
                     this.scanHistory.forEach(c => { counts[c] = (counts[c]||0)+1; if(counts[c] > max){ max = counts[c]; best = c; }});
-                    
-                    if (max >= 3) {
-                        this.stopScan();
-                        this.handleValidScan(best);
-                    } else {
-                        this.scanHistory.shift(); // On enlève le plus vieux et on continue
-                    }
+                    if(max >= 3) { this.stopScan(); this.handleValidScan(best); }
+                    else this.scanHistory.shift();
                 }
             });
         },
 
-        stopScan() {
-            Quagga.stop();
-            document.getElementById('scanner').style.display = 'none';
-        },
+        stopScan() { Quagga.stop(); document.getElementById('scanner').classList.remove('active'); },
 
         handleValidScan(code) {
-            const ex = this.wines.find(w => w.barcode === code);
-            if (ex) {
-                this.showDetail(ex.id);
-            } else {
-                this.showWineModal();
-                document.getElementById('barcode').value = code;
-                this.showToast("Nouveau vin détecté : " + code);
-            }
+            this.showWineModal();
+            document.getElementById('barcode').value = code;
+            this.showToast("Code scanné : " + code);
         },
 
-        // --- GESTION DES PAGES ---
+        showWineModal() {
+            document.getElementById('wineModal').classList.add('active');
+            document.getElementById('locationEntries').innerHTML = "";
+            this.addLocationEntry();
+        },
+
+        closeWineModal() { document.getElementById('wineModal').classList.remove('active'); },
+
+        saveWine() {
+            const name = document.getElementById('wineName').value;
+            if(!name) return alert("Nom requis");
+            
+            const locs = Array.from(document.querySelectorAll('.location-entry')).map(el => ({
+                cellier: el.querySelector('.loc-cellier').value,
+                tab: el.querySelector('.loc-tab').value,
+                qte: parseInt(el.querySelector('.loc-qte').value)
+            }));
+
+            const wine = {
+                id: Date.now(),
+                name: name,
+                barcode: document.getElementById('barcode').value,
+                type: document.getElementById('wineType').value,
+                locations: locs,
+                quantity: locs.reduce((a, b) => a + b.qte, 0)
+            };
+
+            this.wines.push(wine);
+            localStorage.setItem('wines', JSON.stringify(this.wines));
+            this.closeWineModal();
+            this.updateHomePage();
+            this.render();
+        },
+
         showPage(n, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById('page'+n).classList.add('active');
             el.classList.add('active');
-            if(n===2) this.applyFilters();
-            if(n===5) this.updateShoppingList();
         },
 
-        showToast(m) {
-            const t = document.getElementById('toast');
-            t.innerText = m; t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2500);
-        },
+        updateHomePage() { document.getElementById('totalBottles').innerText = this.wines.length; },
 
-        // --- SAUVEGARDE ET RENDU ---
-        saveWine() {
-            const name = document.getElementById('wineName').value;
-            if(!name) return alert("Le nom est obligatoire");
-            
-            const wine = {
-                id: this.editingId || Date.now(),
-                name: name,
-                barcode: document.getElementById('barcode').value,
-                type: document.getElementById('wineType').value,
-                country: document.getElementById('country').value,
-                region: document.getElementById('region').value,
-                cepages: Array.from(document.querySelectorAll('#cepageList input:checked')).map(c => c.value),
-                accords: Array.from(document.querySelectorAll('#accordList input:checked')).map(c => c.value),
-                quantity: 1,
-                locations: []
-            };
-
-            if(this.editingId) {
-                const idx = this.wines.findIndex(w => w.id === this.editingId);
-                this.wines[idx] = wine;
-            } else {
-                this.wines.push(wine);
-            }
-
-            localStorage.setItem('wines', JSON.stringify(this.wines));
-            this.closeWineModal();
-            this.updateHomePage();
-            this.showToast("Vin enregistré !");
-        },
-
-        updateHomePage() {
-            document.getElementById('totalBottles').innerText = this.wines.length;
-            // Rendu simplifié des cépages pour l'accueil
-            const gr = document.getElementById('grapeSummaryGrid');
-            gr.innerHTML = "";
-        },
-
-        showWineModal(id = null) {
-            this.editingId = id;
-            document.getElementById('wineModal').classList.add('active');
-            if(!id) document.getElementById('barcode').value = "";
-        },
-
-        closeWineModal() { document.getElementById('wineModal').classList.remove('active'); this.editingId = null; },
-
-        applyFilters() {
+        render() {
             const q = document.getElementById('searchWine').value.toLowerCase();
-            const wl = document.getElementById('wineList');
-            const filtered = this.wines.filter(w => w.name.toLowerCase().includes(q));
-            wl.innerHTML = filtered.map(w => `
-                <div class="wine-card" onclick="app.showDetail(${w.id})">
-                    <div class="wine-name">${w.name}</div>
-                    <div style="font-size:12px; color:#666">${w.country} | ${w.type}</div>
-                </div>
-            `).join('');
+            document.getElementById('wineList').innerHTML = this.wines
+                .filter(w => w.name.toLowerCase().includes(q))
+                .map(w => `<div class="wine-card"><strong>${w.name}</strong><br>Total: ${w.quantity}</div>`).join('');
         },
 
-        showDetail(id) {
-            const w = this.wines.find(x => x.id === id);
-            document.getElementById('wineDetail').innerHTML = `
-                <h2 style="font-family:'Playfair Display'">${w.name}</h2>
-                <p>${w.country} - ${w.type}</p>
-                <p>Code: ${w.barcode || 'Aucun'}</p>
-                <div style="margin-top:20px">
-                    <button onclick="app.showWineModal(${w.id}); app.closeDetailModal();" style="padding:10px; width:48%">Modifier</button>
-                    <button onclick="app.closeDetailModal()" style="padding:10px; width:48%">Fermer</button>
-                </div>
-            `;
-            document.getElementById('detailModal').classList.add('active');
-        },
-
-        closeDetailModal() { document.getElementById('detailModal').classList.remove('active'); },
-
-        exportToJSON() {
-            const blob = new Blob([JSON.stringify(this.wines)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = 'vino_backup.json'; a.click();
-        }
+        showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display="block"; setTimeout(()=>t.style.display="none", 2000); }
     };
 
-    document.addEventListener('DOMContentLoaded', () => app.init());
+    app.init();
     </script>
 </body>
 </html>

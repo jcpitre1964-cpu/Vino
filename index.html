@@ -752,7 +752,7 @@
                 <div style="text-align: center;">
                     <button class="btn-scan-large" style="background: var(--secondary);" onclick="showWineModal()">⌨️</button>
                     <div class="scan-label">Ajouter</div>
-                </div>
+         
             </div>
         </div>
         <div class="grape-summary-grid" id="grapeSummaryGrid"></div>
@@ -850,6 +850,7 @@
         </div>
     </div>
 </div>
+           </div>
 
 <!-- Navigation -->
 <div class="nav">
@@ -1070,14 +1071,6 @@
         <div id="cepageHistoryContent"></div>
     </div>
 </div>
-
-<!-- Scanner -->
-<div id="scanner">
-    <button class="btn-close-scan" onclick="stopScan()">Fermer</button>
-    <div id="scannerVideo"></div>
-    <div class="line-guide"></div>
-</div>
-
 
 <input type="file" id="importFile" accept=".json,.xlsx" style="display: none;" onchange="handleImport(event)">
 
@@ -2214,6 +2207,28 @@ function stopScan() {
         event.target.value = '';
     }
 
+    // Fonction pour changer de page
+function showPage(pageNumber) {
+    // 1. Masquer toutes les pages (on retire la classe active)
+    document.querySelectorAll('.page').forEach(page => {
+        page.style.display = 'none';
+    });
+
+    // 2. Afficher uniquement la page sélectionnée
+    const targetPage = document.getElementById('page' + pageNumber);
+    if (targetPage) {
+        targetPage.style.display = 'block';
+    }
+
+    // 3. Remonter en haut de l'écran
+    window.scrollTo(0, 0);
+}
+
+// Au chargement, on affiche la page 1 par défaut
+window.onload = function() {
+    showPage(1);
+};
+    
     function closeCepageHistoryModal() {
         document.getElementById('cepageHistoryModal').classList.remove('active');
     }

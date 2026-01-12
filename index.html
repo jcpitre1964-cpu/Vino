@@ -270,14 +270,17 @@
     .cellier-3 { background: var(--cellier3); }
     
     .modal {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 200;
-        overflow-y: auto;
-        padding: 20px;
-    }
+    display: none; /* Caché par défaut */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7); /* Fond noir transparent */
+    align-items: center; /* Centre verticalement */
+    justify-content: center; /* Centre horizontalement */
+}
     
     .modal.active {
         display: flex;
@@ -1040,30 +1043,35 @@
 
     // --- 4. GESTION DU VIN (MODALE) ---
     function showWineModal(id = null) {
-        editingId = id;
-        const entries = document.getElementById('locationEntries');
-        entries.innerHTML = '';
+    editingId = id;
+    const modal = document.getElementById('wineModal');
+    const entries = document.getElementById('locationEntries');
+    entries.innerHTML = '';
 
-        if (id) {
-            const wine = wines.find(w => w.id === id);
-            document.getElementById('modalTitle').textContent = "Modifier le vin";
-            document.getElementById('wineName').value = wine.name;
-            document.getElementById('wineType').value = wine.type;
-            document.getElementById('country').value = wine.country || '';
-            updateCepageList(wine.type);
-            // Cocher cépages existants
-            wine.cepages.forEach(c => { const cb = document.getElementById('cep_'+c); if(cb) cb.checked = true; });
-            wine.locations.forEach(loc => addLocationEntry(loc));
-        } else {
-            document.getElementById('modalTitle').textContent = "Ajouter un vin";
-            document.getElementById('wineName').value = '';
-            document.getElementById('wineType').value = '';
-            updateCepageList('');
-            addLocationEntry(); // Un par défaut
-        }
-        document.getElementById('wineModal').style.display = 'flex';
+    if (id) {
+        const wine = wines.find(w => w.id === id);
+        document.getElementById('modalTitle').textContent = "Modifier le vin";
+        document.getElementById('wineName').value = wine.name;
+        document.getElementById('wineType').value = wine.type;
+        document.getElementById('country').value = wine.country || '';
+        updateCepageList(wine.type);
+        wine.locations.forEach(loc => addLocationEntry(loc));
+    } else {
+        document.getElementById('modalTitle').textContent = "Ajouter un vin";
+        document.getElementById('wineName').value = '';
+        document.getElementById('wineType').value = '';
+        updateCepageList('');
+        addLocationEntry();
     }
+    
+    // Force l'affichage
+    modal.style.display = 'block'; 
+    modal.style.display = 'flex'; 
+}
 
+function closeWineModal() { 
+    document.getElementById('wineModal').style.display = 'none'; 
+}
     function saveWine() {
         const name = document.getElementById('wineName').value.trim();
         const type = document.getElementById('wineType').value;

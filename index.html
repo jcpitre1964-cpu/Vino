@@ -269,17 +269,15 @@
     .cellier-2 { background: var(--cellier2); }
     .cellier-3 { background: var(--cellier3); }
     
-    .modal {
-    display: none; /* Caché par défaut */
+   .modal {
+    display: none; 
     position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7); /* Fond noir transparent */
-    align-items: center; /* Centre verticalement */
-    justify-content: center; /* Centre horizontalement */
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 2000;
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch;
 }
     
     .modal.active {
@@ -288,15 +286,14 @@
         justify-content: center;
     }
     
-    .modal-content {
-        background: white;
-        border-radius: 0;
-        padding: 24px;
-        max-width: 600px;
-        width: 100%;
-        margin: 20px auto;
-        box-shadow: 0 10px 50px rgba(0,0,0,0.3);
-    }
+ .modal-content {
+    background: white;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+}
     
     .modal-header {
         display: flex;
@@ -731,7 +728,7 @@
 </div>
 
 <div class="header">
-    <div class="version">13h20</div>
+    <div class="version">14h58</div>
     <h1>VINO</h1>
     <div class="subtitle">Collections Privée</div>
 </div>
@@ -931,13 +928,14 @@
 
 <div id="wineModal" class="modal">
     <div class="modal-content">
-        <button class="close-btn" onclick="closeWineModal()">×</button>
-        <h2 id="modalTitle" style="margin-bottom:15px;">Ajouter un vin</h2>
-        
-        <input type="text" id="wineName" placeholder="Nom du vin (ex: Apothic Red)" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ccc; border-radius:8px;">
+    <button class="close-btn" onclick="closeWineModal()">×</button>
+    <h2 id="modalTitle" style="margin-bottom:15px;">Ajouter un vin</h2>
+    
+    <form id="wineForm" onsubmit="saveWine(event)">
+        <input type="text" id="wineName" placeholder="Nom du vin (ex: Apothic Red)" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ccc; border-radius:8px;" required>
         
         <div style="display:flex; gap:10px; margin-bottom:10px;">
-            <select id="wineType" onchange="updateCepageList(this.value)" style="flex:1; padding:10px; border-radius:8px;">
+            <select id="wineType" onchange="updateCepageList(this.value)" style="flex:1; padding:10px; border-radius:8px;" required>
                 <option value="">Type...</option>
                 <option value="Rouge">Rouge</option>
                 <option value="Blanc">Blanc</option>
@@ -950,20 +948,57 @@
 
         <div style="font-size:12px; margin-bottom:5px; font-weight:bold;">Cépages :</div>
         <div id="cepageList" style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:15px; max-height:120px; overflow-y:auto; border:1px solid #eee; padding:8px; border-radius:8px;">
-            </div>
+        </div>
 
         <div style="font-size:12px; margin-bottom:5px; font-weight:bold;">Emplacements :</div>
         <div id="locationEntries"></div>
-        <button onclick="addLocationEntry()" style="width:100%; background:#f0f0f0; border:1px dashed #ccc; padding:8px; margin-top:5px; border-radius:8px; cursor:pointer;">+ Ajouter une bouteille</button>
+        <button type="button" onclick="addLocationEntry()" style="width:100%; background:#f0f0f0; border:1px dashed #ccc; padding:8px; margin-top:5px; border-radius:8px; cursor:pointer;">+ Ajouter une bouteille</button>
         
-        <button class="btn-primary" onclick="saveWine()" style="width:100%; margin-top:20px; padding:15px; font-size:16px;">ENREGISTRER</button>
-    </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button type="button" class="btn-secondary" style="flex: 1; padding: 15px; border-radius: 8px; cursor:pointer;" onclick="closeWineModal()">Annuler</button>
+            <button type="submit" class="btn-primary" style="flex: 2; padding: 15px; border-radius: 8px; background-color: #002b5c; color: white; border: none; cursor:pointer;">AJOUTER AU CELLIER</button>
+        </div>
+    </form>
 </div>
 
 <div id="detailModal" class="modal">
-    <div class="modal-content">
-        <button class="close-btn" onclick="closeDetailModal()">×</button>
-        <div id="wineDetail"></div>
+    <div class="modal-content" style="max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
+    <button class="close-btn" onclick="closeWineModal()" style="position: absolute; right: 15px; top: 10px; z-index: 10;">×</button>
+    
+    <div style="padding: 20px; overflow-y: auto;">
+        <h2 id="modalTitle" style="margin-bottom:15px;">Ajouter un vin</h2>
+        
+        <form id="wineForm" onsubmit="saveWine(event)">
+            <input type="text" id="wineName" placeholder="Nom du vin" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ccc; border-radius:8px;" required>
+            
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <select id="wineType" onchange="updateCepageList(this.value)" style="flex:1; padding:10px; border-radius:8px;" required>
+                    <option value="">Type...</option>
+                    <option value="Rouge">Rouge</option>
+                    <option value="Blanc">Blanc</option>
+                    <option value="Rosé">Rosé</option>
+                </select>
+                <select id="country" style="flex:1; padding:10px; border-radius:8px;">
+                    <option value="">Pays...</option>
+                </select>
+            </div>
+
+            <div style="font-size:12px; margin-bottom:5px; font-weight:bold;">Cépages :</div>
+            <div id="cepageList" style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:15px; max-height:150px; overflow-y:auto; border:1px solid #eee; padding:8px; border-radius:8px;">
+            </div>
+
+            <div style="font-size:12px; margin-bottom:5px; font-weight:bold;">Emplacements :</div>
+            <div id="locationEntries"></div>
+            
+            <button type="button" onclick="addLocationEntry()" style="width:100%; background:#f0f0f0; border:1px dashed #ccc; padding:10px; margin-top:5px; border-radius:8px;">+ Ajouter une bouteille</button>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px; padding-bottom: 10px;">
+                <button type="button" class="btn-secondary" style="flex: 1; padding: 15px; border-radius: 8px;" onclick="closeWineModal()">Annuler</button>
+                <button type="submit" class="btn-primary" style="flex: 2; padding: 15px; border-radius: 8px; background-color: #002b5c; color: white; border: none;">AJOUTER</button>
+            </div>
+        </form>
+    </div>
+</div>
     </div>
 </div>
 

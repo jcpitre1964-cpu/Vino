@@ -104,16 +104,25 @@
             <div id="cepageView" style="color: white;"></div>
         </div>
 
+   
+        
+        
+        
+        
         <div id="page5" class="page">
             <div id="shoppingList"></div>
         </div>
 
+  
+        
+        
+        
         <div id="page6" class="page">
             <div style="background: white; padding: 20px; display: flex; flex-direction: column; gap: 15px;">
-                <button onclick="app.exportToJSON()" style="padding:15px; background:var(--primary); color:white; border:none;">EXPORTER JSON</button>
+               
                 <button onclick="app.exportToExcel()" style="padding:15px; background:var(--primary); color:white; border:none;">EXPORTER EXCEL</button>
                 <input type="file" id="importFile" accept=".json,.xlsx" style="display:none" onchange="app.handleImport(event)">
-                <button onclick="document.getElementById('importFile').click()" style="padding:15px; background:#eee; border:none;">IMPORTER DONNÉES</button>
+                <button onclick="document.getElementById('importFile').click()" style="padding:15px; background:var(--primary); color:white; border:none;">IMPORTER DONNÉES</button>
             </div>
         </div>
     </div>

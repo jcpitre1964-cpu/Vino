@@ -727,17 +727,14 @@
     <div class="line-guide"></div>
 </div>
 
-
-
-   <div class="header">
-        <div class="version">12/01/2026 v3</div>
-        <h1>VINO</h1>
-        <div class="subtitle">Collection Privée</div>
-    </div>
-
+<div class="header">
+    <div class="version">12/01/2026 v3</div>
+    <h1>VINO</h1>
+    <div class="subtitle">Collection Privée</div>
+</div>
 
 <div class="container">
-    <div id="page1" class="page active">
+    <div id="page1" class="page">
         <div class="home-stats">
             <span class="total-bottles" id="totalBottles">0</span>
             <span class="total-label">bouteilles</span>
@@ -752,13 +749,12 @@
                 <div style="text-align: center;">
                     <button class="btn-scan-large" style="background: var(--secondary);" onclick="showWineModal()">⌨️</button>
                     <div class="scan-label">Ajouter</div>
-         
+                </div>
             </div>
         </div>
         <div class="grape-summary-grid" id="grapeSummaryGrid"></div>
     </div> 
 
-    <!-- Page Recherche MODIFIÉE -->
     <div id="page2" class="page">
         <div class="filter-bar">
             <label style="font-size: 13px; font-weight: 700; margin-bottom: 8px; display: block; color: var(--primary);">CÉPAGES BLANCS</label>
@@ -809,7 +805,6 @@
         <div id="wineList"></div>
     </div>
 
-    <!-- Page Celliers -->
     <div id="page3" class="page">
         <div class="filter-bar">
             <select id="viewZone" onchange="showLocations()">
@@ -821,12 +816,11 @@
         <div id="locationView"></div>
     </div>
 
-    <!-- Page Cépages par Cellier -->
     <div id="page4" class="page">
         <div class="filter-bar">
             <select id="cepageZone" onchange="showCepagesByCellier()">
                 <option value="0">Tous</option>
-              <option value="1">Cellier</option>
+                <option value="1">Cellier</option>
                 <option value="2">Casiers</option>
                 <option value="3">Réserve</option>
             </select>
@@ -834,78 +828,66 @@
         <div id="cepageView"></div>
     </div>
 
-    <!-- Page Liste d'Achats NOUVELLE -->
     <div id="page5" class="page">
         <div id="shoppingList"></div>
     </div>
 
-    <!-- Page Gestion -->
     <div id="page6" class="page">
         <div class="filter-bar">
             <button class="btn-secondary" onclick="showWineModal()">➕ Ajouter un vin</button>
             <button class="btn-secondary" onclick="showManageLists()">📝 Gérer les listes</button>
-           <!-- <button class="btn-secondary" onclick="exportToJSON()">📥 Exporter JSON</button>-->
             <button class="btn-secondary" onclick="exportToExcel()">📊 Exporter Excel</button>
             <button class="btn-secondary" onclick="document.getElementById('importFile').click()">📤 Importer</button>
         </div>
     </div>
-</div>
-           </div>
-
-<!-- Navigation -->
-<div class="nav">
-    <div class="nav-item active" onclick="showPage(1, this)">
+</div> <div class="nav">
+    <div class="nav-item" onclick="showPage(1)">
         <div style="font-size: 24px;">🍷</div>
         <div class="nav-label">Accueil</div>
     </div>
-    <div class="nav-item" onclick="showPage(2, this)">
+    <div class="nav-item" onclick="showPage(2)">
         <div style="font-size: 24px;">🔍</div>
         <div class="nav-label">Recherche</div>
     </div>
-    <div class="nav-item" onclick="showPage(3, this)">
+    <div class="nav-item" onclick="showPage(3)">
         <div style="font-size: 24px;">🍾</div>
         <div class="nav-label">Celliers</div>
     </div>
-    <div class="nav-item" onclick="showPage(4, this)">
+    <div class="nav-item" onclick="showPage(4)">
         <div style="font-size: 24px;">🍇</div>
         <div class="nav-label">Cépages</div>
     </div>
-    <div class="nav-item" onclick="showPage(5, this)">
+    <div class="nav-item" onclick="showPage(5)">
         <div style="font-size: 24px;">🛒</div>
         <div class="nav-label">Achats</div>
     </div>
-    <div class="nav-item" onclick="showPage(6, this)">
+    <div class="nav-item" onclick="showPage(6)">
         <div style="font-size: 24px;">⚙️</div>
         <div class="nav-label">Gestion</div>
     </div>
 </div>
 
-<!-- Modal Formulaire Vin MODIFIÉ -->
 <div id="wineModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <div class="modal-title" id="modalTitle">Ajouter un vin</div>
             <button class="close-btn" onclick="closeWineModal()">×</button>
         </div>
-
         <div class="form-group">
             <label>Code-barres</label>
             <input type="text" id="barcode" placeholder="Scanner ou saisir">
         </div>
-
         <div class="form-group">
             <label>Nom du vin *</label>
             <input type="text" id="wineName" required>
         </div>
-
         <div class="form-group">
             <label>URL SAQ</label>
             <div style="display: flex; gap: 10px;">
                 <input type="text" id="saqUrl" placeholder="https://..." style="flex: 1;">
-                <button type="button" class="btn-secondary" onclick="window.open('https://www.saq.com/fr/', '_blank')" style="width: auto; padding: 12px 20px; margin: 0;">🔗 Ouvrir SAQ</button>
+                <button type="button" class="btn-secondary" onclick="window.open('https://www.saq.com/fr/', '_blank')" style="width: auto; padding: 12px 20px; margin: 0;">🔗 SAQ</button>
             </div>
         </div>
-
         <div class="form-group">
             <label>Type de vin *</label>
             <select id="wineType" onchange="updateCepageList(this.value)" required>
@@ -916,163 +898,33 @@
                 <option value="Mousseux">Mousseux</option>
             </select>
         </div>
-
         <div class="form-group">
             <label>Pays</label>
             <select id="country" onchange="updateRegions()">
                 <option value="">Sélectionner</option>
             </select>
         </div>
-
-        <div class="form-group">
-            <label>Région</label>
-            <select id="region">
-                <option value="">Sélectionner</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Appellation d'origine</label>
-            <input type="text" id="appellation" placeholder="Ex: Fitou, Navarra, Chianti...">
-        </div>
-
-        <div class="form-group">
-            <label>Particularité</label>
-            <input type="text" id="particularity" placeholder="Ex: Bio, Biodynamique, Vieilles vignes...">
-        </div>
-
         <div class="form-group">
             <label>Cépages</label>
             <div class="checkbox-grid" id="cepageList"></div>
         </div>
-
         <div class="form-group">
-            <label>Accords mets</label>
-            <div class="checkbox-grid" id="accordList"></div>
-        </div>
-
-        <div class="form-group">
-            <label>Importateur</label>
-            <input type="text" id="importateur" placeholder="Nom de l'importateur">
-        </div>
-
-        <div class="form-group">
-            <label>Lieu d'achat</label>
-            <input type="text" id="lieuAchat" placeholder="Quelle succursale ?">
-        </div>
-
-        <div class="form-group">
-            <label>Emplacements <span id="locationCount" style="font-size: 11px; color: var(--text-light); font-weight: normal;">(0)</span></label>
+            <label>Emplacements</label>
             <div id="locationEntries"></div>
             <button type="button" class="btn-secondary" onclick="addLocationEntry()">+ Ajouter un emplacement</button>
         </div>
-
         <button type="button" class="btn-primary" onclick="saveWine()" id="saveBtn">Ajouter au Cellier</button>
     </div>
 </div>
 
-<!-- Modal Ajouter Bouteille MODIFIÉ -->
-<div id="addBottleModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title">Ajouter une bouteille</div>
-            <button class="close-btn" onclick="closeAddBottleModal()">×</button>
-        </div>
-        
-        <div style="margin-bottom: 20px;">
-            <div style="font-size: 18px; font-weight: 600; color: var(--primary); margin-bottom: 8px;" id="addBottleWineName"></div>
-            <div style="font-size: 13px; color: var(--text-light);">Dans quel cellier se trouve cette bouteille ?</div>
-        </div>
-        
-        <div id="addBottleLocationEntries"></div>
-        
-        <button type="button" class="btn-secondary" onclick="addBottleLocationEntry()" style="margin-bottom: 12px;">+ Ajouter un autre emplacement</button>
-        
-        <button type="button" class="btn-primary" onclick="saveAddBottle()">Ajouter au cellier</button>
-    </div>
-</div>
-
-<!-- Modal Détails -->
-<div id="detailModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title">Détails du vin</div>
-            <button class="close-btn" onclick="closeDetailModal()">×</button>
-        </div>
-        <div id="wineDetail"></div>
-    </div>
-</div>
-
-<!-- Modal Retrait NOUVEAU -->
-<div id="removeModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title">Retirer une bouteille</div>
-            <button class="close-btn" onclick="closeRemoveModal()">×</button>
-        </div>
-        
-        <div style="margin-bottom: 20px;">
-            <div style="font-size: 18px; font-weight: 600; color: var(--primary); margin-bottom: 8px;" id="removeWineName"></div>
-            <div style="font-size: 13px; color: var(--text-light);">Sélectionnez l'emplacement de la bouteille à retirer:</div>
-        </div>
-        
-        <div id="removeLocationsList" style="max-height: 300px; overflow-y: auto;">
-            <!-- Sera rempli dynamiquement -->
-        </div>
-        
-        <button type="button" class="btn-danger" onclick="confirmRemoveBottle()" id="confirmRemoveBtn" disabled>Retirer la bouteille</button>
-    </div>
-</div>
-
-<!-- Modal Gestion des Listes -->
-<div id="manageListsModal" class="modal">
-    <div class="modal-content" style="max-width: 800px;">
-        <div class="modal-header">
-            <div class="modal-title">Gérer les listes</div>
-            <button class="close-btn" onclick="closeManageListsModal()">×</button>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 20px;">
-            <!-- Menu de gauche -->
-            <div>
-                <div class="list-menu-item active" onclick="showListManager('countries')" id="menu-countries">
-                    🌍 Pays
-                </div>
-                <div class="list-menu-item" onclick="showListManager('regions')" id="menu-regions">
-                    📍 Régions
-                </div>
-                <div class="list-menu-item" onclick="showListManager('grapes-white')" id="menu-grapes-white">
-                    🍇 Cépages blancs
-                </div>
-                <div class="list-menu-item" onclick="showListManager('grapes-red')" id="menu-grapes-red">
-                    🍇 Cépages rouges
-                </div>
-                <div class="list-menu-item" onclick="showListManager('accords')" id="menu-accords">
-                    🍽️ Accords mets
-                </div>
-            </div>
-            
-            <!-- Contenu de droite -->
-            <div id="listManagerContent" style="max-height: 500px; overflow-y: auto;">
-                <!-- Sera rempli dynamiquement -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Historique Cépage -->
-    
-<div id="cepageHistoryModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title" id="cepageHistoryTitle">Historique</div>
-            <button class="close-btn" onclick="closeCepageHistoryModal()">×</button>
-        </div>
-        <div id="cepageHistoryContent"></div>
-    </div>
-</div>
+<div id="addBottleModal" class="modal"><div class="modal-content"><button class="close-btn" onclick="closeAddBottleModal()">×</button><div id="addBottleWineName"></div><div id="addBottleLocationEntries"></div></div></div>
+<div id="detailModal" class="modal"><div class="modal-content"><button class="close-btn" onclick="closeDetailModal()">×</button><div id="wineDetail"></div></div></div>
+<div id="removeModal" class="modal"><div class="modal-content"><button class="close-btn" onclick="closeRemoveModal()">×</button><div id="removeWineName"></div><div id="removeLocationsList"></div></div></div>
+<div id="manageListsModal" class="modal"><div class="modal-content"><button class="close-btn" onclick="closeManageListsModal()">×</button><div id="listManagerContent"></div></div></div>
+<div id="cepageHistoryModal" class="modal"><div class="modal-content"><button class="close-btn" onclick="closeCepageHistoryModal()">×</button><div id="cepageHistoryContent"></div></div></div>
 
 <input type="file" id="importFile" accept=".json,.xlsx" style="display: none;" onchange="handleImport(event)">
+
 
 <script>
     let wines = JSON.parse(localStorage.getItem('wines')) || [];

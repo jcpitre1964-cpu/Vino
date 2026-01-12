@@ -728,7 +728,7 @@
 </div>
 
 <div class="header">
-    <div class="version">14h58</div>
+    <div class="version">13h20</div>
     <h1>VINO</h1>
     <div class="subtitle">Collections Privée</div>
 </div>
@@ -1003,12 +1003,43 @@
 </div>
 
 <div id="removeModal" class="modal">
-    <div class="modal-content">
-        <button class="close-btn" onclick="closeRemoveModal()">×</button>
-        <h3 id="removeWineName" style="color:var(--primary);"></h3>
-        <p style="font-size:14px; margin-bottom:15px;">Sélectionnez la bouteille à retirer :</p>
-        <div id="removeLocationsList"></div>
+   <div class="modal-content" style="max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
+    <button class="close-btn" onclick="closeWineModal()" style="position: absolute; right: 15px; top: 10px; z-index: 10;">×</button>
+    
+    <div style="padding: 20px; overflow-y: auto;">
+        <h2 id="modalTitle" style="margin-bottom:15px;">Ajouter un vin</h2>
+        
+        <form id="wineForm" onsubmit="saveWine(event)">
+            <input type="text" id="wineName" placeholder="Nom du vin" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ccc; border-radius:8px;" required>
+            
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <select id="wineType" onchange="updateCepageList(this.value)" style="flex:1; padding:10px; border-radius:8px;" required>
+                    <option value="">Type...</option>
+                    <option value="Rouge">Rouge</option>
+                    <option value="Blanc">Blanc</option>
+                    <option value="Rosé">Rosé</option>
+                </select>
+                <select id="country" style="flex:1; padding:10px; border-radius:8px;">
+                    <option value="">Pays...</option>
+                </select>
+            </div>
+
+            <div style="font-size:12px; margin-bottom:5px; font-weight:bold;">Cépages :</div>
+            <div id="cepageList" style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:15px; max-height:150px; overflow-y:auto; border:1px solid #eee; padding:8px; border-radius:8px;">
+            </div>
+
+            <div style="font-size:12px; margin-bottom:5px; font-weight:bold;">Emplacements :</div>
+            <div id="locationEntries"></div>
+            
+            <button type="button" onclick="addLocationEntry()" style="width:100%; background:#f0f0f0; border:1px dashed #ccc; padding:10px; margin-top:5px; border-radius:8px;">+ Ajouter une bouteille</button>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px; padding-bottom: 10px;">
+                <button type="button" class="btn-secondary" style="flex: 1; padding: 15px; border-radius: 8px;" onclick="closeWineModal()">Annuler</button>
+                <button type="submit" class="btn-primary" style="flex: 2; padding: 15px; border-radius: 8px; background-color: #002b5c; color: white; border: none;">AJOUTER</button>
+            </div>
+        </form>
     </div>
+</div>
 </div>
 
 <input type="file" id="importFile" accept=".json,.xlsx" style="display: none;" onchange="handleImport(event)">

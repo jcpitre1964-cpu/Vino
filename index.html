@@ -728,7 +728,7 @@
 </div>
 
 <div class="header">
-    <div class="version">#6</div>
+    <div class="version">71</div>
     <h1>VINO</h1>
     <div class="subtitle">Collections Privée</div>
 </div>
@@ -1053,11 +1053,14 @@
     }
 
     // --- 4. GESTION DU VIN (MODALE) ---
-    function showWineModal(id = null) {
+function showWineModal(id = null) {
     editingId = id;
     const modal = document.getElementById('wineModal');
     const entries = document.getElementById('locationEntries');
     entries.innerHTML = '';
+
+    // Remplit la liste des pays dès l'ouverture
+    if (typeof populateCountries === "function") populateCountries();
 
     if (id) {
         const wine = wines.find(w => w.id === id);
@@ -1065,19 +1068,36 @@
         document.getElementById('wineName').value = wine.name;
         document.getElementById('wineType').value = wine.type;
         document.getElementById('country').value = wine.country || '';
+        
+        // Charge les régions du pays enregistré
+        if (typeof updateRegions === "function") updateRegions();
+        
         updateCepageList(wine.type);
+        
+        // Coche les cépages enregistrés
+        setTimeout(() => {
+            if (wine.cepages) {
+                wine.cepages.forEach(c => {
+                    const cb = document.querySelector(`input[value="${c}"]`);
+                    if (cb) cb.checked = true;
+                });
+            }
+        }, 50);
+
         wine.locations.forEach(loc => addLocationEntry(loc));
     } else {
         document.getElementById('modalTitle').textContent = "Ajouter un vin";
         document.getElementById('wineName').value = '';
         document.getElementById('wineType').value = '';
+        document.getElementById('country').value = '';
+        
+        // Réinitialise les régions et cépages
+        if (typeof updateRegions === "function") updateRegions();
         updateCepageList('');
         addLocationEntry();
     }
     
-    // Force l'affichage
-    modal.style.display = 'block'; 
-    modal.style.display = 'flex'; 
+    modal.style.display = 'block';
 }
 
 function closeWineModal() { 

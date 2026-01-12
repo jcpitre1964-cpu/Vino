@@ -730,13 +730,7 @@
 
 
 
-
-    <div class="header">
-        <h1>VINO</h1>
-        <div class="subtitle">Gestion de Cellier</div>
-    </div>
-
-    <div class="header">
+   <div class="header">
         <div class="version">11/01/2026 v2.0</div>
         <h1>VINO</h1>
         <div class="subtitle">CollectionPrivée</div>
@@ -744,12 +738,15 @@
 
 
 <div class="container">
-    <!-- Page Accueil NOUVELLE VERSION -->
+
+<!-- Page Accueil NOUVELLE VERSION -->
+
+    
     <div id="page1" class="page active">
 
   <div class="home-stats">
             <span class="total-bottles" id="totalBottles">0</span>
-            <span class="total-label">bouteilltttttes</span>
+            <span class="total-label">bouteilles</span>
         </div>
         
         <div class="scan-hero">
@@ -758,13 +755,13 @@
             <button class="btn-scan-large" onclick="quickScan()">
                 <span style="display: block; line-height: 1;">📷</span>
             </button>
-            <div class="scan-label">SCANNER</div>
+            <div class="scan-label"></div>
         </div>
         <div style="text-align: center;">
             <button class="btn-scan-large" style="background: var(--secondary);" onclick="showWineModal()">
                 <span style="display: block; line-height: 1;">⌨️</span>
             </button>
-            <div class="scan-label">MANUEL</div>
+            <div class="scan-label"></div>
         </div>
     </div>
 </div>
@@ -831,9 +828,9 @@
     <div id="page3" class="page">
         <div class="filter-bar">
             <select id="viewZone" onchange="showLocations()">
-                <option value="1">Cellier 1</option>
-                <option value="2">Cellier 2</option>
-                <option value="3">Cellier 3</option>
+                <option value="1">Cellier</option>
+                <option value="2">Casier</option>
+                <option value="3">Réserve</option>
             </select>
         </div>
         <div id="locationView"></div>
@@ -843,9 +840,9 @@
     <div id="page4" class="page">
         <div class="filter-bar">
             <select id="cepageZone" onchange="showCepagesByCellier()">
-                <option value="0">Tous les celliers</option>
-                <option value="1">Cellier</option>
-                <option value="2">Cellier 2</option>
+                <option value="0">Tous</option>
+              <option value="1">Cellier</option>
+                <option value="2">Casier</option>
                 <option value="3">Réserve</option>
             </select>
         </div>
@@ -862,7 +859,7 @@
         <div class="filter-bar">
             <button class="btn-secondary" onclick="showWineModal()">➕ Ajouter un vin</button>
             <button class="btn-secondary" onclick="showManageLists()">📝 Gérer les listes</button>
-            <button class="btn-secondary" onclick="exportToJSON()">📥 Exporter JSON</button>
+           <!-- <button class="btn-secondary" onclick="exportToJSON()">📥 Exporter JSON</button>-->
             <button class="btn-secondary" onclick="exportToExcel()">📊 Exporter Excel</button>
             <button class="btn-secondary" onclick="document.getElementById('importFile').click()">📤 Importer</button>
         </div>

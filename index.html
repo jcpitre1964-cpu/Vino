@@ -737,40 +737,26 @@
 
 
 <div class="container">
-
-<!-- Page Accueil NOUVELLE VERSION -->
-
-    
     <div id="page1" class="page active">
-
-  <div class="home-stats">
+        <div class="home-stats">
             <span class="total-bottles" id="totalBottles">0</span>
             <span class="total-label">bouteilles</span>
         </div>
         
         <div class="scan-hero">
-    <div class="scan-buttons">
-        <div style="text-align: center;">
-            <button class="btn-scan-large" onclick="quickScan()">
-                <span style="display: block; line-height: 1;">📷</span>
-            </button>
-            <div class="scan-label"></div>
+            <div class="scan-buttons">
+                <div style="text-align: center;">
+                    <button class="btn-scan-large" onclick="quickScan()">📷</button>
+                    <div class="scan-label">Scanner</div>
+                </div>
+                <div style="text-align: center;">
+                    <button class="btn-scan-large" style="background: var(--secondary);" onclick="showWineModal()">⌨️</button>
+                    <div class="scan-label">Ajouter</div>
+                </div>
+            </div>
         </div>
-        <div style="text-align: center;">
-            <button class="btn-scan-large" style="background: var(--secondary);" onclick="showWineModal()">
-                <span style="display: block; line-height: 1;">⌨️</span>
-            </button>
-            <div class="scan-label"></div>
-        </div>
-    </div>
-</div>
-
-        </div>
-
-      
-
         <div class="grape-summary-grid" id="grapeSummaryGrid"></div>
-    </div>
+    </div> </div> <div class="nav"> ... </div>
 
     <!-- Page Recherche MODIFIÉE -->
     <div id="page2" class="page">

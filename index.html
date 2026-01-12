@@ -722,13 +722,14 @@
 </head>
 <body>
 
+<div id="scanner">
+    <button class="btn-close-scan" onclick="stopScan()">✕ FERMER</button>
+    <div id="scannerVideo"></div>
+    <div class="line-guide"></div>
+</div>
 
-    <body>
-    <div id="scanner">
-        <button class="btn-close-scan" onclick="stopScan()">✕ FERMER</button>
-        <div id="scannerVideo"></div>
-        <div class="line-guide"></div>
-    </div>
+
+
 
     <div class="header">
         <h1>VINO</h1>
@@ -752,14 +753,22 @@
         </div>
         
         <div class="scan-hero">
-            <div class="scan-buttons">
-                <button class="btn-scan-large" onclick="quickScan()">
-                    <span style="display: block; line-height: 1;">📷</span>
-                </button>
-                <button class="btn-scan-large" onclick="showWineModal()">
-                    <span style="display: block; line-height: 1;">⌨️</span>
-                </button>
-            </div>
+    <div class="scan-buttons">
+        <div style="text-align: center;">
+            <button class="btn-scan-large" onclick="quickScan()">
+                <span style="display: block; line-height: 1;">📷</span>
+            </button>
+            <div class="scan-label">SCANNER</div>
+        </div>
+        <div style="text-align: center;">
+            <button class="btn-scan-large" style="background: var(--secondary);" onclick="showWineModal()">
+                <span style="display: block; line-height: 1;">⌨️</span>
+            </button>
+            <div class="scan-label">MANUEL</div>
+        </div>
+    </div>
+</div>
+
         </div>
 
       
@@ -835,9 +844,9 @@
         <div class="filter-bar">
             <select id="cepageZone" onchange="showCepagesByCellier()">
                 <option value="0">Tous les celliers</option>
-                <option value="1">Cellier 1</option>
+                <option value="1">Cellier</option>
                 <option value="2">Cellier 2</option>
-                <option value="3">Cellier 3</option>
+                <option value="3">Réserve</option>
             </select>
         </div>
         <div id="cepageView"></div>
@@ -2056,20 +2065,18 @@ let scannerActive = false;
 
 function quickScan() {
     scanMode = 'add';
-    startScan();
-}
-
-function startScan() {
     const scanner = document.getElementById('scanner');
+    const videoTarget = document.getElementById('scannerVideo');
+    
     scanner.style.display = 'block';
     scannerActive = true;
-    lastResults = []; // On vide l'historique au début
+    lastResults = [];
 
     Quagga.init({
         inputStream: {
             name: "Live",
             type: "LiveStream",
-            target: document.querySelector('#scannerVideo'),
+            target: videoTarget,
             constraints: {
                 facingMode: "environment",
                 aspectRatio: { min: 1, max: 2 }
@@ -2077,14 +2084,13 @@ function startScan() {
         },
         locator: { patchSize: "medium", halfSample: true },
         decoder: {
-            // "ean_reader" est le standard pour les bouteilles de vin
             readers: ["ean_reader", "ean_8_reader"]
         },
         locate: true
     }, function(err) {
         if (err) {
-            console.error(err);
             alert('Erreur caméra: ' + err);
+            stopScan();
             return;
         }
         Quagga.start();
@@ -2092,34 +2098,25 @@ function startScan() {
 
     Quagga.onDetected(function(result) {
         const barcode = result.codeResult.code;
-        
-        // --- STABILISATION : On attend 3 codes identiques ---
         lastResults.push(barcode);
         if (lastResults.length > 3) lastResults.shift();
 
-        const isStable = lastResults.length === 3 && lastResults.every(v => v === lastResults[0]);
-
-        if (isStable) {
-            if (scanMode === 'add') {
-                stopScan();
-                // "wines" doit être votre tableau global de bouteilles
-                const existing = wines.find(w => w.barcode === barcode);
-                
-                if (existing) {
-                    showDetail(existing.id);
-                } else {
-                    document.getElementById('barcode').value = barcode;
-                    if (typeof copyToClipboard === "function") copyToClipboard(barcode);
-                    showWineModal();
-                }
+        if (lastResults.length === 3 && lastResults.every(v => v === lastResults[0])) {
+            stopScan();
+            const existing = wines.find(w => w.barcode === barcode);
+            if (existing) {
+                showDetail(existing.id);
             } else {
-                document.getElementById('barcode').value = barcode;
-                stopScan();
+                showWineModal();
+                setTimeout(() => {
+                    document.getElementById('barcode').value = barcode;
+                }, 500);
             }
-            lastResults = []; // Reset après succès
+            lastResults = [];
         }
     });
 }
+
 
 function stopScan() {
     if (scannerActive) {
@@ -2127,9 +2124,12 @@ function stopScan() {
         scannerActive = false;
     }
     document.getElementById('scanner').style.display = 'none';
-    // On vide le contenu pour couper le flux caméra proprement
-    document.querySelector('#scannerVideo').innerHTML = '';
+    const videoTarget = document.getElementById('scannerVideo');
+    if (videoTarget) videoTarget.innerHTML = '';
 }
+
+
+
 
 
     function copyToClipboard(text) {

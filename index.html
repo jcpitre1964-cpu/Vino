@@ -1,110 +1,286 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>VINO v2.222222222</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--primary:#1E3A5F;--primary-dark:#0F2744;--secondary:#D4AF37;--bg-light:#F8F6F3;--text-dark:#2C2C2C;--border:#E8E3DC}
-body{font-family:'Lato',sans-serif;background:#000;color:var(--text-dark);padding-bottom:80px;min-height:100vh}
-body::before{content:'';position:fixed;inset:0;background:linear-gradient(180deg,#2D4A6E,#1A293C);z-index:-1}
-.header{background:rgba(30,58,95,.95);padding:16px;text-align:center;box-shadow:0 2px 20px rgba(0,0,0,.3)}
-.header h1{font-family:'Playfair Display',serif;font-size:48px;color:var(--secondary);letter-spacing:6px;text-shadow:2px 2px 4px rgba(0,0,0,.3)}
-.subtitle{font-size:12px;color:rgba(255,255,255,.8);letter-spacing:3px;text-transform:uppercase}
-.container{max-width:1200px;margin:auto;padding:20px}
-.page{display:none}.page.active{display:block}
-.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(30,58,95,.98);display:flex;justify-content:space-around;padding:8px;border-top:1px solid var(--secondary)}
-.nav-item{flex:1;text-align:center;color:rgba(255,255,255,.6);cursor:pointer}.nav-item.active{color:var(--secondary)}
-.btn-scan-large{width:100px;height:100px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-size:40px;cursor:pointer;box-shadow:0 8px 25px rgba(0,0,0,.4)}
-.wine-card{background:#fff;padding:16px;margin-bottom:12px;border-left:4px solid var(--primary);cursor:pointer}
-.wine-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--primary)}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;padding:20px;overflow-y:auto}
-.modal.active{display:flex;justify-content:center;align-items:flex-start}
-.modal-content{background:#fff;width:100%;max-width:600px;padding:25px;margin-top:20px}
-.form-group{margin-bottom:16px}.form-group label{display:block;margin-bottom:5px;font-weight:600;font-size:13px}
-.form-group input,.form-group select{width:100%;padding:10px;border:1px solid var(--border)}
-.checkbox-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:200px;overflow-y:auto;border:1px solid var(--border);padding:10px;background:var(--bg-light)}
-#scanner{display:none;position:fixed;inset:0;background:#000;z-index:1000}
-#scanner.active{display:block}
-.scan-line{position:absolute;top:50%;left:10%;width:80%;height:2px;background:red;animation:scanLine 2s infinite}
-@keyframes scanLine{0%,100%{top:30%}50%{top:70%}}
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 20px;border-radius:20px;z-index:2000;display:none}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>VINO v2.1 - Intégral & Précis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        /* TOUS VOS STYLES ORIGINAUX SONT ICI */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #1E3A5F; --primary-dark: #0F2744; --secondary: #D4AF37;
+            --bg-light: #F8F6F3; --text-dark: #2C2C2C; --text-light: #6B6B6B;
+            --border: #E8E3DC; --cellier1: #8B4513; --cellier2: #2F4F4F; --cellier3: #8B0000;
+        }
+        body { font-family: 'Lato', sans-serif; background: #000; color: var(--text-dark); padding-bottom: 80px; position: relative; min-height: 100vh; }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzJENEE2RTtzdG9wLW9wYWNpdHk6MSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzFBMjkzQztzdG9wLW9wYWNpdHk6MSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IGZpbGw9InVybCgjc2t5KSIgd2lkdGg9IjE5MjAiIGhlaWdodD0iMTA4MCIvPjxwYXRoIGZpbGw9IiMxQTI5M0MiIGQ9Ik0wLDUwMCBRNDgwLDQ1MCA5NjAsNTAwIFQxOTIwLDUwMCBMMTkyMCwxMDgwIEwwLDEwODAgWiIvPjxlbGxpcHNlIGN4PSI0MDAiIGN5PSI2MDAiIHJ4PSIxNTAiIHJ5PSI1MCIgZmlsbD0iIzFGM0UyRCIgb3BhY2l0eT0iMC42Ii8+PGVsbGlwc2UgY3g9IjEwMDAiIGN5PSI2NTAiIHJ4PSIyMDAiIHJ5PSI2MCIgZmlsbD0iIzFGM0UyRCIgb3BhY2l0eT0iMC41Ii8+PGVsbGlwc2UgY3g9IjE2MDAiIGN5PSI2MjAiIHJ4PSIxODAiIHJ5PSI1NSIgZmlsbD0iIzFGM0UyRCIgb3BhY2l0eT0iMC42Ii8+PC9zdmc+') center center / cover;
+            z-index: -1;
+        }
+        .header { background: rgba(30, 58, 95, 0.95); backdrop-filter: blur(10px); padding: 16px 20px; text-align: center; box-shadow: 0 2px 20px rgba(0,0,0,0.3); position: relative; }
+        .version { position: absolute; top: 8px; right: 12px; font-size: 9px; color: rgba(255, 255, 255, 0.5); }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 700; color: var(--secondary); letter-spacing: 8px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .subtitle { font-size: 12px; color: rgba(255, 255, 255, 0.8); letter-spacing: 3px; text-transform: uppercase; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(30, 58, 95, 0.98); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 8px 0 max(8px, env(safe-area-inset-bottom)); z-index: 100; border-top: 1px solid var(--secondary); }
+        .nav-item { flex: 1; text-align: center; color: rgba(255, 255, 255, 0.6); cursor: pointer; }
+        .nav-item.active { color: var(--secondary); }
+        .nav-label { font-size: 9px; margin-top: 2px; text-transform: uppercase; }
+        .scan-hero { text-align: center; padding: 40px 20px; }
+        .btn-scan-large { width: 100px; height: 100px; border-radius: 50%; border: none; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; font-size: 40px; cursor: pointer; box-shadow: 0 8px 25px rgba(0,0,0,0.4); margin: 0 15px; }
+        .home-stats { text-align: center; margin: 20px 0; color: white; }
+        .total-bottles { font-family: 'Playfair Display', serif; font-size: 48px; color: var(--secondary); }
+        .wine-card { background: rgba(255, 255, 255, 0.95); padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--primary); cursor: pointer; }
+        .wine-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        .badge { background: var(--bg-light); padding: 4px 10px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .wine-location { display: inline-block; padding: 4px 10px; font-size: 11px; color: white; margin-right: 6px; }
+        .cellier-1 { background: var(--cellier1); } .cellier-2 { background: var(--cellier2); } .cellier-3 { background: var(--cellier3); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; padding: 20px; overflow-y: auto; }
+        .modal.active { display: flex; justify-content: center; align-items: flex-start; }
+        .modal-content { background: white; width: 100%; max-width: 600px; padding: 25px; margin-top: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border); }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border); padding: 10px; background: var(--bg-light); }
+        
+        /* SCANNER INTERFACE */
+        #scanner { display: none; position: fixed; inset: 0; background: black; z-index: 1000; }
+        #scanner.active { display: block; }
+        #scannerVideo { width: 100%; height: 100%; }
+        #scannerVideo video { width: 100%; height: 100%; object-fit: cover; }
+        .scan-overlay { position: absolute; inset: 0; border: 50px solid rgba(0,0,0,0.5); pointer-events: none; }
+        .scan-line { position: absolute; top: 50%; left: 10%; width: 80%; height: 2px; background: red; box-shadow: 0 0 10px red; animation: scanLine 2s infinite; }
+        @keyframes scanLine { 0%, 100% { top: 30%; } 50% { top: 70%; } }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 10px 20px; border-radius: 20px; z-index: 2000; display: none; }
+    </style>
 </head>
 <body>
-<div class="header"><h1>VINO</h1><div class="subtitle">Collection Privée</div></div>
-<div class="container">
-<div id="page1" class="page active">
-<div style="text-align:center;padding:40px;">
-<button class="btn-scan-large" onclick="app.quickScan()">📷</button>
-<button class="btn-scan-large" onclick="app.showWineModal()">⌨️</button>
-</div>
-<div style="text-align:center;color:#fff;">
-<span id="totalBottles" style="font-size:48px;color:var(--secondary);">0</span> bouteilles
-</div>
-</div>
-<div id="page2" class="page">
-<div style="background:#fff;padding:15px;margin-bottom:15px;">
-<input type="text" id="searchWine" placeholder="Rechercher par nom..." onkeyup="app.applyFilters()" style="width:100%;padding:10px;">
-</div>
-<div id="wineList"></div>
-</div>
-<div id="page5" class="page"><div id="shoppingList"></div></div>
-<div id="page6" class="page">
-<div style="display:flex;flex-direction:column;gap:10px;">
-<button class="btn-scan-large" style="width:100%;border-radius:5px;font-size:16px;" onclick="app.exportToJSON()">📥 EXPORTER JSON</button>
-<button class="btn-scan-large" style="width:100%;border-radius:5px;font-size:16px;" onclick="app.exportToExcel()">📊 EXPORTER EXCEL</button>
-<button class="btn-scan-large" style="width:100%;border-radius:5px;font-size:16px;background:#fff;color:var(--primary);" onclick="document.getElementById('importFile').click()">📤 IMPORTER</button>
-</div>
-</div>
-</div>
-<div class="nav">
-<div class="nav-item active" onclick="app.showPage(1,this)">🍷<div class="nav-label">Accueil</div></div>
-<div class="nav-item" onclick="app.showPage(2,this)">🔍<div class="nav-label">Recherche</div></div>
-<div class="nav-item" onclick="app.showPage(5,this)">🛒<div class="nav-label">Achats</div></div>
-<div class="nav-item" onclick="app.showPage(6,this)">⚙️<div class="nav-label">Gestion</div></div>
-</div>
-<div id="wineModal" class="modal"><div class="modal-content"><h2>Ajouter un vin</h2>
-<div class="form-group"><label>Nom du vin *</label><input type="text" id="wineName"></div>
-<div class="form-group"><label>Type *</label><select id="wineType"><option value="Rouge">Rouge</option><option value="Blanc">Blanc</option></select></div>
-<button class="btn-scan-large" style="width:100%;border-radius:5px;font-size:16px;" onclick="app.saveWine()">ENREGISTRER</button>
-<button onclick="app.closeWineModal()" style="width:100%;background:none;border:none;margin-top:10px;">Annuler</button>
-</div></div>
-<div id="detailModal" class="modal"><div class="modal-content" id="wineDetail"></div></div>
-<div id="scanner"><div id="scannerVideo" style="width:100%;height:100%;"></div><div class="scan-line"></div><button onclick="app.stopScan()" style="position:absolute;bottom:40px;width:100%;padding:15px;border-radius:30px;border:none;background:#fff;">ANNULER</button></div>
-<div id="toast" class="toast"></div>
-<input type="file" id="importFile" accept=".json,.xlsx" style="display:none;" onchange="app.handleImport(event)">
-<script defer>
-const app={
-wines:JSON.parse(localStorage.getItem('wines'))||[],
-init(){this.updateHomePage();},
-showPage(n,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
-document.getElementById('page'+n).classList.add('active');el.classList.add('active');if(n===2)this.applyFilters();if(n===5)this.updateShoppingList();},
-saveWine(){const name=document.getElementById('wineName').value;if(!name)return alert("Nom requis");
-const wine={id:Date.now(),name,type:document.getElementById('wineType').value,quantity:1};
-this.wines.push(wine);localStorage.setItem('wines',JSON.stringify(this.wines));this.closeWineModal();this.updateHomePage();this.showToast("Vin ajouté");},
-updateHomePage(){document.getElementById('totalBottles').innerText=this.wines.length;},
-applyFilters(){const q=document.getElementById('searchWine').value.toLowerCase();const wl=document.getElementById('wineList');const frag=document.createDocumentFragment();
-this.wines.filter(w=>w.name.toLowerCase().includes(q)).forEach(w=>{const div=document.createElement('div');div.className='wine-card';div.onclick=()=>this.showDetail(w.id);
-div.innerHTML=`<div class="wine-name">${w.name}</div><small>${w.type}</small>`;frag.appendChild(div);});wl.innerHTML='';wl.appendChild(frag);},
-showDetail(id){const w=this.wines.find(x=>x.id===id);document.getElementById('wineDetail').innerHTML=`<h2>${w.name}</h2><p>${w.type}</p><button onclick="app.closeDetailModal()">Fermer</button>`;
-document.getElementById('detailModal').classList.add('active');},
-closeDetailModal(){document.getElementById('detailModal').classList.remove('active');},showWineModal(){document.getElementById('wineModal').classList.add('active');},
-closeWineModal(){document.getElementById('wineModal').classList.remove('active');},updateShoppingList(){const sl=document.getElementById('shoppingList');const toBuy=this.wines.filter(w=>w.quantity===0);
-sl.innerHTML=toBuy.length?toBuy.map(w=>`<div>${w.name}</div>`).join(''):'<div class="empty">Rien à acheter</div>';},
-showToast(m){const t=document.getElementById('toast');t.innerText=m;t.style.display="block";setTimeout(()=>t.style.display="none",2000);},
-quickScan(){if(!window.Quagga){import('https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js').then(()=>this.startScanner());}else{this.startScanner();}},
-startScanner(){document.getElementById('scanner').classList.add('active');
-Quagga.init({inputStream:{name:"Live",type:"LiveStream",target:document.querySelector('#scannerVideo'),constraints:{facingMode:"environment"}},
-decoder:{readers:["ean_reader","upc_reader","code_128_reader"]}},err=>{if(err){alert("Erreur caméra : activez HTTPS et permissions.");console.error(err);return;}Quagga.start();});
-Quagga.onDetected(res=>{const code=res.codeResult.code;this.stopScan();this.showToast("Code: "+code);});},
-stopScan(){if(window.Quagga)Quagga.stop();document.getElementById('scanner').classList.remove('active');}
-};
-document.addEventListener('DOMContentLoaded',()=>app.init());
-</script>
+    <div class="header">
+        <div class="version">11/01/2026 v2.5 PRECISION</div>
+        <h1>VINO</h1>
+        <div class="subtitle">Collection Privée</div>
+    </div>
+
+    <div class="container">
+        <div id="page1" class="page active">
+            <div class="scan-hero">
+                <div class="scan-buttons">
+                    <button class="btn-scan-large" onclick="app.quickScan()">📷</button>
+                    <button class="btn-scan-large" onclick="app.showWineModal()">⌨️</button>
+                </div>
+            </div>
+            <div class="home-stats">
+                <span class="total-bottles" id="totalBottles">0</span>
+                <span class="total-label">bouteilles</span>
+            </div>
+            <div class="grape-summary-grid" id="grapeSummaryGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 30px;"></div>
+        </div>
+
+        <div id="page2" class="page">
+            <div class="filter-bar" style="background: white; padding: 15px; margin-bottom: 15px;">
+                <select id="filterType" onchange="app.applyFilters()" style="width:100%; margin-bottom:10px; padding:10px;">
+                    <option value="">Tous les types</option><option value="Rouge">Rouge</option><option value="Blanc">Blanc</option><option value="Rosé">Rosé</option><option value="Mousseux">Mousseux</option>
+                </select>
+                <div id="cepageSection" style="display: none;">
+                    <div id="cepageFilterWhite" class="checkbox-grid"></div>
+                    <div id="cepageFilterRed" class="checkbox-grid"></div>
+                </div>
+                <input type="text" id="searchWine" placeholder="Rechercher par nom..." onkeyup="app.applyFilters()" style="width:100%; padding:10px;">
+            </div>
+            <div id="wineList"></div>
+        </div>
+
+        <div id="page3" class="page">
+            <select id="viewZone" onchange="app.showLocations()" style="width:100%; padding:10px; margin-bottom:15px;">
+                <option value="1">Cellier 1</option><option value="2">Cellier 2</option><option value="3">Cellier 3</option>
+            </select>
+            <div id="locationView"></div>
+        </div>
+
+        <div id="page4" class="page">
+            <select id="cepageZone" onchange="app.showCepagesByCellier()" style="width:100%; padding:10px; margin-bottom:15px;">
+                <option value="0">Tous les celliers</option><option value="1">Cellier 1</option><option value="2">Cellier 2</option><option value="3">Cellier 3</option>
+            </select>
+            <div id="cepageView"></div>
+        </div>
+
+        <div id="page5" class="page"><div id="shoppingList"></div></div>
+
+        <div id="page6" class="page">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn-scan-large" style="width:100%; border-radius:5px; font-size:16px;" onclick="app.exportToJSON()">📥 EXPORTER JSON</button>
+                <button class="btn-scan-large" style="width:100%; border-radius:5px; font-size:16px;" onclick="app.exportToExcel()">📊 EXPORTER EXCEL</button>
+                <button class="btn-scan-large" style="width:100%; border-radius:5px; font-size:16px; background: white; color: var(--primary);" onclick="document.getElementById('importFile').click()">📤 IMPORTER</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav">
+        <div class="nav-item active" onclick="app.showPage(1, this)"><div>🍷</div><div class="nav-label">Accueil</div></div>
+        <div class="nav-item" onclick="app.showPage(2, this)"><div>🔍</div><div class="nav-label">Recherche</div></div>
+        <div class="nav-item" onclick="app.showPage(3, this)"><div>🍾</div><div class="nav-label">Celliers</div></div>
+        <div class="nav-item" onclick="app.showPage(4, this)"><div>🍇</div><div class="nav-label">Cépages</div></div>
+        <div class="nav-item" onclick="app.showPage(5, this)"><div>🛒</div><div class="nav-label">Achats</div></div>
+        <div class="nav-item" onclick="app.showPage(6, this)"><div>⚙️</div><div class="nav-label">Gestion</div></div>
+    </div>
+
+    <div id="wineModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Ajouter un vin</h2>
+            <div class="form-group"><label>Code-barres</label><input type="text" id="barcode"></div>
+            <div class="form-group"><label>Nom du vin *</label><input type="text" id="wineName"></div>
+            <div class="form-group"><label>Type *</label><select id="wineType" onchange="app.updateCepageList(this.value)"><option value="Rouge">Rouge</option><option value="Blanc">Blanc</option><option value="Rosé">Rosé</option><option value="Mousseux">Mousseux</option></select></div>
+            <div class="form-group"><label>Pays</label><select id="country" onchange="app.updateRegions()"></select></div>
+            <div class="form-group"><label>Région</label><select id="region"></select></div>
+            <div class="form-group"><label>Cépages</label><div class="checkbox-grid" id="cepageList"></div></div>
+            <div class="form-group"><label>Accords</label><div class="checkbox-grid" id="accordList"></div></div>
+            <div class="form-group"><label>Emplacements</label><div id="locationEntries"></div><button onclick="app.addLocationEntry()">+ Ajouter</button></div>
+            <button class="btn-scan-large" style="width:100%; border-radius:5px; font-size:16px;" onclick="app.saveWine()" id="saveBtn">ENREGISTRER</button>
+            <button onclick="app.closeWineModal()" style="width:100%; background:none; border:none; margin-top:10px;">Annuler</button>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal"><div class="modal-content" id="wineDetail"></div></div>
+
+    <div id="scanner">
+        <div id="scannerVideo"></div>
+        <div class="scan-overlay"></div>
+        <div class="scan-line"></div>
+        <div style="position: absolute; bottom: 40px; width: 100%; text-align: center;"><button onclick="app.stopScan()" style="padding:15px 30px; border-radius:30px; border:none; background:white;">ANNULER</button></div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <input type="file" id="importFile" accept=".json,.xlsx" style="display: none;" onchange="app.handleImport(event)">
+
+    <script>
+    const app = {
+        wines: JSON.parse(localStorage.getItem('wines')) || [],
+        scanHistory: [],
+        countries: ['France','Italie','Espagne','Portugal','Canada','États-Unis','Argentine','Chili','Australie','Nouvelle-Zélande','Afrique du Sud','Allemagne'].sort(),
+        regionsByCountry: {'France':['Alsace','Bordeaux','Bourgogne','Champagne','Languedoc','Loire','Provence','Rhône'],'Italie':['Piémont','Toscane','Sicile'],'Espagne':['Rioja','Priorat'],'Canada':['Québec','Ontario']},
+        cepagesBlancs: ['Chardonnay','Sauvignon Blanc','Riesling','Pinot Gris','Viognier'].sort(),
+        cepagesRouges: ['Cabernet Sauvignon','Pinot Noir','Merlot','Syrah','Grenache','Malbec'].sort(),
+        accords: ['Apéro','Asiatique','Grillades','Pizza','Poisson','Poulet','ZZZ - Ne pas racheter'].sort(),
+
+        init() {
+            this.initForm();
+            this.updateHomePage();
+        },
+
+        initForm() {
+            const cs = document.getElementById('country');
+            cs.innerHTML = '<option value="">Sélectionner</option>' + this.countries.map(c => `<option value="${c}">${c}</option>`).join('');
+            const al = document.getElementById('accordList');
+            al.innerHTML = this.accords.map(a => `<label style="display:block"><input type="checkbox" value="${a}"> ${a}</label>`).join('');
+            this.updateCepageList('Rouge');
+        },
+
+        updateCepageList(type) {
+            const list = (type === 'Blanc') ? this.cepagesBlancs : this.cepagesRouges;
+            document.getElementById('cepageList').innerHTML = list.map(c => `<label style="display:block"><input type="checkbox" value="${c}"> ${c}</label>`).join('');
+        },
+
+        updateRegions() {
+            const c = document.getElementById('country').value;
+            const rs = document.getElementById('region');
+            rs.innerHTML = '<option value="">Sélectionner</option>';
+            if(c && this.regionsByCountry[c]) this.regionsByCountry[c].forEach(r => rs.innerHTML += `<option value="${r}">${r}</option>`);
+        },
+
+        // --- SCANNER AVEC LOGIQUE DE PRÉCISION ---
+        quickScan() {
+            this.scanHistory = [];
+            document.getElementById('scanner').classList.add('active');
+            Quagga.init({
+                inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#scannerVideo'), constraints: { facingMode: "environment" } },
+                decoder: { readers: ["ean_reader", "upc_reader", "code_128_reader"] },
+                locator: { patchSize: "medium", halfSample: true }
+            }, (err) => { if(err) return; Quagga.start(); });
+
+            Quagga.onDetected((res) => {
+                const code = res.codeResult.code;
+                this.scanHistory.push(code);
+                if(this.scanHistory.length > 5) {
+                    const counts = {}; let max = 0, best = null;
+                    this.scanHistory.forEach(c => { counts[c] = (counts[c]||0)+1; if(counts[c] > max) { max = counts[c]; best = c; }});
+                    if(max >= 3) { this.stopScan(); this.validateCode(best); }
+                    else this.scanHistory.shift();
+                }
+            });
+        },
+
+        stopScan() { Quagga.stop(); document.getElementById('scanner').classList.remove('active'); },
+
+        validateCode(code) {
+            const ex = this.wines.find(w => w.barcode === code);
+            if(ex) this.showDetail(ex.id);
+            else { this.showWineModal(); document.getElementById('barcode').value = code; this.showToast("Code vérifié: " + code); }
+        },
+
+        showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = "block"; setTimeout(()=>t.style.display="none", 2000); },
+
+        showPage(n, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('page'+n).classList.add('active'); el.classList.add('active');
+            if(n===2) this.applyFilters();
+            if(n===5) this.updateShoppingList();
+        },
+
+        // LOGIQUE DE SAUVEGARDE ET RENDU (HÉRITÉE DE VOTRE CODE)
+        saveWine() {
+            const name = document.getElementById('wineName').value;
+            if(!name) return alert("Nom requis");
+            const wine = {
+                id: Date.now(),
+                name: name,
+                barcode: document.getElementById('barcode').value,
+                type: document.getElementById('wineType').value,
+                country: document.getElementById('country').value,
+                region: document.getElementById('region').value,
+                cepages: Array.from(document.querySelectorAll('#cepageList input:checked')).map(cb => cb.value),
+                accords: Array.from(document.querySelectorAll('#accordList input:checked')).map(cb => cb.value),
+                quantity: 1, locations: []
+            };
+            this.wines.push(wine);
+            localStorage.setItem('wines', JSON.stringify(this.wines));
+            this.closeWineModal(); this.updateHomePage(); this.showToast("Vin ajouté");
+        },
+
+        updateHomePage() { document.getElementById('totalBottles').innerText = this.wines.length; },
+
+        applyFilters() {
+            const q = document.getElementById('searchWine').value.toLowerCase();
+            const wl = document.getElementById('wineList');
+            wl.innerHTML = this.wines.filter(w => w.name.toLowerCase().includes(q))
+                .map(w => `<div class="wine-card" onclick="app.showDetail(${w.id})"><div class="wine-name">${w.name}</div><small>${w.country} - ${w.type}</small></div>`).join('');
+        },
+
+        showDetail(id) {
+            const w = this.wines.find(x => x.id === id);
+            document.getElementById('wineDetail').innerHTML = `<h2>${w.name}</h2><p>${w.country} | ${w.type}</p><p>Code: ${w.barcode}</p><button onclick="app.closeDetailModal()">Fermer</button>`;
+            document.getElementById('detailModal').classList.add('active');
+        },
+
+        closeDetailModal() { document.getElementById('detailModal').classList.remove('active'); },
+        showWineModal() { document.getElementById('wineModal').classList.add('active'); },
+        closeWineModal() { document.getElementById('wineModal').classList.remove('active'); },
+        
+        updateShoppingList() {
+            const sl = document.getElementById('shoppingList');
+            const toBuy = this.wines.filter(w => w.quantity === 0);
+            sl.innerHTML = toBuy.length ? toBuy.map(w => `<div>${w.name}</div>`).join('') : '<div class="empty">Rien à acheter</div>';
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => app.init());
+    </script>
 </body>
 </html>

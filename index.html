@@ -927,1167 +927,266 @@
 
 
 <script>
+    // --- 1. VOS DONNÉES ET ÉTAT ---
     let wines = JSON.parse(localStorage.getItem('wines')) || [];
-    let scannerActive = false;
-    let scanMode = 'add';
     let editingId = null;
-    let locationCounter = 0;
-    let currentRemoveWineId = null;
-    let selectedRemoveLocationIndex = null;
+    let currentWineId = null;
 
-    const countries = [
-        'France', 'Italie', 'Espagne', 'Portugal', 'Canada', 
-        'États-Unis', 'Argentine', 'Chili', 'Australie', 
-        'Nouvelle-Zélande', 'Afrique du Sud', 'Allemagne'
-    ].sort();
-
+    // Vos listes de pays et régions
+    const countries = ['France', 'Italie', 'Espagne', 'Portugal', 'Canada', 'États-Unis', 'Argentine', 'Chili', 'Australie', 'Nouvelle-Zélande', 'Afrique du Sud', 'Allemagne'].sort();
     const regionsByCountry = {
         'France': ['Alsace', 'Beaujolais', 'Bordeaux', 'Bourgogne', 'Champagne', 'Jura', 'Languedoc', 'Loire', 'Provence', 'Rhône', 'Roussillon', 'Savoie', 'Sud-Ouest'],
         'Italie': ['Piémont', 'Toscane', 'Vénétie', 'Sicile', 'Pouilles', 'Lombardie', 'Trentin'],
         'Espagne': ['Rioja', 'Ribera del Duero', 'Priorat', 'Navarre', 'Catalogne', 'Rías Baixas'],
         'Portugal': ['Douro', 'Alentejo', 'Dão', 'Vinho Verde'],
         'Canada': ['Colombie-Britannique', 'Ontario', 'Québec'],
-        'États-Unis': ['Californie', 'Oregon', 'Washington', 'New York'],
-        'Argentine': ['Mendoza', 'Salta'],
-        'Chili': ['Vallée de Maipo', 'Vallée de Colchagua'],
-        'Australie': ['Barossa Valley', 'Margaret River', 'Hunter Valley'],
-        'Nouvelle-Zélande': ['Marlborough', 'Hawke\'s Bay', 'Central Otago'],
-        'Afrique du Sud': ['Stellenbosch', 'Paarl', 'Swartland'],
-        'Allemagne': ['Mosel', 'Rheingau', 'Pfalz']
+        'États-Unis': ['Californie', 'Oregon', 'Washington', 'New York']
     };
 
-    const cepagesBlancs = [
-        'Chardonnay',
-        'Sauvignon Blanc',
-        'Sémillon',
-        'Chenin Blanc',
-        'Riesling',
-        'Gewürztraminer',
-        'Pinot Blanc',
-        'Pinot Gris/Grigio',
-        'Viognier',
-        'Muscat Blanc',
-        'Sylvaner',
-        'Malvasia',
-        'Trebbiano',
-        'Albariño',
-        'Verdejo',
-        'Vermentino',
-        'Marsanne',
-        'Roussanne',
-        'Grüner Veltliner'
-    ].sort();
-
-    const cepagesRouges = [
-        'Cabernet Sauvignon',
-        'Pinot Noir',
-        'Merlot',
-        'Syrah/Shiraz',
-        'Cabernet Franc',
-        'Gamay',
-        'Grenache',
-        'Cinsault',
-        'Carignan',
-        'Barbera',
-        'Sangiovese',
-        'Zinfandel',
-        'Tempranillo',
-        'Nebbiolo',
-        'Mourvèdre',
-        'Malbec',
-        'Moscato'
-    ].sort();
-
-    const cepages = [...cepagesBlancs, ...cepagesRouges];
-
-    function getWineTypeIcon(type) {
-        if (type === 'Rouge') {
-            return '<span style="display: inline-block; width: 12px; height: 12px; background: #8B0000; border-radius: 50%; flex-shrink: 0;"></span>';
-        } else if (type === 'Blanc') {
-            return '<span style="display: inline-block; width: 12px; height: 12px; background: #F5DEB3; border-radius: 50%; border: 1px solid #D4AF37; flex-shrink: 0;"></span>';
-        } else if (type === 'Rosé') {
-            return '<span style="display: inline-block; width: 12px; height: 12px; background: #FFB6C1; border-radius: 50%; flex-shrink: 0;"></span>';
-        } else if (type === 'Mousseux') {
-            return '<span style="font-size: 14px;">🫧</span>';
-        } else {
-            return '<span style="display: inline-block; width: 12px; height: 12px; background: #888; border-radius: 50%; flex-shrink: 0;"></span>';
-        }
-    }
-
+    // Vos listes de cépages et accords
+    const cepagesBlancs = ['Chardonnay', 'Sauvignon Blanc', 'Sémillon', 'Chenin Blanc', 'Riesling', 'Gewürztraminer', 'Pinot Blanc', 'Pinot Gris/Grigio', 'Viognier', 'Muscat Blanc', 'Sylvaner', 'Malvasia', 'Trebbiano', 'Albariño', 'Verdejo', 'Vermentino', 'Marsanne', 'Roussanne', 'Grüner Veltliner'].sort();
+    const cepagesRouges = ['Cabernet Sauvignon', 'Pinot Noir', 'Merlot', 'Syrah/Shiraz', 'Cabernet Franc', 'Gamay', 'Grenache', 'Cinsault', 'Carignan', 'Barbera', 'Sangiovese', 'Zinfandel', 'Tempranillo', 'Nebbiolo', 'Mourvèdre', 'Malbec', 'Moscato'].sort();
     const accords = ['Apéro', 'Asiatique', 'Cuisine grecque', 'Cuisine indienne', 'Cuisine italienne (pâtes)', 'Dessert', 'Fromage', 'Friture', 'Grillades', 'Mets portugais', 'Mets traditionnels', 'Moyen orient', 'Noël', 'Pizza', 'Poisson', 'Polyvalent', 'Poulet', 'Saumon', 'Saucisses', 'Tomates', 'ZZZ - Ne pas racheter'].sort();
 
-    function init() {
-        // Initialiser les filtres de cépages blancs
-        const cepageFilterWhite = document.getElementById('cepageFilterWhite');
-        cepagesBlancs.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'cepage-filter-item';
-            div.innerHTML = `<input type="checkbox" id="filter_${c}" value="${c}" onchange="applyFilters()"><label for="filter_${c}">${c}</label>`;
-            cepageFilterWhite.appendChild(div);
+    // --- 2. NAVIGATION ---
+    function showPage(n) {
+        document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+        const target = document.getElementById('page' + n);
+        if (target) target.style.display = 'block';
+        
+        document.querySelectorAll('.nav-item').forEach((item, index) => {
+            if (index + 1 === n) item.classList.add('active');
+            else item.classList.remove('active');
         });
 
-        // Initialiser les filtres de cépages rouges
-        const cepageFilterRed = document.getElementById('cepageFilterRed');
-        cepagesRouges.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'cepage-filter-item';
-            div.innerHTML = `<input type="checkbox" id="filter_${c}" value="${c}" onchange="applyFilters()"><label for="filter_${c}">${c}</label>`;
-            cepageFilterRed.appendChild(div);
-        });
-
-        // Initialiser les pays
-        const countrySelect = document.getElementById('country');
-        const filterCountrySelect = document.getElementById('filterCountry');
-        
-        countries.forEach(country => {
-            const option = document.createElement('option');
-            option.value = country;
-            option.textContent = country;
-            countrySelect.appendChild(option);
-            
-            const filterOption = document.createElement('option');
-            filterOption.value = country;
-            filterOption.textContent = country;
-            filterCountrySelect.appendChild(filterOption);
-        });
-
-        // Initialiser les cépages dans le formulaire
-        const cepageGrid = document.getElementById('cepageList');
-        
-        // Section Blancs
-        const blancHeader = document.createElement('div');
-        blancHeader.style.cssText = 'padding: 8px; background: #F5DEB3; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 4px; display: flex; align-items: center; gap: 6px;';
-        blancHeader.innerHTML = '<span style="display: inline-block; width: 12px; height: 12px; background: #F5DEB3; border-radius: 50%; border: 1px solid #D4AF37;"></span> CÉPAGES BLANCS';
-        cepageGrid.appendChild(blancHeader);
-        
-        cepagesBlancs.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'checkbox-item';
-            div.innerHTML = `<input type="checkbox" id="cepage_${c}" value="${c}"><label for="cepage_${c}">${c}</label>`;
-            cepageGrid.appendChild(div);
-        });
-        
-        // Section Rouges
-        const rougeHeader = document.createElement('div');
-        rougeHeader.style.cssText = 'padding: 8px; background: #FFE4E4; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 8px; display: flex; align-items: center; gap: 6px;';
-        rougeHeader.innerHTML = '<span style="display: inline-block; width: 12px; height: 12px; background: #8B0000; border-radius: 50%;"></span> CÉPAGES ROUGES';
-        cepageGrid.appendChild(rougeHeader);
-        
-        cepagesRouges.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'checkbox-item';
-            div.innerHTML = `<input type="checkbox" id="cepage_${c}" value="${c}"><label for="cepage_${c}">${c}</label>`;
-            cepageGrid.appendChild(div);
-        });
-
-        // Initialiser les accords
-        const accordGrid = document.getElementById('accordList');
-        accords.forEach(a => {
-            const div = document.createElement('div');
-            div.className = 'checkbox-item';
-            div.innerHTML = `<input type="checkbox" id="accord_${a}" value="${a}"><label for="accord_${a}">${a}</label>`;
-            accordGrid.appendChild(div);
-        });
-
-        updateHomePage();
-        render();
-    }
-
-    function updateRegions() {
-        const country = document.getElementById('country').value;
-        const regionSelect = document.getElementById('region');
-        
-        regionSelect.innerHTML = '<option value="">Sélectionner</option>';
-        
-        if (country && regionsByCountry[country]) {
-            regionsByCountry[country].forEach(region => {
-                const option = document.createElement('option');
-                option.value = region;
-                option.textContent = region;
-                regionSelect.appendChild(option);
-            });
-        }
-    }
-
-    function updateHomePage() {
-        // Calculer le total de bouteilles
-        let totalBottles = 0;
-        const grapeCounts = {};
-
-        wines.forEach(wine => {
-            const qty = wine.locations ? wine.locations.length : wine.quantity;
-            totalBottles += qty;
-
-            if (wine.cepages && wine.cepages.length > 0 && qty > 0) {
-                wine.cepages.forEach(grape => {
-                    grapeCounts[grape] = (grapeCounts[grape] || 0) + qty;
-                });
-            }
-        });
-
-        document.getElementById('totalBottles').textContent = totalBottles;
-
-        // Afficher le résumé des cépages
-        const grapeSummaryGrid = document.getElementById('grapeSummaryGrid');
-        grapeSummaryGrid.innerHTML = '';
-
-        // Trier par quantité décroissante et filtrer ceux à 0
-        const sortedGrapes = Object.entries(grapeCounts)
-            .filter(([grape, count]) => count > 0)
-            .sort((a, b) => b[1] - a[1]);
-
-        if (sortedGrapes.length === 0) {
-            grapeSummaryGrid.innerHTML = '<div class="empty">Aucun vin en cave</div>';
-            return;
-        }
-
-        sortedGrapes.forEach(([grape, count]) => {
-            const card = document.createElement('div');
-            card.className = 'grape-summary-card';
-            card.onclick = () => filterByGrape(grape);
-            card.innerHTML = `
-                <div class="grape-summary-name">${grape}</div>
-                <div class="grape-summary-count">${count}</div>
-            `;
-            grapeSummaryGrid.appendChild(card);
-        });
-    }
-
-    function filterByGrape(grape) {
-        // Aller à la page recherche
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        document.getElementById('page2').classList.add('active');
-        document.querySelectorAll('.nav-item')[1].classList.add('active');
-        
-        // Réinitialiser tous les filtres
-        resetFilters();
-        
-        // Cocher uniquement le cépage sélectionné
-        const checkbox = document.getElementById('filter_' + grape);
-        if (checkbox) {
-            checkbox.checked = true;
-        }
-        
-        // Appliquer les filtres
-        applyFilters();
-    }
-
-    function updateShoppingList() {
-        const container = document.getElementById('shoppingList');
-        
-        // Vins avec quantité 0 et qui ne sont pas marqués "Ne pas racheter"
-        const toBuy = wines.filter(w => {
-            const qty = w.locations ? w.locations.length : w.quantity;
-            const noRebuy = w.accords && w.accords.includes('ZZZ - Ne pas racheter');
-            return qty === 0 && !noRebuy;
-        });
-
-        if (toBuy.length === 0) {
-            container.innerHTML = '<div class="empty">Aucun vin à racheter 🎉</div>';
-            return;
-        }
-
-        container.innerHTML = toBuy.map(wine => `
-            <div style="background: rgba(255, 255, 255, 0.95); padding: 8px 12px; margin-bottom: 6px; border-radius: 0; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; border-left: 4px solid var(--primary);" onclick="showDetail(${wine.id})">
-                ${getWineTypeIcon(wine.type)}
-                <div style="font-weight: 600; color: var(--primary); font-size: 14px; flex: 1;">${wine.name}</div>
-                ${wine.country ? `<div style="font-size: 11px; color: var(--text-light);">🌍 ${wine.country}</div>` : ''}
-                ${wine.cepages && wine.cepages.length > 0 ? `<div style="font-size: 11px; color: var(--text-light);">🍇 ${wine.cepages.join(', ')}</div>` : ''}
-            </div>
-        `).join('');
-    }
-
-    function save() {
-        localStorage.setItem('wines', JSON.stringify(wines));
-        updateHomePage();
-        updateShoppingList();
-    }
-
-    function showPage(n, btn) {
-        const currentPage = document.querySelector('.page.active');
-        if (currentPage && currentPage.id === 'page2' && n !== 2) {
-            resetFilters();
-        }
-        
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        document.getElementById('page' + n).classList.add('active');
-        btn.classList.add('active');
-        
         if (n === 1) updateHomePage();
         if (n === 2) render();
-        if (n === 3) showLocations();
-        if (n === 4) showCepagesByCellier();
         if (n === 5) updateShoppingList();
+        window.scrollTo(0, 0);
     }
 
-    function updateCepageList(selectedType = '') {
-        const cepageGrid = document.getElementById('cepageList');
-        if (!cepageGrid) return;
-        
-        cepageGrid.innerHTML = '';
-        
-        const currentSelections = Array.from(document.querySelectorAll('#cepageList input:checked')).map(cb => cb.value);
-        
-        if (selectedType === 'Blanc') {
-            const blancHeader = document.createElement('div');
-            blancHeader.style.cssText = 'padding: 8px; background: #F5DEB3; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 4px; display: flex; align-items: center; gap: 6px;';
-            blancHeader.innerHTML = '<span style="display: inline-block; width: 12px; height: 12px; background: #F5DEB3; border-radius: 50%; border: 1px solid #D4AF37;"></span> CÉPAGES BLANCS';
-            cepageGrid.appendChild(blancHeader);
-            
-            cepagesBlancs.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'checkbox-item';
-                div.innerHTML = `<input type="checkbox" id="cepage_${c}" value="${c}" ${currentSelections.includes(c) ? 'checked' : ''}><label for="cepage_${c}">${c}</label>`;
-                cepageGrid.appendChild(div);
-            });
-        } else if (selectedType === 'Rouge') {
-            const rougeHeader = document.createElement('div');
-            rougeHeader.style.cssText = 'padding: 8px; background: #FFE4E4; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 4px; display: flex; align-items: center; gap: 6px;';
-            rougeHeader.innerHTML = '<span style="display: inline-block; width: 12px; height: 12px; background: #8B0000; border-radius: 50%;"></span> CÉPAGES ROUGES';
-            cepageGrid.appendChild(rougeHeader);
-            
-            cepagesRouges.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'checkbox-item';
-                div.innerHTML = `<input type="checkbox" id="cepage_${c}" value="${c}" ${currentSelections.includes(c) ? 'checked' : ''}><label for="cepage_${c}">${c}</label>`;
-                cepageGrid.appendChild(div);
-            });
-        } else {
-            const blancHeader = document.createElement('div');
-            blancHeader.style.cssText = 'padding: 8px; background: #F5DEB3; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 4px; display: flex; align-items: center; gap: 6px;';
-            blancHeader.innerHTML = '<span style="display: inline-block; width: 12px; height: 12px; background: #F5DEB3; border-radius: 50%; border: 1px solid #D4AF37;"></span> CÉPAGES BLANCS';
-            cepageGrid.appendChild(blancHeader);
-            
-            cepagesBlancs.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'checkbox-item';
-                div.innerHTML = `<input type="checkbox" id="cepage_${c}" value="${c}" ${currentSelections.includes(c) ? 'checked' : ''}><label for="cepage_${c}">${c}</label>`;
-                cepageGrid.appendChild(div);
-            });
-            
-            const rougeHeader = document.createElement('div');
-            rougeHeader.style.cssText = 'padding: 8px; background: #FFE4E4; font-weight: 700; font-size: 12px; color: var(--text-dark); margin-top: 8px; display: flex; align-items: center; gap: 6px;';
-            rougeHeader.innerHTML = '<span style="display: inline-block; width: 12px; height: 12px; background: #8B0000; border-radius: 50%;"></span> CÉPAGES ROUGES';
-            cepageGrid.appendChild(rougeHeader);
-            
-            cepagesRouges.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'checkbox-item';
-                div.innerHTML = `<input type="checkbox" id="cepage_${c}" value="${c}" ${currentSelections.includes(c) ? 'checked' : ''}><label for="cepage_${c}">${c}</label>`;
-                cepageGrid.appendChild(div);
-            });
-        }
+    // --- 3. INITIALISATION ---
+    window.onload = function() {
+        initFormElements();
+        updateHomePage();
+        showPage(1);
+    };
+
+    function initFormElements() {
+        const countrySelect = document.getElementById('country');
+        const filterCountry = document.getElementById('filterCountry');
+        countries.forEach(c => {
+            countrySelect.add(new Option(c, c));
+            filterCountry.add(new Option(c, c));
+        });
+
+        // Init filtres cépages recherche (Page 2)
+        const whiteFilter = document.getElementById('cepageFilterWhite');
+        cepagesBlancs.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'cepage-filter-item';
+            div.innerHTML = `<input type="checkbox" id="filter_${c}" value="${c}" onchange="applyFilters()"><label for="filter_${c}">${c}</label>`;
+            whiteFilter.appendChild(div);
+        });
+
+        const redFilter = document.getElementById('cepageFilterRed');
+        cepagesRouges.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'cepage-filter-item';
+            div.innerHTML = `<input type="checkbox" id="filter_${c}" value="${c}" onchange="applyFilters()"><label for="filter_${c}">${c}</label>`;
+            redFilter.appendChild(div);
+        });
     }
 
-    function addLocationEntry() {
-        locationCounter++;
-        const container = document.getElementById('locationEntries');
-        const div = document.createElement('div');
-        div.className = 'location-entry';
-        div.id = 'location_' + locationCounter;
-        div.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <strong style="font-size: 12px;">Emplacement</strong>
-                <button type="button" onclick="removeLocationEntry(${locationCounter})" style="width: auto; padding: 4px 8px; margin: 0; background: #ef4444; color: white; font-size: 11px;">✕</button>
-            </div>
-            <div class="location-entry-grid">
-                <div>
-                    <label style="font-size: 10px;">Cellier</label>
-                    <select class="location-zone">
-                        <option value="">-</option>
-                        <option value="1">Cellier</option>
-                        <option value="2">Rangement</option>
-                        <option value="3">Réserve</option>
-                    </select>
-                </div>
-                <div>
-                    <label style="font-size: 10px;">Rangée</label>
-                    <select class="location-rangee">
-                        <option value="">-</option>
-                        ${Array.from({length: 10}, (_, i) => `<option value="${i + 1}">R${i + 1}</option>`).join('')}
-                    </select>
-                </div>
-                <div>
-                    <label style="font-size: 10px;">Espace</label>
-                    <select class="location-espace">
-                        <option value="">-</option>
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                        <option value="D">D</option>
-                        <option value="E">E</option>
-                        <option value="F">F</option>
-                    </select>
-                </div>
-            </div>
-        `;
-        container.appendChild(div);
-        updateLocationCount();
-    }
-
-    function removeLocationEntry(id) {
-        const elem = document.getElementById('location_' + id);
-        if (elem) {
-            elem.remove();
-            updateLocationCount();
-        }
-    }
-    
-    function updateLocationCount() {
-        const count = document.querySelectorAll('#locationEntries .location-entry').length;
-        const countElem = document.getElementById('locationCount');
-        if (countElem) {
-            countElem.textContent = `(${count})`;
-        }
-    }
-
+    // --- 4. GESTION DU VIN (MODALE) ---
     function showWineModal(id = null) {
         editingId = id;
-        const modal = document.getElementById('wineModal');
-        
+        const entries = document.getElementById('locationEntries');
+        entries.innerHTML = '';
+
         if (id) {
             const wine = wines.find(w => w.id === id);
-            if (!wine) return;
-            
-            document.getElementById('modalTitle').textContent = 'Modifier le vin';
-            document.getElementById('saveBtn').textContent = 'Enregistrer';
-            document.getElementById('barcode').value = wine.barcode || '';
+            document.getElementById('modalTitle').textContent = "Modifier le vin";
             document.getElementById('wineName').value = wine.name;
-            document.getElementById('saqUrl').value = wine.saqUrl || '';
             document.getElementById('wineType').value = wine.type;
             document.getElementById('country').value = wine.country || '';
-            updateRegions();
-            setTimeout(() => {
-                document.getElementById('region').value = wine.region || '';
-            }, 50);
-            document.getElementById('appellation').value = wine.appellation || '';
-            document.getElementById('particularity').value = wine.particularity || '';
-            document.getElementById('importateur').value = wine.importateur || '';
-            document.getElementById('lieuAchat').value = wine.lieuAchat || '';
-            
             updateCepageList(wine.type);
-            
-            if (wine.cepages) {
-                wine.cepages.forEach(c => {
-                    const cb = document.getElementById('cepage_' + c);
-                    if (cb) cb.checked = true;
-                });
-            }
-            
-            if (wine.accords) {
-                wine.accords.forEach(a => {
-                    const cb = document.getElementById('accord_' + a);
-                    if (cb) cb.checked = true;
-                });
-            }
-            
-            document.getElementById('locationEntries').innerHTML = '';
-            if (wine.locations && wine.locations.length > 0) {
-                wine.locations.forEach(loc => {
-                    addLocationEntry();
-                    const lastEntry = document.querySelector('#locationEntries .location-entry:last-child');
-                    lastEntry.querySelector('.location-zone').value = loc.zone;
-                    lastEntry.querySelector('.location-rangee').value = loc.rangee;
-                    lastEntry.querySelector('.location-espace').value = loc.espace;
-                });
-            }
+            // Cocher cépages existants
+            wine.cepages.forEach(c => { const cb = document.getElementById('cep_'+c); if(cb) cb.checked = true; });
+            wine.locations.forEach(loc => addLocationEntry(loc));
         } else {
-            document.getElementById('modalTitle').textContent = 'Ajouter un vin';
-            document.getElementById('saveBtn').textContent = 'Ajouter au Cellier';
-            document.getElementById('barcode').value = '';
+            document.getElementById('modalTitle').textContent = "Ajouter un vin";
             document.getElementById('wineName').value = '';
-            document.getElementById('saqUrl').value = '';
             document.getElementById('wineType').value = '';
-            document.getElementById('country').value = '';
-            document.getElementById('region').innerHTML = '<option value="">Sélectionner</option>';
-            document.getElementById('appellation').value = '';
-            document.getElementById('particularity').value = '';
-            document.getElementById('importateur').value = '';
-            document.getElementById('lieuAchat').value = '';
-            document.getElementById('locationEntries').innerHTML = '';
-            
-            document.querySelectorAll('#cepageList input[type="checkbox"]').forEach(cb => cb.checked = false);
-            document.querySelectorAll('#accordList input[type="checkbox"]').forEach(cb => cb.checked = false);
-            
             updateCepageList('');
+            addLocationEntry(); // Un par défaut
         }
-        
-        modal.classList.add('active');
-    }
-
-    function closeWineModal() {
-        document.getElementById('wineModal').classList.remove('active');
-        editingId = null;
+        document.getElementById('wineModal').style.display = 'flex';
     }
 
     function saveWine() {
         const name = document.getElementById('wineName').value.trim();
         const type = document.getElementById('wineType').value;
-        
-        if (!name || !type) {
-            alert('Veuillez remplir au moins le nom et le type du vin');
-            return;
-        }
-        
-        const selectedCepages = Array.from(document.querySelectorAll('#cepageList input:checked')).map(cb => cb.value);
-        const selectedAccords = Array.from(document.querySelectorAll('#accordList input:checked')).map(cb => cb.value);
-        
-        const locations = [];
-        document.querySelectorAll('#locationEntries .location-entry').forEach(entry => {
-            const zone = entry.querySelector('.location-zone').value;
-            const rangee = entry.querySelector('.location-rangee').value;
-            const espace = entry.querySelector('.location-espace').value;
-            
-            if (zone && rangee && espace) {
-                locations.push({ zone, rangee, espace });
-            }
+        if (!name || !type) return alert("Nom et Type requis");
+
+        const locs = [];
+        document.querySelectorAll('.location-entry').forEach(entry => {
+            const z = entry.querySelector('.location-zone').value;
+            const r = entry.querySelector('.location-rangee').value;
+            const e = entry.querySelector('.location-espace').value;
+            if (z && r && e) locs.push({ zone: z, rangee: r, espace: e });
         });
-        
+
         const wineData = {
+            id: editingId || Date.now(),
             name,
-            barcode: document.getElementById('barcode').value.trim(),
-            saqUrl: document.getElementById('saqUrl').value.trim(),
             type,
             country: document.getElementById('country').value,
-            region: document.getElementById('region').value,
-            appellation: document.getElementById('appellation').value.trim(),
-            particularity: document.getElementById('particularity').value.trim(),
-            cepages: selectedCepages,
-            accords: selectedAccords,
-            importateur: document.getElementById('importateur').value.trim(),
-            lieuAchat: document.getElementById('lieuAchat').value.trim(),
-            locations,
-            quantity: locations.length || 1
+            cepages: Array.from(document.querySelectorAll('#cepageList input:checked')).map(cb => cb.value),
+            locations: locs
         };
-        
+
         if (editingId) {
-            const index = wines.findIndex(w => w.id === editingId);
-            wines[index] = { ...wines[index], ...wineData };
+            const idx = wines.findIndex(w => w.id === editingId);
+            wines[idx] = wineData;
         } else {
-            wines.push({
-                id: Date.now(),
-                ...wineData
-            });
+            wines.push(wineData);
         }
-        
-        save();
+
+        localStorage.setItem('wines', JSON.stringify(wines));
         closeWineModal();
+        updateHomePage();
         render();
     }
 
-    function applyFilters() {
-        render();
-        
-        // Mettre à jour le filtre de région basé sur le pays sélectionné
-        const selectedCountry = document.getElementById('filterCountry').value;
-        const filterRegionSelect = document.getElementById('filterRegion');
-        
-        filterRegionSelect.innerHTML = '<option value="">Toutes les régions</option>';
-        
-        if (selectedCountry && regionsByCountry[selectedCountry]) {
-            regionsByCountry[selectedCountry].forEach(region => {
-                const option = document.createElement('option');
-                option.value = region;
-                option.textContent = region;
-                filterRegionSelect.appendChild(option);
-            });
-        }
-    }
-
-    function resetFilters() {
-        document.getElementById('searchWine').value = '';
-        document.getElementById('filterType').value = '';
-        document.getElementById('filterCountry').value = '';
-        document.getElementById('filterRegion').value = '';
-        document.getElementById('filterAccord').value = '';
-        document.querySelectorAll('.cepage-filter-item input').forEach(cb => cb.checked = false);
-    }
-
-    function render() {
-        const search = document.getElementById('searchWine').value.toLowerCase();
-        const filterType = document.getElementById('filterType').value;
-        const filterCountry = document.getElementById('filterCountry').value;
-        const filterRegion = document.getElementById('filterRegion').value;
-        const filterAccord = document.getElementById('filterAccord').value;
-        const selectedCepages = Array.from(document.querySelectorAll('.cepage-filter-item input:checked')).map(cb => cb.value);
-        
-        const wineList = document.getElementById('wineList');
-        
-        // Vérifier si au moins un critère est sélectionné
-        const hasCriteria = search || filterType || filterCountry || filterRegion || filterAccord || selectedCepages.length > 0;
-        
-        if (!hasCriteria) {
-            wineList.innerHTML = '<div class="empty">Sélectionnez un critère de recherche</div>';
-            return;
-        }
-        
-        let filtered = wines.filter(wine => {
-            const matchName = !search || wine.name.toLowerCase().includes(search);
-            const matchType = !filterType || wine.type === filterType;
-            const matchCountry = !filterCountry || wine.country === filterCountry;
-            const matchRegion = !filterRegion || wine.region === filterRegion;
-            const matchAccord = !filterAccord || (wine.accords && wine.accords.includes(filterAccord));
-            const matchCepage = selectedCepages.length === 0 || (wine.cepages && wine.cepages.some(c => selectedCepages.includes(c)));
-            
-            return matchName && matchType && matchCountry && matchRegion && matchAccord && matchCepage;
-        });
-        
-        if (filtered.length === 0) {
-            wineList.innerHTML = '<div class="empty">Aucun vin trouvé</div>';
-            return;
-        }
-        
-        wineList.innerHTML = filtered.map(wine => {
-            const qty = wine.locations ? wine.locations.length : wine.quantity;
-            return `
-                <div class="wine-card" onclick="showDetail(${wine.id})">
-                    <div class="wine-name">
-                        ${getWineTypeIcon(wine.type)}
-                        ${wine.name}
-                        <span class="badge" style="margin-left: auto;">${qty} bouteille(s)</span>
-                    </div>
-                    <div class="wine-info">
-                        ${wine.cepages && wine.cepages.length > 0 ? `<span class="badge">🍇 ${wine.cepages.join(', ')}</span>` : ''}
-                        ${wine.country ? `<span class="badge">🌍 ${wine.country}</span>` : ''}
-                        ${wine.region ? `<span class="badge">📍 ${wine.region}</span>` : ''}
-                        ${wine.appellation ? `<span class="badge">🏆 ${wine.appellation}</span>` : ''}
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    function showDetail(id) {
+    // --- 5. BOIRE / RETRAIT ---
+    function showRemoveModal(id) {
+        currentWineId = id;
         const wine = wines.find(w => w.id === id);
-        if (!wine) return;
-
-        let locationsHtml = '';
-        if (wine.locations && wine.locations.length > 0) {
-            locationsHtml = wine.locations.map(loc => 
-                `<div class="wine-location cellier-${loc.zone}">C${loc.zone} • R${loc.rangee} • ${loc.espace}</div>`
-            ).join(' ');
-        } else {
-            locationsHtml = '<div style="color: var(--text-light); font-size: 13px; margin-bottom: 12px;">Emplacement non défini</div>';
-        }
-
-        const qty = wine.locations ? wine.locations.length : wine.quantity;
-
-        document.getElementById('wineDetail').innerHTML = `
-            <div class="wine-name" style="font-size: 24px; margin-bottom: 12px;">${wine.name}</div>
-            ${locationsHtml}
-            
-            ${wine.saqUrl ? `
-                <button class="btn-secondary btn-icon" onclick="copyToClipboard('${wine.barcode || ''}'); window.open('${wine.saqUrl}', '_blank')" style="margin: 12px 0;">
-                    🔗 Voir sur SAQ (code copié)
-                </button>
-            ` : ''}
-            
-            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0;">
-                ${wine.type ? `<span class="badge" style="display: flex; align-items: center; gap: 6px;">${getWineTypeIcon(wine.type)} ${wine.type}</span>` : ''}
-                ${wine.barcode ? `<span class="badge">📊 ${wine.barcode}</span>` : ''}
-                ${wine.country ? `<span class="badge">🌍 ${wine.country}</span>` : ''}
-                ${wine.region ? `<span class="badge">📍 ${wine.region}</span>` : ''}
-                ${wine.appellation ? `<span class="badge">🏆 ${wine.appellation}</span>` : ''}
-                ${wine.particularity ? `<span class="badge">✨ ${wine.particularity}</span>` : ''}
-                <span class="badge"><span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; font-weight: 700; margin-right: 6px;">${qty}</span>bouteille(s)</span>
-            </div>
-            
-            <div style="display: flex; gap: 10px; margin: 16px 0;">
-                <button class="btn-icon btn-secondary" onclick="showRemoveModal(${wine.id})" style="flex: 1;" ${qty === 0 ? 'disabled' : ''}>− Retirer</button>
-                <button class="btn-icon btn-secondary" onclick="adjustQuantity(${wine.id}, 1)" style="flex: 1;">+ Ajouter</button>
-            </div>
-            
-            ${wine.cepages && wine.cepages.length > 0 ? `
-                <div style="margin-top: 16px;">
-                    <strong style="font-size: 13px;">Cépages:</strong>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
-                        ${wine.cepages.map(c => `<span class="badge">🍇 ${c}</span>`).join('')}
-                    </div>
-                </div>
-            ` : ''}
-            
-            ${wine.accords && wine.accords.length > 0 ? `
-                <div style="margin-top: 16px;">
-                    <strong style="font-size: 13px;">Accords mets:</strong>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
-                        ${wine.accords.map(a => `<span class="badge">🍽️ ${a}</span>`).join('')}
-                    </div>
-                </div>
-            ` : ''}
-            
-            ${wine.importateur ? `<div style="margin-top: 12px; font-size: 13px;"><strong>Importateur:</strong> ${wine.importateur}</div>` : ''}
-            ${wine.lieuAchat ? `<div style="margin-top: 6px; font-size: 13px;"><strong>Succursale:</strong> ${wine.lieuAchat}</div>` : ''}
-            
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn-secondary" onclick="showWineModal(${wine.id}); closeDetailModal();" style="flex: 1;">✏️ Modifier</button>
-                <button class="btn-danger" onclick="deleteWine(${wine.id})" style="flex: 1;">🗑️ Supprimer</button>
-            </div>
-        `;
-        document.getElementById('detailModal').classList.add('active');
-    }
-
-    function closeDetailModal() {
-        document.getElementById('detailModal').classList.remove('active');
-    }
-
-    function showRemoveModal(wineId) {
-        currentRemoveWineId = wineId;
-        selectedRemoveLocationIndex = null;
-        const wine = wines.find(w => w.id === wineId);
-        if (!wine) return;
-        
+        const container = document.getElementById('removeLocationsList');
         document.getElementById('removeWineName').textContent = wine.name;
-        document.getElementById('confirmRemoveBtn').disabled = true;
         
-        const locationsList = document.getElementById('removeLocationsList');
-        
-        if (wine.locations && wine.locations.length > 0) {
-            locationsList.innerHTML = wine.locations.map((loc, index) => `
-                <div class="location-entry" style="cursor: pointer; margin-bottom: 8px; transition: all 0.2s;" 
-                     onclick="selectRemoveLocation(${index})" 
-                     id="removeLoc_${index}">
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 2px solid var(--border); border-radius: 0;">
-                        <input type="radio" name="removeLocation" id="radio_${index}" style="width: auto; margin: 0;">
-                        <div class="wine-location cellier-${loc.zone}">C${loc.zone} • R${loc.rangee} • ${loc.espace}</div>
-                    </div>
-                </div>
-            `).join('');
-        } else {
-            locationsList.innerHTML = '<div style="color: var(--text-light); padding: 20px; text-align: center;">Aucun emplacement défini pour ce vin</div>';
-        }
-        
-        document.getElementById('removeModal').classList.add('active');
+        container.innerHTML = wine.locations.map((loc, index) => `
+            <div style="background:#f1f1f1; padding:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border-radius:8px;">
+                <span>Cellier ${loc.zone} • R${loc.rangee} • ${loc.espace}</span>
+                <button onclick="confirmRemoval(${index})" style="background:#8B0000; color:white; border:none; padding:8px 15px; border-radius:5px;">BOIRE</button>
+            </div>
+        `).join('');
+        document.getElementById('removeModal').style.display = 'flex';
     }
 
-    function selectRemoveLocation(index) {
-        selectedRemoveLocationIndex = index;
-        
-        // Mettre à jour le style visuel
-        document.querySelectorAll('#removeLocationsList .location-entry').forEach((elem, i) => {
-            if (i === index) {
-                elem.style.background = 'rgba(30, 58, 95, 0.1)';
-                elem.querySelector('input[type="radio"]').checked = true;
-            } else {
-                elem.style.background = 'transparent';
-                elem.querySelector('input[type="radio"]').checked = false;
-            }
-        });
-        
-        document.getElementById('confirmRemoveBtn').disabled = false;
-    }
-
-    function closeRemoveModal() {
-        document.getElementById('removeModal').classList.remove('active');
-        currentRemoveWineId = null;
-        selectedRemoveLocationIndex = null;
-    }
-
-    function confirmRemoveBottle() {
-        if (selectedRemoveLocationIndex === null) {
-            alert('Veuillez sélectionner un emplacement');
-            return;
-        }
-        
-        const wine = wines.find(w => w.id === currentRemoveWineId);
-        if (!wine) return;
-        
-        if (wine.locations && wine.locations.length > 0) {
-            wine.locations.splice(selectedRemoveLocationIndex, 1);
-            wine.quantity = wine.locations.length;
-        } else {
-            wine.quantity = Math.max(0, wine.quantity - 1);
-        }
-        
-        save();
+    function confirmRemoval(index) {
+        const wineIdx = wines.findIndex(w => w.id === currentWineId);
+        wines[wineIdx].locations.splice(index, 1);
+        localStorage.setItem('wines', JSON.stringify(wines));
         closeRemoveModal();
         closeDetailModal();
         render();
+        updateHomePage();
     }
 
-    function adjustQuantity(id, change) {
-        const wine = wines.find(w => w.id === id);
-        if (!wine) return;
-        
-        if (change > 0) {
-            closeDetailModal();
-            showAddBottleModal(id);
-        }
-    }
-    
-    function showAddBottleModal(wineId) {
-        const wine = wines.find(w => w.id === wineId);
-        if (!wine) return;
-        
-        const modal = document.getElementById('addBottleModal');
-        document.getElementById('addBottleWineName').textContent = wine.name;
-        document.getElementById('addBottleLocationEntries').innerHTML = '';
-        
-        addBottleLocationEntry();
-        
-        modal.classList.add('active');
-        modal.dataset.wineId = wineId;
-    }
-    
-    function closeAddBottleModal() {
-        document.getElementById('addBottleModal').classList.remove('active');
-    }
-    
-    function addBottleLocationEntry() {
-        const container = document.getElementById('addBottleLocationEntries');
-        const entryId = Date.now();
-        const div = document.createElement('div');
-        div.className = 'location-entry';
-        div.id = 'addloc_' + entryId;
-        div.innerHTML = `
-            <div class="location-entry-grid">
-                <div>
-                    <label style="font-size: 10px;">Cellier</label>
-                    <select class="addlocation-zone">
-                        <option value="">-</option>
-                        <option value="1">Cellier 1</option>
-                        <option value="2">Cellier 2</option>
-                        <option value="3">Cellier 3</option>
-                    </select>
-                </div>
-                <div>
-                    <label style="font-size: 10px;">Rangée</label>
-                    <select class="addlocation-rangee">
-                        <option value="">-</option>
-                        ${Array.from({length: 10}, (_, i) => `<option value="${i + 1}">R${i + 1}</option>`).join('')}
-                    </select>
-                </div>
-                <div>
-                    <label style="font-size: 10px;">Espace</label>
-                    <select class="addlocation-espace">
-                        <option value="">-</option>
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                        <option value="D">D</option>
-                        <option value="E">E</option>
-                        <option value="F">F</option>
-                    </select>
-                </div>
-            </div>
-        `;
-        container.appendChild(div);
-    }
-    
-    function saveAddBottle() {
-        const wineId = parseInt(document.getElementById('addBottleModal').dataset.wineId);
-        const wine = wines.find(w => w.id === wineId);
-        if (!wine) return;
-        
-        const locations = [];
-        document.querySelectorAll('#addBottleLocationEntries .location-entry').forEach(entry => {
-            const zone = entry.querySelector('.addlocation-zone').value;
-            const rangee = entry.querySelector('.addlocation-rangee').value;
-            const espace = entry.querySelector('.addlocation-espace').value;
-            
-            if (zone && rangee && espace) {
-                locations.push({ zone, rangee, espace });
-            }
+    // --- 6. AFFICHAGE ET LISTE DE COURSES ---
+    function updateHomePage() {
+        let total = 0;
+        const grapeCounts = {};
+        wines.forEach(w => {
+            const q = w.locations.length;
+            total += q;
+            if(q > 0) w.cepages.forEach(c => grapeCounts[c] = (grapeCounts[c] || 0) + q);
         });
+        document.getElementById('totalBottles').textContent = total;
         
-        if (locations.length === 0) {
-            alert('Veuillez définir au moins un emplacement');
-            return;
-        }
-        
-        if (!wine.locations) {
-            wine.locations = [];
-        }
-        
-        wine.locations.push(...locations);
-        wine.quantity = wine.locations.length;
-        
-        save();
-        closeAddBottleModal();
-        render();
-    }
-
-    function deleteWine(id) {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce vin?')) return;
-        
-        wines = wines.filter(w => w.id !== id);
-        save();
-        closeDetailModal();
-        render();
-    }
-
-    function showLocations() {
-        const zone = document.getElementById('viewZone').value;
-        const container = document.getElementById('locationView');
-        
-        const winesInZone = wines.filter(w => 
-            w.locations && w.locations.some(loc => loc.zone === zone)
-        );
-        
-        if (winesInZone.length === 0) {
-            container.innerHTML = '<div class="empty">Aucun vin dans ce cellier</div>';
-            return;
-        }
-        
-        container.innerHTML = winesInZone.map(wine => {
-            const locsInZone = wine.locations.filter(loc => loc.zone === zone);
-            return `
-                <div class="wine-card" onclick="showDetail(${wine.id})">
-                    <div class="wine-name">
-                        ${getWineTypeIcon(wine.type)}
-                        ${wine.name}
-                    </div>
-                    <div class="wine-info">
-                        ${locsInZone.map(loc => `<div class="wine-location cellier-${loc.zone}">R${loc.rangee} • ${loc.espace}</div>`).join('')}
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    function showCepagesByCellier() {
-        const zone = document.getElementById('cepageZone').value;
-        const container = document.getElementById('cepageView');
-        
-        const cepageCounts = {};
-        
-        wines.forEach(wine => {
-            if (wine.cepages && wine.cepages.length > 0) {
-                let count = 0;
-                
-                if (zone === '0') {
-                    count = wine.locations ? wine.locations.length : wine.quantity;
-                } else {
-                    if (wine.locations) {
-                        count = wine.locations.filter(loc => loc.zone === zone).length;
-                    }
-                }
-                
-                if (count > 0) {
-                    wine.cepages.forEach(cepage => {
-                        cepageCounts[cepage] = (cepageCounts[cepage] || 0) + count;
-                    });
-                }
-            }
-        });
-        
-        if (Object.keys(cepageCounts).length === 0) {
-            container.innerHTML = '<div class="empty">Aucun cépage trouvé</div>';
-            return;
-        }
-        
-        const sortedCepages = Object.entries(cepageCounts).sort((a, b) => b[1] - a[1]);
-        
-        container.innerHTML = sortedCepages.map(([cepage, count]) => `
-            <div class="cepage-summary">
-                <h3>${cepage}</h3>
-                <div style="font-size: 14px; color: var(--text-light);">${count} bouteille(s)</div>
+        const grid = document.getElementById('grapeSummaryGrid');
+        grid.innerHTML = Object.entries(grapeCounts).sort((a,b)=>b[1]-a[1]).map(([name, count]) => `
+            <div class="grape-summary-card" onclick="filterByGrape('${name}')">
+                <div class="grape-summary-name">${name}</div>
+                <div class="grape-summary-count">${count}</div>
             </div>
         `).join('');
     }
 
-    let lastResults = []; // Pour stocker les scans successifs
-let scannerActive = false;
-
-function quickScan() {
-    scanMode = 'add';
-    const scanner = document.getElementById('scanner');
-    const videoTarget = document.getElementById('scannerVideo');
-    
-    scanner.style.display = 'block';
-    scannerActive = true;
-    lastResults = [];
-
-    Quagga.init({
-        inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: videoTarget,
-            constraints: {
-                facingMode: "environment",
-                aspectRatio: { min: 1, max: 2 }
-            }
-        },
-        locator: { patchSize: "medium", halfSample: true },
-        decoder: {
-            readers: ["ean_reader", "ean_8_reader"]
-        },
-        locate: true
-    }, function(err) {
-        if (err) {
-            alert('Erreur caméra: ' + err);
-            stopScan();
+    function updateShoppingList() {
+        const container = document.getElementById('shoppingList');
+        const toBuy = wines.filter(w => w.locations.length === 0);
+        
+        if (toBuy.length === 0) {
+            container.innerHTML = '<div class="empty">Aucun vin à racheter 🎉</div>';
             return;
         }
-        Quagga.start();
-    });
 
-    Quagga.onDetected(function(result) {
-        const barcode = result.codeResult.code;
-        lastResults.push(barcode);
-        if (lastResults.length > 3) lastResults.shift();
-
-        if (lastResults.length === 3 && lastResults.every(v => v === lastResults[0])) {
-            stopScan();
-            const existing = wines.find(w => w.barcode === barcode);
-            if (existing) {
-                showDetail(existing.id);
-            } else {
-                showWineModal();
-                setTimeout(() => {
-                    document.getElementById('barcode').value = barcode;
-                }, 500);
-            }
-            lastResults = [];
-        }
-    });
-}
-
-
-function stopScan() {
-    if (scannerActive) {
-        Quagga.stop();
-        scannerActive = false;
-    }
-    document.getElementById('scanner').style.display = 'none';
-    const videoTarget = document.getElementById('scannerVideo');
-    if (videoTarget) videoTarget.innerHTML = '';
-}
-
-
-
-
-
-    function copyToClipboard(text) {
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(text);
-        }
+        container.innerHTML = '<h3 style="padding:15px;">À Racheter</h3>' + toBuy.map(w => `
+            <div class="wine-card" onclick="showDetail(${w.id})">
+                <div class="wine-name">${getWineTypeIcon(w.type)} ${w.name}</div>
+                <div style="color:red; font-size:12px;">STOCK ÉPUISÉ</div>
+            </div>
+        `).join('');
     }
 
-    function exportToJSON() {
-        const data = JSON.stringify(wines, null, 2);
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'vino_export_' + new Date().toISOString().split('T')[0] + '.json';
-        a.click();
-    }
-
-    function exportToExcel() {
-        const data = wines.map(w => ({
-            'Nom': w.name,
-            'Type': w.type,
-            'Pays': w.country || '',
-            'Région': w.region || '',
-            'Appellation': w.appellation || '',
-            'Particularité': w.particularity || '',
-            'Cépages': w.cepages ? w.cepages.join(', ') : '',
-            'Accords': w.accords ? w.accords.join(', ') : '',
-            'Quantité': w.locations ? w.locations.length : w.quantity,
-            'Code-barres': w.barcode || '',
-            'Importateur': w.importateur || '',
-            'Lieu d\'achat': w.lieuAchat || ''
-        }));
-
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Vins");
-        XLSX.writeFile(wb, 'vino_export_' + new Date().toISOString().split('T')[0] + '.xlsx');
-    }
-
-    function handleImport(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
+    function render() {
+        const search = document.getElementById('searchWine').value.toLowerCase();
+        const list = document.getElementById('wineList');
+        const filtered = wines.filter(w => w.name.toLowerCase().includes(search) && w.locations.length > 0);
         
-        if (file.name.endsWith('.json')) {
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (confirm(`Importer ${imported.length} vins? Cela remplacera vos données actuelles.`)) {
-                        wines = imported;
-                        save();
-                        render();
-                        alert('Import réussi!');
-                    }
-                } catch (err) {
-                    alert('Erreur lors de l\'import: ' + err.message);
-                }
-            };
-            reader.readAsText(file);
-        } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const imported = XLSX.utils.sheet_to_json(firstSheet);
-                    
-                    const converted = imported.map(row => ({
-                        id: Date.now() + Math.random(),
-                        name: row['Nom'] || '',
-                        type: row['Type'] || '',
-                        country: row['Pays'] || '',
-                        region: row['Région'] || '',
-                        appellation: row['Appellation'] || '',
-                        particularity: row['Particularité'] || '',
-                        cepages: row['Cépages'] ? row['Cépages'].split(',').map(c => c.trim()) : [],
-                        accords: row['Accords'] ? row['Accords'].split(',').map(a => a.trim()) : [],
-                        quantity: row['Quantité'] || 0,
-                        barcode: row['Code-barres'] || '',
-                        importateur: row['Importateur'] || '',
-                        lieuAchat: row['Lieu d\'achat'] || '',
-                        locations: []
-                    }));
-                    
-                    if (confirm(`Importer ${converted.length} vins? Cela remplacera vos données actuelles.`)) {
-                        wines = converted;
-                        save();
-                        render();
-                        alert('Import réussi!');
-                    }
-                } catch (err) {
-                    alert('Erreur lors de l\'import Excel: ' + err.message);
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-        
-        event.target.value = '';
+        list.innerHTML = filtered.map(w => `
+            <div class="wine-card" onclick="showDetail(${w.id})">
+                <div class="wine-name">${getWineTypeIcon(w.type)} ${w.name}</div>
+                <div class="badge">${w.locations.length} bouteille(s)</div>
+            </div>
+        `).join('');
     }
 
-    // Fonction pour changer de page
-function showPage(pageNumber) {
-    // 1. Masquer toutes les pages (on retire la classe active)
-    document.querySelectorAll('.page').forEach(page => {
-        page.style.display = 'none';
-    });
-
-    // 2. Afficher uniquement la page sélectionnée
-    const targetPage = document.getElementById('page' + pageNumber);
-    if (targetPage) {
-        targetPage.style.display = 'block';
+    function showDetail(id) {
+        const wine = wines.find(w => w.id === id);
+        document.getElementById('wineDetail').innerHTML = `
+            <h2>${wine.name}</h2>
+            <p>${getWineTypeIcon(wine.type)} ${wine.type} - ${wine.country || ''}</p>
+            <div style="margin:15px 0;">${wine.locations.map(l => `<span class="badge">C${l.zone}-R${l.rangee}-${l.espace}</span>`).join(' ')}</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button class="btn-primary" onclick="showRemoveModal(${wine.id})">BOIRE</button>
+                <button class="btn-secondary" onclick="closeDetailModal(); showWineModal(${wine.id})">MODIFIER</button>
+            </div>
+        `;
+        document.getElementById('detailModal').style.display = 'flex';
     }
 
-    // 3. Remonter en haut de l'écran
-    window.scrollTo(0, 0);
-}
-
-// Au chargement, on affiche la page 1 par défaut
-window.onload = function() {
-    showPage(1);
-};
-    
-    function closeCepageHistoryModal() {
-        document.getElementById('cepageHistoryModal').classList.remove('active');
+    // --- 7. UTILITAIRES ---
+    function addLocationEntry(data = {zone:'1', rangee:'1', espace:'A'}) {
+        const div = document.createElement('div');
+        div.className = 'location-entry';
+        div.innerHTML = `
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <select class="location-zone"><option value="1" ${data.zone==='1'?'selected':''}>Cellier</option><option value="2" ${data.zone==='2'?'selected':''}>Casiers</option><option value="3" ${data.zone==='3'?'selected':''}>Réserve</option></select>
+                <select class="location-rangee">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${data.rangee==i+1?'selected':''}>R${i+1}</option>`).join('')}</select>
+                <select class="location-espace"><option value="A" ${data.espace==='A'?'selected':''}>A</option><option value="B" ${data.espace==='B'?'selected':''}>B</option><option value="C" ${data.espace==='C'?'selected':''}>C</option></select>
+                <button onclick="this.parentElement.remove()" style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px;">✕</button>
+            </div>`;
+        document.getElementById('locationEntries').appendChild(div);
     }
 
-    init();
+    function updateCepageList(type) {
+        const grid = document.getElementById('cepageList');
+        grid.innerHTML = '';
+        const list = (type === 'Blanc') ? cepagesBlancs : (type === 'Rouge' ? cepagesRouges : [...cepagesBlancs, ...cepagesRouges]);
+        list.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'checkbox-item';
+            div.innerHTML = `<input type="checkbox" id="cep_${c}" value="${c}"><label for="cep_${c}">${c}</label>`;
+            grid.appendChild(div);
+        });
+    }
+
+    function getWineTypeIcon(t) {
+        const c = { 'Rouge': '#8B0000', 'Blanc': '#F5DEB3', 'Rosé': '#FFB6C1' };
+        return `<span style="display:inline-block;width:12px;height:12px;background:${c[t]||'#888'};border-radius:50%;border:1px solid #ccc"></span>`;
+    }
+
+    function filterByGrape(g) { showPage(2); document.getElementById('filter_'+g).checked = true; applyFilters(); }
+    function closeWineModal() { document.getElementById('wineModal').style.display = 'none'; }
+    function closeDetailModal() { document.getElementById('detailModal').style.display = 'none'; }
+    function closeRemoveModal() { document.getElementById('removeModal').style.display = 'none'; }
+    function applyFilters() { render(); }
+    function quickScan() { alert("Scanner en attente de config."); }
 </script>
-
 
 </body>
 </html>

@@ -728,7 +728,7 @@
 </div>
 
 <div class="header">
-    <div class="version">123</div>
+    <div class="version">456</div>
     <h1>VINO</h1>
     <div class="subtitle">Collections Privée</div>
 </div>
@@ -981,13 +981,13 @@
 <input type="file" id="importFile" accept=".json,.xlsx" style="display: none;" onchange="handleImport(event)">
 
 <script>
-    // --- 1. VOS DONNÉES ET ÉTAT ---
+    // --- 1. DONNÉES ET ÉTAT ---
     let wines = JSON.parse(localStorage.getItem('wines')) || [];
     let editingId = null;
     let currentWineId = null;
 
-    // Vos listes de pays et régions
     const countries = ['France', 'Italie', 'Espagne', 'Portugal', 'Canada', 'États-Unis', 'Argentine', 'Chili', 'Australie', 'Nouvelle-Zélande', 'Afrique du Sud', 'Allemagne'].sort();
+    
     const regionsByCountry = {
         'France': ['Alsace', 'Beaujolais', 'Bordeaux', 'Bourgogne', 'Champagne', 'Jura', 'Languedoc', 'Loire', 'Provence', 'Rhône', 'Roussillon', 'Savoie', 'Sud-Ouest'],
         'Italie': ['Piémont', 'Toscane', 'Vénétie', 'Sicile', 'Pouilles', 'Lombardie', 'Trentin'],
@@ -997,12 +997,39 @@
         'États-Unis': ['Californie', 'Oregon', 'Washington', 'New York']
     };
 
-    // Vos listes de cépages et accords
     const cepagesBlancs = ['Chardonnay', 'Sauvignon Blanc', 'Sémillon', 'Chenin Blanc', 'Riesling', 'Gewürztraminer', 'Pinot Blanc', 'Pinot Gris/Grigio', 'Viognier', 'Muscat Blanc', 'Sylvaner', 'Malvasia', 'Trebbiano', 'Albariño', 'Verdejo', 'Vermentino', 'Marsanne', 'Roussanne', 'Grüner Veltliner'].sort();
     const cepagesRouges = ['Cabernet Sauvignon', 'Pinot Noir', 'Merlot', 'Syrah/Shiraz', 'Cabernet Franc', 'Gamay', 'Grenache', 'Cinsault', 'Carignan', 'Barbera', 'Sangiovese', 'Zinfandel', 'Tempranillo', 'Nebbiolo', 'Mourvèdre', 'Malbec', 'Moscato'].sort();
     const accords = ['Apéro', 'Asiatique', 'Cuisine grecque', 'Cuisine indienne', 'Cuisine italienne (pâtes)', 'Dessert', 'Fromage', 'Friture', 'Grillades', 'Mets portugais', 'Mets traditionnels', 'Moyen orient', 'Noël', 'Pizza', 'Poisson', 'Polyvalent', 'Poulet', 'Saumon', 'Saucisses', 'Tomates', 'ZZZ - Ne pas racheter'].sort();
 
-    // --- 2. NAVIGATION ---
+    // --- 2. INITIALISATION ---
+    window.onload = function() {
+        populateCountries(); // Remplit les listes de pays au départ
+        updateHomePage();
+        showPage(1);
+    };
+
+    function populateCountries() {
+        const selects = ['country', 'filterCountry'];
+        selects.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.innerHTML = '<option value="">Pays...</option>';
+                countries.forEach(c => el.add(new Option(c, c)));
+            }
+        });
+    }
+
+    function updateRegions() {
+        const country = document.getElementById('country').value;
+        const regionSelect = document.getElementById('region');
+        if (!regionSelect) return;
+        regionSelect.innerHTML = '<option value="">Sélectionner</option>';
+        if (regionsByCountry[country]) {
+            regionsByCountry[country].sort().forEach(r => regionSelect.add(new Option(r, r)));
+        }
+    }
+
+    // --- 3. NAVIGATION ---
     function showPage(n) {
         document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
         const target = document.getElementById('page' + n);
@@ -1019,89 +1046,49 @@
         window.scrollTo(0, 0);
     }
 
-    // --- 3. INITIALISATION ---
-    window.onload = function() {
-        initFormElements();
-        updateHomePage();
-        showPage(1);
-    };
-
-    function initFormElements() {
-        const countrySelect = document.getElementById('country');
-        const filterCountry = document.getElementById('filterCountry');
-        countries.forEach(c => {
-            countrySelect.add(new Option(c, c));
-            filterCountry.add(new Option(c, c));
-        });
-
-        // Init filtres cépages recherche (Page 2)
-        const whiteFilter = document.getElementById('cepageFilterWhite');
-        cepagesBlancs.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'cepage-filter-item';
-            div.innerHTML = `<input type="checkbox" id="filter_${c}" value="${c}" onchange="applyFilters()"><label for="filter_${c}">${c}</label>`;
-            whiteFilter.appendChild(div);
-        });
-
-        const redFilter = document.getElementById('cepageFilterRed');
-        cepagesRouges.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'cepage-filter-item';
-            div.innerHTML = `<input type="checkbox" id="filter_${c}" value="${c}" onchange="applyFilters()"><label for="filter_${c}">${c}</label>`;
-            redFilter.appendChild(div);
-        });
-    }
-
     // --- 4. GESTION DU VIN (MODALE) ---
-function showWineModal(id = null) {
-    editingId = id;
-    const modal = document.getElementById('wineModal');
-    
-    // 1. On affiche la fenêtre d'abord
-    modal.style.display = 'block';
-
-    // 2. On vide les emplacements pour repartir à neuf
-    const entries = document.getElementById('locationEntries');
-    if (entries) entries.innerHTML = '';
-
-    // 3. REMPLISSAGE DES LISTES (C'est ici que ça se passe)
-    if (typeof populateCountries === "function") {
-        populateCountries();
-    }
-
-    if (id) {
-        const wine = wines.find(w => w.id === id);
-        document.getElementById('modalTitle').textContent = "Modifier le vin";
-        document.getElementById('wineName').value = wine.name;
-        document.getElementById('wineType').value = wine.type;
+    function showWineModal(id = null) {
+        editingId = id;
+        const modal = document.getElementById('wineModal');
+        const form = document.getElementById('wineForm');
+        const entries = document.getElementById('locationEntries');
         
-        // On sélectionne le pays et on charge les régions
-        const countrySelect = document.getElementById('country');
-        if (countrySelect) {
-            countrySelect.value = wine.country || '';
-            if (typeof updateRegions === "function") updateRegions();
+        if (form) form.reset();
+        if (entries) entries.innerHTML = '';
+        
+        modal.style.display = 'block';
+
+        if (id) {
+            const wine = wines.find(w => w.id === id);
+            document.getElementById('modalTitle').textContent = "Modifier le vin";
+            document.getElementById('wineName').value = wine.name;
+            document.getElementById('wineType').value = wine.type;
+            document.getElementById('country').value = wine.country || '';
+            updateRegions();
+            if(wine.region) document.getElementById('region').value = wine.region;
+            
+            updateCepageList(wine.type);
+            // Cocher les cépages
+            if (wine.cepages) {
+                wine.cepages.forEach(c => {
+                    const cb = document.getElementById('cep_' + c);
+                    if (cb) cb.checked = true;
+                });
+            }
+            wine.locations.forEach(loc => addLocationEntry(loc));
+        } else {
+            document.getElementById('modalTitle').textContent = "Ajouter un vin";
+            updateCepageList('');
+            addLocationEntry();
         }
-
-        updateCepageList(wine.type);
-        wine.locations.forEach(loc => addLocationEntry(loc));
-    } else {
-        document.getElementById('modalTitle').textContent = "Ajouter un vin";
-        document.getElementById('wineForm').reset();
-        
-        // Reset des listes pour un nouveau vin
-        if (typeof updateRegions === "function") updateRegions();
-        updateCepageList('');
-        addLocationEntry();
     }
-}
-    
-    modal.style.display = 'block';
 
+    function closeWineModal() { 
+        document.getElementById('wineModal').style.display = 'none'; 
+    }
 
-function closeWineModal() { 
-    document.getElementById('wineModal').style.display = 'none'; 
-}
-    function saveWine() {
+    function saveWine(event) {
+        if (event) event.preventDefault();
         const name = document.getElementById('wineName').value.trim();
         const type = document.getElementById('wineType').value;
         if (!name || !type) return alert("Nom et Type requis");
@@ -1119,6 +1106,7 @@ function closeWineModal() {
             name,
             type,
             country: document.getElementById('country').value,
+            region: document.getElementById('region') ? document.getElementById('region').value : '',
             cepages: Array.from(document.querySelectorAll('#cepageList input:checked')).map(cb => cb.value),
             locations: locs
         };
@@ -1136,72 +1124,34 @@ function closeWineModal() {
         render();
     }
 
-    // --- 5. BOIRE / RETRAIT ---
-    function showRemoveModal(id) {
-        currentWineId = id;
-        const wine = wines.find(w => w.id === id);
-        const container = document.getElementById('removeLocationsList');
-        document.getElementById('removeWineName').textContent = wine.name;
-        
-        container.innerHTML = wine.locations.map((loc, index) => `
-            <div style="background:#f1f1f1; padding:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border-radius:8px;">
-                <span>Cellier ${loc.zone} • R${loc.rangee} • ${loc.espace}</span>
-                <button onclick="confirmRemoval(${index})" style="background:#8B0000; color:white; border:none; padding:8px 15px; border-radius:5px;">BOIRE</button>
-            </div>
-        `).join('');
-        document.getElementById('removeModal').style.display = 'flex';
-    }
-
-    function confirmRemoval(index) {
-        const wineIdx = wines.findIndex(w => w.id === currentWineId);
-        wines[wineIdx].locations.splice(index, 1);
-        localStorage.setItem('wines', JSON.stringify(wines));
-        closeRemoveModal();
-        closeDetailModal();
-        render();
-        updateHomePage();
-    }
-
-    // --- 6. AFFICHAGE ET LISTE DE COURSES ---
+    // --- 5. AFFICHAGE ET LISTES ---
     function updateHomePage() {
         let total = 0;
         const grapeCounts = {};
         wines.forEach(w => {
             const q = w.locations.length;
             total += q;
-            if(q > 0) w.cepages.forEach(c => grapeCounts[c] = (grapeCounts[c] || 0) + q);
+            if(q > 0 && w.cepages) w.cepages.forEach(c => grapeCounts[c] = (grapeCounts[c] || 0) + q);
         });
         document.getElementById('totalBottles').textContent = total;
         
         const grid = document.getElementById('grapeSummaryGrid');
-        grid.innerHTML = Object.entries(grapeCounts).sort((a,b)=>b[1]-a[1]).map(([name, count]) => `
-            <div class="grape-summary-card" onclick="filterByGrape('${name}')">
-                <div class="grape-summary-name">${name}</div>
-                <div class="grape-summary-count">${count}</div>
-            </div>
-        `).join('');
-    }
-
-    function updateShoppingList() {
-        const container = document.getElementById('shoppingList');
-        const toBuy = wines.filter(w => w.locations.length === 0);
-        
-        if (toBuy.length === 0) {
-            container.innerHTML = '<div class="empty">Aucun vin à racheter 🎉</div>';
-            return;
+        if (grid) {
+            grid.innerHTML = Object.entries(grapeCounts).sort((a,b)=>b[1]-a[1]).map(([name, count]) => `
+                <div class="grape-summary-card" onclick="filterByGrape('${name}')">
+                    <div class="grape-summary-name">${name}</div>
+                    <div class="grape-summary-count">${count}</div>
+                </div>
+            `).join('');
         }
-
-        container.innerHTML = '<h3 style="padding:15px;">À Racheter</h3>' + toBuy.map(w => `
-            <div class="wine-card" onclick="showDetail(${w.id})">
-                <div class="wine-name">${getWineTypeIcon(w.type)} ${w.name}</div>
-                <div style="color:red; font-size:12px;">STOCK ÉPUISÉ</div>
-            </div>
-        `).join('');
     }
 
     function render() {
-        const search = document.getElementById('searchWine').value.toLowerCase();
+        const searchInput = document.getElementById('searchWine');
+        const search = searchInput ? searchInput.value.toLowerCase() : '';
         const list = document.getElementById('wineList');
+        if (!list) return;
+
         const filtered = wines.filter(w => w.name.toLowerCase().includes(search) && w.locations.length > 0);
         
         list.innerHTML = filtered.map(w => `
@@ -1212,36 +1162,31 @@ function closeWineModal() {
         `).join('');
     }
 
-    function showDetail(id) {
-        const wine = wines.find(w => w.id === id);
-        document.getElementById('wineDetail').innerHTML = `
-            <h2>${wine.name}</h2>
-            <p>${getWineTypeIcon(wine.type)} ${wine.type} - ${wine.country || ''}</p>
-            <div style="margin:15px 0;">${wine.locations.map(l => `<span class="badge">C${l.zone}-R${l.rangee}-${l.espace}</span>`).join(' ')}</div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button class="btn-primary" onclick="showRemoveModal(${wine.id})">BOIRE</button>
-                <button class="btn-secondary" onclick="closeDetailModal(); showWineModal(${wine.id})">MODIFIER</button>
-            </div>
-        `;
-        document.getElementById('detailModal').style.display = 'flex';
-    }
-
-    // --- 7. UTILITAIRES ---
+    // --- 6. UTILITAIRES ---
     function addLocationEntry(data = {zone:'1', rangee:'1', espace:'A'}) {
         const div = document.createElement('div');
         div.className = 'location-entry';
         div.innerHTML = `
             <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <select class="location-zone"><option value="1" ${data.zone==='1'?'selected':''}>Cellier</option><option value="2" ${data.zone==='2'?'selected':''}>Casiers</option><option value="3" ${data.zone==='3'?'selected':''}>Réserve</option></select>
+                <select class="location-zone">
+                    <option value="1" ${data.zone==='1'?'selected':''}>Cellier</option>
+                    <option value="2" ${data.zone==='2'?'selected':''}>Casiers</option>
+                    <option value="3" ${data.zone==='3'?'selected':''}>Réserve</option>
+                </select>
                 <select class="location-rangee">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${data.rangee==i+1?'selected':''}>R${i+1}</option>`).join('')}</select>
-                <select class="location-espace"><option value="A" ${data.espace==='A'?'selected':''}>A</option><option value="B" ${data.espace==='B'?'selected':''}>B</option><option value="C" ${data.espace==='C'?'selected':''}>C</option></select>
-                <button onclick="this.parentElement.remove()" style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px;">✕</button>
+                <select class="location-espace">
+                    <option value="A" ${data.espace==='A'?'selected':''}>A</option>
+                    <option value="B" ${data.espace==='B'?'selected':''}>B</option>
+                    <option value="C" ${data.espace==='C'?'selected':''}>C</option>
+                </select>
+                <button type="button" onclick="this.parentElement.remove()" style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px;">✕</button>
             </div>`;
         document.getElementById('locationEntries').appendChild(div);
     }
 
     function updateCepageList(type) {
         const grid = document.getElementById('cepageList');
+        if (!grid) return;
         grid.innerHTML = '';
         const list = (type === 'Blanc') ? cepagesBlancs : (type === 'Rouge' ? cepagesRouges : [...cepagesBlancs, ...cepagesRouges]);
         list.forEach(c => {
@@ -1253,16 +1198,12 @@ function closeWineModal() {
     }
 
     function getWineTypeIcon(t) {
-        const c = { 'Rouge': '#8B0000', 'Blanc': '#F5DEB3', 'Rosé': '#FFB6C1' };
+        const c = { 'Rouge': '#8B0000', 'Blanc': '#F5DEB3', 'Rosé': '#FFB6C1', 'Mousseux': '#EEE' };
         return `<span style="display:inline-block;width:12px;height:12px;background:${c[t]||'#888'};border-radius:50%;border:1px solid #ccc"></span>`;
     }
 
-    function filterByGrape(g) { showPage(2); document.getElementById('filter_'+g).checked = true; applyFilters(); }
-    function closeWineModal() { document.getElementById('wineModal').style.display = 'none'; }
     function closeDetailModal() { document.getElementById('detailModal').style.display = 'none'; }
     function closeRemoveModal() { document.getElementById('removeModal').style.display = 'none'; }
-    function applyFilters() { render(); }
-    function quickScan() { alert("Scanner en attente de config."); }
 </script>
 
 </body>

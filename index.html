@@ -1,1211 +1,324 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>VINO</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VINO - Gestion de Cave</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #002b5c; --secondary: #6d071a; --accent: #d4af37;
+            --bg: #0a0a0a; --card-bg: #1a1a1a; --text: #ffffff;
+            --text-light: #a0a0a0; --border: #333;
+        }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
+                        url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80');
+            background-size: cover;  text-align: center; border-bottom: 2px solid var(--accent);  }
 
-    :root {
-        --primary: #1E3A5F;
-        --primary-dark: #0F2744;
-        --secondary: #D4AF37;
-        --bg-light: #F8F6F3;
-        --text-dark: #2C2C2C;
-        --text-light: #6B6B6B;
-        --border: #E8E3DC;
-        --cellier1: #8B4513;
-        --cellier2: #2F4F4F;
-        --cellier3: #8B0000;
-    }
-    
-    body {
-        font-family: 'Lato', sans-serif;
-        background: #000;
-        color: var(--text-dark);
-        padding-bottom: 80px;
-        position: relative;
-        min-height: 100vh;
-    }
-    
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-       
-    }
-    
-    .header {
-        background: rgba(30, 58, 95, 0.95);
-        backdrop-filter: blur(10px);
-        padding: 16px 20px;
-        text-align: center;
-        box-shadow: 0 2px 20px rgba(0,0,0,0.3);
-        position: relative;
-    }
-    
-    .version {
-        position: absolute;
-        top: 8px;
-        right: 12px;
-        font-size: 9px;
-        color: rgba(255, 255, 255, 0.5);
-        font-weight: 300;
-    }
-    
-    .header h1 {
-        font-family: 'Playfair Display', serif;
-        font-size: 52px;
-        font-weight: 700;
-        color: var(--secondary);
-        letter-spacing: 8px;
-        margin-bottom: 2px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    }
-    
-    .subtitle {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.8);
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        font-weight: 300;
-    }
-    
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-    
-    .page {
-        display: none;
-    }
-    
-    .page.active {
-        display: block;
-    }
-    
-    .nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(30, 58, 95, 0.98);
-        backdrop-filter: blur(15px);
-        display: flex;
-        justify-content: space-around;
-        padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-        box-shadow: 0 -2px 20px rgba(0,0,0,0.3);
-        z-index: 100;
-    }
-    
-    .nav-item {
-        flex: 1;
-        text-align: center;
-        color: rgba(255, 255, 255, 0.6);
-        padding: 8px 4px;
-        cursor: pointer;
-        transition: all 0.3s;
-        font-size: 20px;
-        position: relative;
-    }
-    
-    .nav-item.active {
-        color: var(--secondary);
-    }
-    
-    .nav-item .nav-label {
-        font-size: 9px;
-        margin-top: 2px;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        font-weight: 400;
-    }
-    
-    .scan-hero {
-        text-align: center;
-        padding: 60px 20px 40px;
-    }
-    
-    .scan-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 40px;
-        margin-top: 30px;
-    }
-    
-    .btn-scan-large {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: none;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        color: white;
-        font-size: 52px;
-        cursor: pointer;
-        box-shadow: 0 8px 30px rgba(30, 58, 95, 0.4);
-        transition: all 0.3s;
-    }
-    
-    .btn-scan-large:active {
-        transform: scale(0.95);
-    }
-    
-    .scan-label {
-        margin-top: 12px;
-        font-size: 13px;
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 600;
-        letter-spacing: 1px;
-    }
-    
-    .filter-bar {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        padding: 16px;
-        border-radius: 0;
-        margin-bottom: 16px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    
-    .filter-bar select,
-    .filter-bar input {
-        width: 100%;
-        padding: 12px;
-        margin-bottom: 10px;
-        border: 1px solid var(--border);
-        border-radius: 0;
-        font-size: 14px;
-        background: white;
-    }
-    
-    .cepage-filter-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        margin-bottom: 12px;
-    }
-    
-    .cepage-filter-item {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 12px;
-    }
-    
-    .cepage-filter-item input[type="checkbox"] {
-        width: auto;
-        margin: 0;
-    }
-    
-    .wine-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        padding: 16px;
-        margin-bottom: 12px;
-        border-radius: 0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        cursor: pointer;
-        transition: all 0.2s;
-        border-left: 4px solid var(--primary);
-    }
-    
-    .wine-card:active {
-        transform: scale(0.98);
-    }
-    
-    .wine-name {
-        font-family: 'Playfair Display', serif;
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--primary);
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .wine-info {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        font-size: 12px;
-        color: var(--text-light);
-    }
-    
-    .badge {
-        background: var(--bg-light);
-        padding: 4px 10px;
-        border-radius: 0;
-        font-size: 11px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
-    
-    .wine-location {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 0;
-        font-size: 11px;
-        font-weight: 600;
-        color: white;
-        margin-right: 6px;
-        margin-bottom: 6px;
-    }
-    
-    .cellier-1 { background: var(--cellier1); }
-    .cellier-2 { background: var(--cellier2); }
-    .cellier-3 { background: var(--cellier3); }
-    
-.modal {
-    display: none; 
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; 
-    height: 100%;
-    background: white; /* Fond blanc total sur mobile */
-    z-index: 9999;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-}
-    
-    .modal.active {
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-    }
-    
-.modal-content {
-    width: 100%;
-    min-height: 100%;
-    margin: 0;
-    padding: 20px;
-    border-radius: 0; /* Pas de bords arrondis pour prendre tout l'écran */
-}
-    
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 12px;
-        border-bottom: 2px solid var(--border);
-    }
-    
-    .modal-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 24px;
-        font-weight: 600;
-        color: var(--primary);
-    }
-    
-    .close-btn {
-        background: none;
-        border: none;
-        font-size: 32px;
-        color: var(--text-light);
-        cursor: pointer;
-        padding: 0;
-        width: 32px;
-        height: 32px;
-        line-height: 1;
-    }
-    
-    .form-group {
-        margin-bottom: 16px;
-    }
-    
-    .form-group label {
-        display: block;
-        margin-bottom: 6px;
-        font-weight: 600;
-        font-size: 13px;
-        color: var(--text-dark);
-    }
-    
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid var(--border);
-        border-radius: 0;
-        font-size: 14px;
-        font-family: 'Lato', sans-serif;
-    }
-    
-    .form-group textarea {
-        resize: vertical;
-        min-height: 80px;
-    }
-    
-    .checkbox-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        max-height: 300px;
-        overflow-y: auto;
-        border: 1px solid var(--border);
-        padding: 12px;
-        background: var(--bg-light);
-    }
-    
-    .checkbox-item {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 12px;
-    }
-    
-    .checkbox-item input[type="checkbox"] {
-        width: auto;
-        margin: 0;
-    }
-    
-    .btn-primary,
-    .btn-secondary,
-    .btn-danger {
-        width: 100%;
-        padding: 14px;
-        border: none;
-        border-radius: 0;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        color: white;
-        box-shadow: 0 4px 15px rgba(30, 58, 95, 0.3);
-    }
-    
-    .btn-primary:active {
-        transform: translateY(2px);
-    }
-    
-    .btn-secondary {
-        background: white;
-        color: var(--primary);
-        border: 2px solid var(--primary);
-        margin-bottom: 10px;
-    }
-    
-    .btn-danger {
-        background: #dc2626;
-        color: white;
-    }
-    
-    .btn-icon {
-        width: auto;
-        padding: 10px 20px;
-        font-size: 13px;
-    }
-    
-    .location-btn {
-        width: 32px;
-        height: 32px;
-        border: none;
-        border-radius: 0;
-        background: #ef4444;
-        color: white;
-        font-size: 18px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
-        margin: 0;
-        line-height: 1;
-    }
-    
-    .location-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-    }
-    
-    .location-entry {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 10px;
-        border-radius: 0;
-        margin-bottom: 8px;
-        border: 1px solid var(--border);
-    }
-    
-    .location-entry-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-        margin-top: 6px;
-    }
-    
-   /* Le conteneur qui s'affiche par-dessus tout */
-#scanner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: #000;
-    z-index: 9999;
-    display: none; /* Caché par défaut */
-}
+        .header { 
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
+                        url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80');
+            background-size: cover; padding: 40px 20px; text-align: center; border-bottom: 2px solid var(--accent); 
+        }
+        .version { font-size: 10px; color: var(--accent); letter-spacing: 2px; margin-bottom: 5px; }
+        h1 { font-size: 32px; letter-spacing: 5px; margin: 10px 0; font-weight: 300; }
+        .subtitle { font-size: 12px; color: var(--text-light); text-transform: uppercase; letter-spacing: 2px; }
 
-/* La vidéo elle-même */
-#scannerVideo video {
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover;
-}
+        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        
+        .page { display: none; }
+        .page.active { display: block; }
 
-/* La ligne rouge de guidage */
-.line-guide {
-    position: absolute;
-    top: 50%;
-    left: 10%;
-    right: 10%;
-    height: 2px;
-    background: red;
-    box-shadow: 0 0 10px red;
-    z-index: 10000;
-    pointer-events: none; /* Pour ne pas gêner le clic */
-}
+        .home-stats { text-align: center; margin-bottom: 30px; }
+        .total-bottles { font-size: 64px; color: var(--accent); font-weight: bold; display: block; line-height: 1; }
+        .total-label { text-transform: uppercase; font-size: 12px; color: var(--text-light); letter-spacing: 2px; }
 
-/* Bouton pour fermer le scan */
-.btn-close-scan {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 10001;
-    padding: 10px 20px;
-    background: rgba(0,0,0,0.5);
-    color: white;
-    border: 1px solid white;
-    border-radius: 5px;
-}
+        .scan-buttons { display: flex; justify-content: center; gap: 40px; margin: 30px 0; }
+        .btn-circle { width: 80px; height: 80px; border-radius: 50%; border: none; background: var(--primary); color: white; font-size: 30px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+        .scan-label { margin-top: 10px; font-size: 12px; color: var(--text-light); text-align: center; }
 
-    
-    #scanner .controls {
-        position: absolute;
-        bottom: 40px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    
-    .empty {
-        text-align: center;
-        padding: 40px 20px;
-        color: rgba(255, 255, 255, 0.7);
-    }
-    
-    .cepage-summary {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 12px;
-        border-radius: 0;
-        margin-bottom: 10px;
-        border-left: 4px solid var(--primary);
-    }
-    
-    .cepage-summary h3 {
-        margin-bottom: 8px;
-        color: var(--primary);
-        font-size: 16px;
-    }
-    
-    .missing-cepages {
-        background: rgba(239, 68, 68, 0.1);
-        border-left: 4px solid #ef4444;
-        padding: 12px;
-        border-radius: 0;
-        margin-bottom: 12px;
-    }
-    
-    .missing-cepages h3 {
-        color: #ef4444;
-        margin-bottom: 8px;
-        font-size: 16px;
-    }
-    
-    .missing-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-    
-    .missing-badge {
-        background: white;
-        padding: 4px 10px;
-        border-radius: 0;
-        font-size: 12px;
-        border: 1px solid #ef4444;
-        color: #ef4444;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    
-    .missing-badge:hover {
-        background: #ef4444;
-        color: white;
-    }
-    
-    .history-item {
-        background: rgba(255, 255, 255, 0.7);
-        padding: 8px;
-        margin-bottom: 6px;
-        border-radius: 0;
-        font-size: 12px;
-    }
+        .grape-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .grape-summary-card { background: var(--card-bg); padding: 15px; border-radius: 10px; border-left: 3px solid var(--accent); }
+        .grape-summary-name { font-size: 12px; color: var(--text-light); text-transform: uppercase; }
+        .grape-summary-count { font-size: 20px; font-weight: bold; color: var(--accent); }
 
-    /* Nouveaux styles pour page d'accueil */
-    .home-stats {
-        text-align: center;
-        margin: 30px 0 20px;
-        padding: 0;
-        display: flex;
-        align-items: baseline;
-        justify-content: center;
-        gap: 8px;
-    }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; overflow-y: auto; }
+        .modal-content { padding: 25px; max-width: 500px; margin: 0 auto; }
+        label { display: block; font-size: 11px; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; background: #222; border: 1px solid var(--border); color: white; border-radius: 8px; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-    .total-bottles {
-        font-family: 'Playfair Display', serif;
-        font-size: 48px;
-        font-weight: 700;
-        color: var(--secondary);
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        line-height: 1;
-    }
+        .cepage-grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #111; padding: 10px; border-radius: 8px; max-height: 150px; overflow-y: auto; margin-bottom: 15px; }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        
+        .location-entry { background: #252525; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; gap: 5px; }
+        .location-entry select { margin-bottom: 0; flex: 1; }
 
-    .total-label {
-        font-size: 16px;
-        color: rgba(255, 255, 255, 0.8);
-        font-weight: 300;
-        letter-spacing: 1px;
-    }
+        .nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; border-top: 1px solid var(--border); padding: 10px 0; z-index: 100; }
+        .nav-item { flex: 1; text-align: center; color: var(--text-light); font-size: 9px; text-transform: uppercase; cursor: pointer; }
+        .nav-item.active { color: var(--accent); }
+        .nav-item div { font-size: 18px; margin-bottom: 3px; }
 
-    .grape-summary-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 8px;
-        margin-top: 30px;
-    }
-
-    .grape-summary-card {
-        background: linear-gradient(135deg, rgba(30, 58, 95, 0.9) 0%, rgba(15, 39, 68, 0.9) 100%);
-        backdrop-filter: blur(10px);
-        padding: 12px;
-        border-radius: 50%;
-        aspect-ratio: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        text-align: center;
-        transition: all 0.2s;
-        cursor: pointer;
-        border: 2px solid transparent;
-    }
-
-    .grape-summary-card:hover {
-        border-color: var(--secondary);
-    }
-
-    .grape-summary-card:active {
-        transform: scale(0.95);
-    }
-
-    .grape-summary-name {
-        font-size: 10px;
-        font-weight: 600;
-        color: rgba(255, 255, 255, 0.9);
-        margin-bottom: 4px;
-        line-height: 1.2;
-    }
-
-    .grape-summary-count {
-        font-family: 'Playfair Display', serif;
-        font-size: 24px;
-        font-weight: 700;
-        color: var(--secondary);
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-    }
-
-    .section-divider {
-        margin: 30px 0 16px;
-        padding-bottom: 8px;
-        border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .section-divider h2 {
-        font-family: 'Playfair Display', serif;
-        font-size: 20px;
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 600;
-    }
-
-    .list-menu-item {
-        padding: 12px;
-        margin-bottom: 4px;
-        cursor: pointer;
-        border-radius: 0;
-        transition: all 0.2s;
-        font-size: 14px;
-        background: rgba(255, 255, 255, 0.05);
-        color: var(--text-dark);
-    }
-
-    .list-menu-item:hover {
-        background: rgba(30, 58, 95, 0.1);
-    }
-
-    .list-menu-item.active {
-        background: var(--primary);
-        color: white;
-        font-weight: 600;
-    }
-
-    .list-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 10px 12px;
-        margin-bottom: 6px;
-        background: var(--bg-light);
-        border-radius: 0;
-        border-left: 3px solid var(--primary);
-    }
-
-    .list-item-actions {
-        display: flex;
-        gap: 8px;
-    }
-
-    .list-item-actions button {
-        padding: 6px 12px;
-        font-size: 12px;
-        border: none;
-        border-radius: 0;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .btn-edit {
-        background: var(--primary);
-        color: white;
-    }
-
-    .btn-delete {
-        background: #dc2626;
-        color: white;
-    }
-</style>
-
-
+        .wine-card { background: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        .btn-list-saq, .btn-form-saq { background: var(--accent); color: black; text-decoration: none; padding: 5px 10px; border-radius: 5px; font-size: 10px; font-weight: bold; text-align: center; }
+        .btn-form-saq { display: block; margin-bottom: 15px; padding: 10px; }
+    </style>
 </head>
 <body>
 
-<div id="scanner">
-    <button class="btn-close-scan" onclick="stopScan()">✕ FERMER</button>
-    <div id="scannerVideo"></div>
-    <div class="line-guide"></div>
-</div>
-
 <div class="header">
-    <div class="version">456</div>
+    <div class="version">910</div>
     <h1>VINO</h1>
     <div class="subtitle">Collections Privée</div>
 </div>
 
 <div class="container">
-    <div id="page1" class="page">
+    <div id="page1" class="page active">
         <div class="home-stats">
             <span class="total-bottles" id="totalBottles">0</span>
-            <span class="total-label">bouteilles</span>
+            <span class="total-label">bouteilles au total</span>
         </div>
-        
-        <div class="scan-hero">
-            <div class="scan-buttons">
-                <div style="text-align: center;">
-                    <button class="btn-scan-large" onclick="quickScan()">📷</button>
-                    <div class="scan-label">Scanner</div>
-                </div>
-
-                <div style="text-align: center;">
-                    <button class="btn-scan-large" style="background: var(--secondary); pointer-events: auto; position: relative; z-index: 10;" onclick="showWineModal()">⌨️</button>
-                    <div class="scan-label">Ajouter</div>
-                </div>
-            </div> </div> <div class="grape-summary-grid" id="grapeSummaryGrid"></div>
-    </div>
-
-
-
-
-
-                
+        <div class="scan-buttons">
+            <div onclick="alert('Scanner activé')">
+                <div class="btn-circle">📷</div>
+                <div class="scan-label">Scanner</div>
+            </div>
+            <div onclick="showWineModal()">
+                <div class="btn-circle" style="background: var(--secondary);">⌨️</div>
+                <div class="scan-label">Ajouter</div>
             </div>
         </div>
         <div class="grape-summary-grid" id="grapeSummaryGrid"></div>
-    </div> 
+    </div>
 
     <div id="page2" class="page">
-        <div class="filter-bar">
-            <label style="font-size: 13px; font-weight: 700; margin-bottom: 8px; display: block; color: var(--primary);">CÉPAGES BLANCS</label>
-            <div class="cepage-filter-grid" id="cepageFilterWhite"></div>
-            
-            <label style="font-size: 13px; font-weight: 700; margin: 16px 0 8px; display: block; color: var(--primary);">CÉPAGES ROUGES</label>
-            <div class="cepage-filter-grid" id="cepageFilterRed"></div>
-            
-            <select id="filterType" onchange="applyFilters()">
-                <option value="">Tous les types</option>
-                <option value="Rouge">Rouge</option>
-                <option value="Blanc">Blanc</option>
-                <option value="Rosé">Rosé</option>
-                <option value="Mousseux">Mousseux</option>
-            </select>
-            <select id="filterCountry" onchange="applyFilters()">
-                <option value="">Tous les pays</option>
-            </select>
-            <select id="filterRegion" onchange="applyFilters()">
-                <option value="">Toutes les régions</option>
-            </select>
-            <select id="filterAccord" onchange="applyFilters()">
-                <option value="">Tous les accords</option>
-                <option value="Apéro">Apéro</option>
-                <option value="Asiatique">Asiatique</option>
-                <option value="Cuisine grecque">Cuisine grecque</option>
-                <option value="Cuisine indienne">Cuisine indienne</option>
-                <option value="Cuisine italienne (pâtes)">Cuisine italienne</option>
-                <option value="Dessert">Dessert</option>
-                <option value="Fromage">Fromage</option>
-                <option value="Friture">Friture</option>
-                <option value="Grillades">Grillades</option>
-                <option value="Mets portugais">Mets portugais</option>
-                <option value="Mets traditionnels">Mets traditionnels</option>
-                <option value="Moyen orient">Moyen orient</option>
-                <option value="Noël">Noël</option>
-                <option value="Pizza">Pizza</option>
-                <option value="Poisson">Poisson</option>
-                <option value="Polyvalent">Polyvalent</option>
-                <option value="Poulet">Poulet</option>
-                <option value="Saumon">Saumon</option>
-                <option value="Saucisses">Saucisses</option>
-                <option value="Tomates">Tomates</option>
-                <option value="ZZZ - Ne pas racheter">Ne pas racheter</option>
-            </select>
-            <input type="text" id="searchWine" placeholder="Rechercher par nom..." onkeyup="applyFilters()">
-        </div>
+        <input type="text" id="searchWine" placeholder="Rechercher un vin..." onkeyup="render()">
         <div id="wineList"></div>
     </div>
 
-    <div id="page3" class="page">
-        <div class="filter-bar">
-            <select id="viewZone" onchange="showLocations()">
-                <option value="1">Cellier</option>
-                <option value="2">Casiers</option>
-                <option value="3">Réserve</option>
-            </select>
-        </div>
-        <div id="locationView"></div>
-    </div>
-
-    <div id="page4" class="page">
-        <div class="filter-bar">
-            <select id="cepageZone" onchange="showCepagesByCellier()">
-                <option value="0">Tous</option>
-                <option value="1">Cellier</option>
-                <option value="2">Casiers</option>
-                <option value="3">Réserve</option>
-            </select>
-        </div>
-        <div id="cepageView"></div>
-    </div>
-
-    <div id="page5" class="page">
-        <div id="shoppingList"></div>
-    </div>
-
+    <div id="page3" class="page"><h2>Cellier Visuel</h2></div>
+    <div id="page4" class="page"><h2>Cépages & Stats</h2></div>
+    <div id="page5" class="page"><h2>Liste d'achats</h2></div>
     <div id="page6" class="page">
-        <div class="filter-bar">
-            <button class="btn-secondary" onclick="showWineModal()">➕ Ajouter un vin</button>
-            <button class="btn-secondary" onclick="showManageLists()">📝 Gérer les listes</button>
-            <button class="btn-secondary" onclick="exportToExcel()">📊 Exporter Excel</button>
-            <button class="btn-secondary" onclick="document.getElementById('importFile').click()">📤 Importer</button>
-        </div>
-    </div>
-</div> <div class="nav">
-    <div class="nav-item" onclick="showPage(1)">
-        <div style="font-size: 24px;">🍷</div>
-        <div class="nav-label">Accueil</div>
-    </div>
-    <div class="nav-item" onclick="showPage(2)">
-        <div style="font-size: 24px;">🔍</div>
-        <div class="nav-label">Recherche</div>
-    </div>
-    <div class="nav-item" onclick="showPage(3)">
-        <div style="font-size: 24px;">🍾</div>
-        <div class="nav-label">Celliers</div>
-    </div>
-    <div class="nav-item" onclick="showPage(4)">
-        <div style="font-size: 24px;">🍇</div>
-        <div class="nav-label">Cépages</div>
-    </div>
-    <div class="nav-item" onclick="showPage(5)">
-        <div style="font-size: 24px;">🛒</div>
-        <div class="nav-label">Achats</div>
-    </div>
-    <div class="nav-item" onclick="showPage(6)">
-        <div style="font-size: 24px;">⚙️</div>
-        <div class="nav-label">Gestion</div>
+        <h2>Outils</h2>
+        <button onclick="localStorage.clear(); location.reload();" style="background:red; color:white; padding:10px; border:none; margin-top:20px; border-radius:5px;">Réinitialiser la base</button>
     </div>
 </div>
 
-
 <div id="wineModal" class="modal">
     <div class="modal-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 id="modalTitle" style="margin: 0;">Ajouter un vin</h2>
-            <button type="button" onclick="closeWineModal()" style="font-size: 30px; border: none; background: none; cursor:pointer;">×</button>
-        </div>
-        
+        <h2 id="modalTitle" style="margin-bottom:20px; font-weight:300;">Ajouter un vin</h2>
         <form id="wineForm" onsubmit="saveWine(event)">
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Code-barres</label>
-                <input type="text" id="barcode" placeholder="Scanner ou saisir" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;">
-            </div>
+            <label>Nom du vin *</label>
+            <input type="text" id="wineName" required>
 
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Nom du vin *</label>
-                <input type="text" id="wineName" placeholder="ex: Apothic Red" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;" required>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">URL SAQ</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="saqUrl" placeholder="https://..." style="flex: 1; padding:12px; border:1px solid #ccc; border-radius:8px;">
-                    <button type="button" onclick="window.open('https://www.saq.com/fr/', '_blank')" style="padding: 10px; background: #eee; border: 1px solid #ccc; border-radius: 8px;">🔗 SAQ</button>
-                </div>
-            </div>
-
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <div style="flex:1;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Type *</label>
-                    <select id="wineType" onchange="updateCepageList(this.value)" style="width:100%; padding:12px; border-radius:8px;" required>
-                        <option value="">Type...</option>
+            <div class="row">
+                <div><label>Code-Barres</label><input type="text" id="barcode"></div>
+                <div>
+                    <label>Type *</label>
+                    <select id="wineType" onchange="updateCepageList(this.value)" required>
+                        <option value="">Choisir...</option>
                         <option value="Rouge">Rouge</option>
                         <option value="Blanc">Blanc</option>
                         <option value="Rosé">Rosé</option>
                         <option value="Mousseux">Mousseux</option>
                     </select>
                 </div>
-                <div style="flex:1;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Pays</label>
-                    <select id="country" style="width:100%; padding:12px; border-radius:8px;">
-                        <option value="">Pays...</option>
-                    </select>
-                </div>
             </div>
 
-            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Cépages</label>
-            <div id="cepageList" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:15px; max-height:150px; overflow-y:auto; border:1px solid #eee; padding:10px; border-radius:8px;">
+            <div class="row">
+                <div><label>Pays</label><select id="country" onchange="updateRegions()"></select></div>
+                <div><label>Région</label><select id="region"></select></div>
             </div>
 
-            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Emplacements</label>
+            <label>Accords Mets</label>
+            <select id="foodPairing">
+                <option value="">Choisir un accord...</option>
+                <option value="Viande Rouge">Viande Rouge</option>
+                <option value="Poisson">Poisson</option>
+                <option value="Volaille">Volaille</option>
+                <option value="Fromages">Fromages</option>
+                <option value="Pâtes">Pâtes</option>
+                <option value="Dessert">Dessert</option>
+            </select>
+
+            <label>URL SAQ</label>
+            <input type="text" id="saqUrl" placeholder="https://www.saq.com/...">
+            <a href="javascript:void(0)" onclick="openSaqFromForm()" class="btn-form-saq" id="btnFormSaq">VOIR SUR SAQ.COM</a>
+
+            <label>Cépages</label>
+            <div id="cepageList" class="cepage-grid-container"></div>
+
+            <label>Emplacements</label>
             <div id="locationEntries"></div>
-            <button type="button" onclick="addLocationEntry()" style="width:100%; background:#f8f8f8; border:1px dashed #ccc; padding:12px; margin-top:5px; border-radius:8px;">+ Ajouter une bouteille</button>
-            
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 30px; padding-bottom: 40px;">
-                <button type="submit" style="width:100%; padding:18px; background:#002b5c; color:white; border:none; border-radius:10px; font-weight:bold; font-size:16px;">ENREGISTRER AU CELLIER</button>
-                <button type="button" onclick="closeWineModal()" style="width:100%; padding:15px; background:none; border:1px solid #ccc; border-radius:10px;">Annuler</button>
-            </div>
+            <button type="button" onclick="addLocationEntry()" style="background:#333; color:white; border:none; padding:10px; width:100%; border-radius:8px; margin-bottom:20px;">+ Ajouter une bouteille</button>
+
+            <button type="submit" class="btn-save">ENREGISTRER</button>
+            <button type="button" onclick="closeWineModal()" style="background:none; border:none; color:gray; width:100%; margin-top:10px;">Annuler</button>
         </form>
     </div>
 </div>
 
-<div id="removeModal" class="modal">
-   <div class="modal-content" style="max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
-    <button class="close-btn" onclick="closeWineModal()" style="position: absolute; right: 15px; top: 10px; z-index: 10;">×</button>
-    
-    <div style="padding: 20px; overflow-y: auto;">
-        <h2 id="modalTitle" style="margin-bottom:15px;">Ajouter un vin</h2>
-        
-        <form id="wineForm" onsubmit="saveWine(event)">
-            <input type="text" id="wineName" placeholder="Nom du vin" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ccc; border-radius:8px;" required>
-            
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <select id="wineType" onchange="updateCepageList(this.value)" style="flex:1; padding:10px; border-radius:8px;" required>
-                    <option value="">Type...</option>
-                    <option value="Rouge">Rouge</option>
-                    <option value="Blanc">Blanc</option>
-                    <option value="Rosé">Rosé</option>
-                </select>
-                <select id="country" style="flex:1; padding:10px; border-radius:8px;">
-                    <option value="">Pays...</option>
-                </select>
-            </div>
-
-            <div style="font-size:12px; margin-bottom:5px; font-weight:bold;">Cépages :</div>
-            <div id="cepageList" style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:15px; max-height:150px; overflow-y:auto; border:1px solid #eee; padding:8px; border-radius:8px;">
-            </div>
-
-            <div style="font-size:12px; margin-bottom:5px; font-weight:bold;">Emplacements :</div>
-            <div id="locationEntries"></div>
-            
-            <button type="button" onclick="addLocationEntry()" style="width:100%; background:#f0f0f0; border:1px dashed #ccc; padding:10px; margin-top:5px; border-radius:8px;">+ Ajouter une bouteille</button>
-            
-            <div style="display: flex; gap: 10px; margin-top: 20px; padding-bottom: 10px;">
-                <button type="button" class="btn-secondary" style="flex: 1; padding: 15px; border-radius: 8px;" onclick="closeWineModal()">Annuler</button>
-                <button type="submit" class="btn-primary" style="flex: 2; padding: 15px; border-radius: 8px; background-color: #002b5c; color: white; border: none;">AJOUTER</button>
-            </div>
-        </form>
-    </div>
+<div class="nav">
+    <div class="nav-item active" onclick="showPage(1)"><div>🍷</div>Accueil</div>
+    <div class="nav-item" onclick="showPage(2)"><div>🔍</div>Liste</div>
+    <div class="nav-item" onclick="showPage(3)"><div>📦</div>Cellier</div>
+    <div class="nav-item" onclick="showPage(4)"><div>🍇</div>Cépages</div>
+    <div class="nav-item" onclick="showPage(5)"><div>🛒</div>Achats</div>
+    <div class="nav-item" onclick="showPage(6)"><div>⚙️</div>Outils</div>
 </div>
-</div>
-
-<input type="file" id="importFile" accept=".json,.xlsx" style="display: none;" onchange="handleImport(event)">
 
 <script>
-    // --- 1. DONNÉES ET ÉTAT ---
     let wines = JSON.parse(localStorage.getItem('wines')) || [];
     let editingId = null;
-    let currentWineId = null;
 
-    const countries = ['France', 'Italie', 'Espagne', 'Portugal', 'Canada', 'États-Unis', 'Argentine', 'Chili', 'Australie', 'Nouvelle-Zélande', 'Afrique du Sud', 'Allemagne'].sort();
-    
-    const regionsByCountry = {
-        'France': ['Alsace', 'Beaujolais', 'Bordeaux', 'Bourgogne', 'Champagne', 'Jura', 'Languedoc', 'Loire', 'Provence', 'Rhône', 'Roussillon', 'Savoie', 'Sud-Ouest'],
-        'Italie': ['Piémont', 'Toscane', 'Vénétie', 'Sicile', 'Pouilles', 'Lombardie', 'Trentin'],
-        'Espagne': ['Rioja', 'Ribera del Duero', 'Priorat', 'Navarre', 'Catalogne', 'Rías Baixas'],
-        'Portugal': ['Douro', 'Alentejo', 'Dão', 'Vinho Verde'],
-        'Canada': ['Colombie-Britannique', 'Ontario', 'Québec'],
-        'États-Unis': ['Californie', 'Oregon', 'Washington', 'New York']
-    };
+    const countries = ['France', 'Italie', 'Espagne', 'Portugal', 'Canada', 'États-Unis'].sort();
+    const regionsByCountry = { 'France': ['Bordeaux', 'Bourgogne', 'Rhône'], 'Canada': ['Québec', 'Ontario'] };
+    const cepagesBlancs = ['Chardonnay', 'Sauvignon Blanc', 'Riesling'];
+    const cepagesRouges = ['Cabernet Sauvignon', 'Pinot Noir', 'Merlot'];
 
-    const cepagesBlancs = ['Chardonnay', 'Sauvignon Blanc', 'Sémillon', 'Chenin Blanc', 'Riesling', 'Gewürztraminer', 'Pinot Blanc', 'Pinot Gris/Grigio', 'Viognier', 'Muscat Blanc', 'Sylvaner', 'Malvasia', 'Trebbiano', 'Albariño', 'Verdejo', 'Vermentino', 'Marsanne', 'Roussanne', 'Grüner Veltliner'].sort();
-    const cepagesRouges = ['Cabernet Sauvignon', 'Pinot Noir', 'Merlot', 'Syrah/Shiraz', 'Cabernet Franc', 'Gamay', 'Grenache', 'Cinsault', 'Carignan', 'Barbera', 'Sangiovese', 'Zinfandel', 'Tempranillo', 'Nebbiolo', 'Mourvèdre', 'Malbec', 'Moscato'].sort();
-    const accords = ['Apéro', 'Asiatique', 'Cuisine grecque', 'Cuisine indienne', 'Cuisine italienne (pâtes)', 'Dessert', 'Fromage', 'Friture', 'Grillades', 'Mets portugais', 'Mets traditionnels', 'Moyen orient', 'Noël', 'Pizza', 'Poisson', 'Polyvalent', 'Poulet', 'Saumon', 'Saucisses', 'Tomates', 'ZZZ - Ne pas racheter'].sort();
+    window.onload = () => { populateCountries(); updateHomePage(); showPage(1); };
 
-    // --- 2. INITIALISATION ---
-    window.onload = function() {
-        populateCountries(); // Remplit les listes de pays au départ
-        updateHomePage();
-        showPage(1);
-    };
+    function showPage(n) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.getElementById('page' + n).classList.add('active');
+        document.querySelectorAll('.nav-item')[n-1].classList.add('active');
+        if(n === 2) render();
+    }
+
+    function openSaqFromForm() {
+        const url = document.getElementById('saqUrl').value;
+        if(url) window.open(url, '_blank');
+        else alert("Veuillez d'abord coller un lien SAQ.");
+    }
 
     function populateCountries() {
-        const selects = ['country', 'filterCountry'];
-        selects.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.innerHTML = '<option value="">Pays...</option>';
-                countries.forEach(c => el.add(new Option(c, c)));
-            }
-        });
+        const el = document.getElementById('country');
+        el.innerHTML = '<option value="">Choisir...</option>';
+        countries.forEach(c => el.add(new Option(c, c)));
     }
 
     function updateRegions() {
-        const country = document.getElementById('country').value;
-        const regionSelect = document.getElementById('region');
-        if (!regionSelect) return;
-        regionSelect.innerHTML = '<option value="">Sélectionner</option>';
-        if (regionsByCountry[country]) {
-            regionsByCountry[country].sort().forEach(r => regionSelect.add(new Option(r, r)));
-        }
+        const c = document.getElementById('country').value;
+        const r = document.getElementById('region');
+        r.innerHTML = '<option value="">Région...</option>';
+        if(regionsByCountry[c]) regionsByCountry[c].forEach(reg => r.add(new Option(reg, reg)));
     }
 
-    // --- 3. NAVIGATION ---
-    function showPage(n) {
-        document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-        const target = document.getElementById('page' + n);
-        if (target) target.style.display = 'block';
-        
-        document.querySelectorAll('.nav-item').forEach((item, index) => {
-            if (index + 1 === n) item.classList.add('active');
-            else item.classList.remove('active');
+    function updateCepageList(type) {
+        const container = document.getElementById('cepageList');
+        container.innerHTML = '';
+        const list = (type === 'Blanc' || type === 'Mousseux') ? cepagesBlancs : (type === 'Rouge' ? cepagesRouges : [...cepagesBlancs, ...cepagesRouges]);
+        list.forEach(c => {
+            container.innerHTML += `<div class="checkbox-item"><input type="checkbox" id="cep_${c}" value="${c}"><label for="cep_${c}">${c}</label></div>`;
         });
-
-        if (n === 1) updateHomePage();
-        if (n === 2) render();
-        if (n === 5) updateShoppingList();
-        window.scrollTo(0, 0);
     }
 
-    // --- 4. GESTION DU VIN (MODALE) ---
+    function addLocationEntry(data = {zone:'1', rangee:'1', espace:'A'}) {
+        const div = document.createElement('div');
+        div.className = 'location-entry';
+        div.innerHTML = `
+            <select class="loc-z"><option value="1" ${data.zone=='1'?'selected':''}>Cellier</option><option value="2" ${data.zone=='2'?'selected':''}>Casiers</option><option value="3" ${data.zone=='3'?'selected':''}>Réserve</option></select>
+            <select class="loc-r">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${data.rangee==i+1?'selected':''}>R${i+1}</option>`).join('')}</select>
+            <select class="loc-e">${"ABCDEFGHIJ".split('').map(e => `<option value="${e}" ${data.espace==e?'selected':''}>${e}</option>`).join('')}</select>
+            <button type="button" onclick="this.parentElement.remove()" style="background:none; border:none; color:red; font-weight:bold;">✕</button>
+        `;
+        document.getElementById('locationEntries').appendChild(div);
+    }
+
     function showWineModal(id = null) {
         editingId = id;
-        const modal = document.getElementById('wineModal');
-        const form = document.getElementById('wineForm');
-        const entries = document.getElementById('locationEntries');
-        
-        if (form) form.reset();
-        if (entries) entries.innerHTML = '';
-        
-        modal.style.display = 'block';
-
-        if (id) {
-            const wine = wines.find(w => w.id === id);
-            document.getElementById('modalTitle').textContent = "Modifier le vin";
-            document.getElementById('wineName').value = wine.name;
-            document.getElementById('wineType').value = wine.type;
-            document.getElementById('country').value = wine.country || '';
-            updateRegions();
-            if(wine.region) document.getElementById('region').value = wine.region;
-            
-            updateCepageList(wine.type);
-            // Cocher les cépages
-            if (wine.cepages) {
-                wine.cepages.forEach(c => {
-                    const cb = document.getElementById('cep_' + c);
-                    if (cb) cb.checked = true;
-                });
-            }
-            wine.locations.forEach(loc => addLocationEntry(loc));
+        document.getElementById('wineForm').reset();
+        document.getElementById('locationEntries').innerHTML = '';
+        document.getElementById('wineModal').style.display = 'block';
+        if(id) {
+            const w = wines.find(x => x.id === id);
+            document.getElementById('modalTitle').innerText = "Modifier le vin";
+            document.getElementById('wineName').value = w.name;
+            document.getElementById('wineType').value = w.type;
+            document.getElementById('saqUrl').value = w.saqUrl || '';
+            document.getElementById('foodPairing').value = w.foodPairing || '';
+            updateCepageList(w.type);
+            w.cepages.forEach(c => { if(document.getElementById('cep_'+c)) document.getElementById('cep_'+c).checked = true; });
+            w.locations.forEach(l => addLocationEntry(l));
         } else {
-            document.getElementById('modalTitle').textContent = "Ajouter un vin";
+            document.getElementById('modalTitle').innerText = "Ajouter un vin";
             updateCepageList('');
             addLocationEntry();
         }
     }
 
-    function closeWineModal() { 
-        document.getElementById('wineModal').style.display = 'none'; 
-    }
-
-    function saveWine(event) {
-        if (event) event.preventDefault();
-        const name = document.getElementById('wineName').value.trim();
-        const type = document.getElementById('wineType').value;
-        if (!name || !type) return alert("Nom et Type requis");
-
+    function saveWine(e) {
+        e.preventDefault();
         const locs = [];
-        document.querySelectorAll('.location-entry').forEach(entry => {
-            const z = entry.querySelector('.location-zone').value;
-            const r = entry.querySelector('.location-rangee').value;
-            const e = entry.querySelector('.location-espace').value;
-            if (z && r && e) locs.push({ zone: z, rangee: r, espace: e });
-        });
+        const entries = document.querySelectorAll('.location-entry');
+        
+        // --- VERIFICATION DOUBLON EMPLACEMENT ---
+        for (let entry of entries) {
+            const z = entry.querySelector('.loc-z').value;
+            const r = entry.querySelector('.loc-r').value;
+            const es = entry.querySelector('.loc-e').value;
+            
+            const occupant = wines.find(w => w.id !== editingId && w.locations.some(l => l.zone === z && l.rangee === r && l.espace === es));
+            
+            if(occupant) {
+                alert(`ERREUR : L'emplacement Zone ${z} / Rang ${r} / Espace ${es} est déjà occupé par le vin : "${occupant.name}".`);
+                return; // Bloque l'enregistrement
+            }
+            locs.push({ zone: z, rangee: r, espace: es });
+        }
 
-        const wineData = {
+        const data = {
             id: editingId || Date.now(),
-            name,
-            type,
+            name: document.getElementById('wineName').value,
+            type: document.getElementById('wineType').value,
             country: document.getElementById('country').value,
-            region: document.getElementById('region') ? document.getElementById('region').value : '',
+            foodPairing: document.getElementById('foodPairing').value,
+            saqUrl: document.getElementById('saqUrl').value,
             cepages: Array.from(document.querySelectorAll('#cepageList input:checked')).map(cb => cb.value),
             locations: locs
         };
 
-        if (editingId) {
-            const idx = wines.findIndex(w => w.id === editingId);
-            wines[idx] = wineData;
-        } else {
-            wines.push(wineData);
-        }
-
+        if(editingId) wines = wines.map(w => w.id === editingId ? data : w);
+        else wines.push(data);
+        
         localStorage.setItem('wines', JSON.stringify(wines));
         closeWineModal();
         updateHomePage();
-        render();
-    }
-
-    // --- 5. AFFICHAGE ET LISTES ---
-    function updateHomePage() {
-        let total = 0;
-        const grapeCounts = {};
-        wines.forEach(w => {
-            const q = w.locations.length;
-            total += q;
-            if(q > 0 && w.cepages) w.cepages.forEach(c => grapeCounts[c] = (grapeCounts[c] || 0) + q);
-        });
-        document.getElementById('totalBottles').textContent = total;
-        
-        const grid = document.getElementById('grapeSummaryGrid');
-        if (grid) {
-            grid.innerHTML = Object.entries(grapeCounts).sort((a,b)=>b[1]-a[1]).map(([name, count]) => `
-                <div class="grape-summary-card" onclick="filterByGrape('${name}')">
-                    <div class="grape-summary-name">${name}</div>
-                    <div class="grape-summary-count">${count}</div>
-                </div>
-            `).join('');
-        }
     }
 
     function render() {
-        const searchInput = document.getElementById('searchWine');
-        const search = searchInput ? searchInput.value.toLowerCase() : '';
-        const list = document.getElementById('wineList');
-        if (!list) return;
-
-        const filtered = wines.filter(w => w.name.toLowerCase().includes(search) && w.locations.length > 0);
-        
-        list.innerHTML = filtered.map(w => `
-            <div class="wine-card" onclick="showDetail(${w.id})">
-                <div class="wine-name">${getWineTypeIcon(w.type)} ${w.name}</div>
-                <div class="badge">${w.locations.length} bouteille(s)</div>
+        const s = document.getElementById('searchWine').value.toLowerCase();
+        document.getElementById('wineList').innerHTML = wines.filter(w => w.name.toLowerCase().includes(s)).map(w => `
+            <div class="wine-card">
+                <div onclick="showWineModal(${w.id})" style="flex:1">
+                    <strong>${w.name}</strong><br><small>${w.type} • ${w.country}</small>
+                </div>
+                <div style="display:flex; align-items:center;">
+                    <span style="color:var(--accent); font-weight:bold; margin-right:10px;">${w.locations.length}</span>
+                    ${w.saqUrl ? `<a href="${w.saqUrl}" target="_blank" class="btn-list-saq">SAQ</a>` : ''}
+                </div>
             </div>
         `).join('');
     }
 
-    // --- 6. UTILITAIRES ---
-    function addLocationEntry(data = {zone:'1', rangee:'1', espace:'A'}) {
-        const div = document.createElement('div');
-        div.className = 'location-entry';
-        div.innerHTML = `
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <select class="location-zone">
-                    <option value="1" ${data.zone==='1'?'selected':''}>Cellier</option>
-                    <option value="2" ${data.zone==='2'?'selected':''}>Casiers</option>
-                    <option value="3" ${data.zone==='3'?'selected':''}>Réserve</option>
-                </select>
-                <select class="location-rangee">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${data.rangee==i+1?'selected':''}>R${i+1}</option>`).join('')}</select>
-                <select class="location-espace">
-                    <option value="A" ${data.espace==='A'?'selected':''}>A</option>
-                    <option value="B" ${data.espace==='B'?'selected':''}>B</option>
-                    <option value="C" ${data.espace==='C'?'selected':''}>C</option>
-                </select>
-                <button type="button" onclick="this.parentElement.remove()" style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px;">✕</button>
-            </div>`;
-        document.getElementById('locationEntries').appendChild(div);
-    }
-
-    function updateCepageList(type) {
-        const grid = document.getElementById('cepageList');
-        if (!grid) return;
-        grid.innerHTML = '';
-        const list = (type === 'Blanc') ? cepagesBlancs : (type === 'Rouge' ? cepagesRouges : [...cepagesBlancs, ...cepagesRouges]);
-        list.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'checkbox-item';
-            div.innerHTML = `<input type="checkbox" id="cep_${c}" value="${c}"><label for="cep_${c}">${c}</label>`;
-            grid.appendChild(div);
+    function updateHomePage() {
+        let total = 0; let counts = {};
+        wines.forEach(w => {
+            total += w.locations.length;
+            w.cepages.forEach(c => counts[c] = (counts[c] || 0) + w.locations.length);
         });
+        document.getElementById('totalBottles').innerText = total;
+        document.getElementById('grapeSummaryGrid').innerHTML = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([name, count]) => `
+            <div class="grape-summary-card"><div class="grape-summary-name">${name}</div><div class="grape-summary-count">${count}</div></div>
+        `).join('');
     }
 
-    function getWineTypeIcon(t) {
-        const c = { 'Rouge': '#8B0000', 'Blanc': '#F5DEB3', 'Rosé': '#FFB6C1', 'Mousseux': '#EEE' };
-        return `<span style="display:inline-block;width:12px;height:12px;background:${c[t]||'#888'};border-radius:50%;border:1px solid #ccc"></span>`;
-    }
-
-    function closeDetailModal() { document.getElementById('detailModal').style.display = 'none'; }
-    function closeRemoveModal() { document.getElementById('removeModal').style.display = 'none'; }
+    function closeWineModal() { document.getElementById('wineModal').style.display = 'none'; }
 </script>
-
 </body>
 </html>
-

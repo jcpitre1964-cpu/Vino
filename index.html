@@ -181,7 +181,7 @@
  <header class="text-center mb-8 pt-6">
     <h1 class="text-5xl font-bold tracking-[0.2em] uppercase" style="color: #d97a00;">VINO</h1>
     <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collections privées</p>
-  
+   
 </header>
 
 <main class="max-w-md mx-auto">
@@ -201,6 +201,9 @@
         <div class="grid grid-cols-2 gap-3">
             <button type="button" onclick="openModal('manuel')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center text-white">Saisie Manuelle</button>
             <button type="button" onclick="showPage('recherche')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center text-white">🍷 Recherche</button>
+       
+</button>
+       
         </div>
         <div class="glass-card p-6 shadow-2xl border-t border-white/10 text-center">
             <div class="flex items-baseline justify-center gap-3 mb-4">
@@ -262,6 +265,9 @@
                     🔎 Chercher sur SAQ.com
                 </button>
             </div>
+
+            <div id="stock-details-container" class="space-y-2"></div>
+
             <div>
                 <p class="text-[9px] text-gray-500 uppercase mb-1">Nom / Description du vin</p>
                 <input type="text" id="f-nom" placeholder="Nom du vin..." class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm focus:border-red-900 outline-none">
@@ -375,19 +381,64 @@
    
    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
    
-  <script>
-    // ================================================================
-    // 1. VARIABLES GLOBALES ET BASE DE DONNÉES LOCALES
-    // ================================================================
-    let inventaire = JSON.parse(localStorage.getItem('vino_db')) || [];
-    let currentFilters = { couleur: "", cepage: "", accords: "", nom: "" };
+  <script>  
 
-    const cepagesDB = {
-        rouge: ['Cabernet Sauvignon', 'Merlot', 'Pinot Noir', 'Syrah', 'Sangiovese', 'Malbec', 'Grenache'],
-        blanc: ['Chardonnay', 'Sauvignon Blanc', 'Riesling', 'Pinot Gris', 'Chenin Blanc'],
-        rose: ['Grenache', 'Cinsault', 'Syrah']
-    };
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQ-N2SMpjhY9q4au31twy1UCBdUH41D_mCA7UwG4y3rIeoGpMztczAOoHel-5U7mDvZA/exec";
 
+
+   // ================================================================
+// 1. VARIABLES GLOBALES ET CONNEXION CLOUD
+// ================================================================
+
+
+let inventaire = []; 
+let currentFilters = { couleur: "", cepage: "", accords: "", nom: "" };
+
+const cepagesDB = {
+    rouge: ['Cabernet Sauvignon', 'Merlot', 'Pinot Noir', 'Syrah', 'Sangiovese', 'Malbec', 'Grenache'],
+    blanc: ['Chardonnay', 'Sauvignon Blanc', 'Riesling', 'Pinot Gris', 'Chenin Blanc'],
+    rose: ['Grenache', 'Cinsault', 'Syrah']
+}; // <-- Le point-virgule ici est important
+
+// --- CHARGER DEPUIS GOOGLE ---
+async function chargerInventaire() {
+    try {
+        const response = await fetch(SCRIPT_URL);
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+            inventaire = data;
+            localStorage.setItem('vino_db', JSON.stringify(inventaire)); // On met à jour le secours local
+            console.log("Données chargées depuis Google Sheets");
+        } else {
+            inventaire = JSON.parse(localStorage.getItem('vino_db')) || [];
+        }
+    } catch (e) {
+        console.log("Mode hors-ligne : chargement local");
+        inventaire = JSON.parse(localStorage.getItem('vino_db')) || [];
+    }
+    renderSearchList();
+    majStatsAccueil();
+}
+
+// --- SAUVEGARDER VERS GOOGLE ---
+async function sauverInventaire() {
+    // Sauvegarde locale immédiate
+    localStorage.setItem('vino_db', JSON.stringify(inventaire));
+
+    // Envoi vers le Cloud
+    try {
+        await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(inventaire)
+        });
+        console.log("Synchro Cloud réussie");
+    } catch (e) {
+        console.error("Erreur synchro Cloud :", e);
+    }
+}
     // ================================================================
     // 2. NAVIGATION ET GESTION DES FENÊTRES (MODALS)
     // ================================================================
@@ -485,61 +536,98 @@
 });
     }
 
-  // ================================================================
-    // 4. ACTIONS DE STOCK (ENREGISTRER / BOIRE)
-    // ================================================================
-    function enregistrerBouteille() {
-        const form = document.getElementById('wineForm');
-        const editId = form.dataset.editId;
-        
-        const vinData = {
-            nom: document.getElementById('f-nom').value.trim(),
-    import: document.getElementById('f-import').value.trim(),
-    couleur: document.getElementById('f-couleur').value,
-    prix: document.getElementById('f-prix').value,
-    millesime: document.getElementById('f-millesime').value,
-    pays: document.getElementById('f-pays').value,
-    region: document.getElementById('f-region').value,
-    cepage: document.getElementById('f-cepage').value,
-    // Nouveaux champs :
-    appellation: document.getElementById('f-appellation').value.trim(),
-    importateur: document.getElementById('f-importateur').value.trim(),
-    particularite: document.getElementById('f-particularite').value.trim(),
-    accords: document.getElementById('f-accords').value.trim()
-        };
+ // ================================================================
+// 4. ACTIONS DE STOCK (ENREGISTRER / BOIRE)
+// ================================================================
 
-        if (!vinData.nom && !vinData.import) return alert("Nom ou Code-barres obligatoire");
+/**
+ * Enregistre ou modifie une bouteille et synchronise avec Google Sheets
+ */
+async function enregistrerBouteille() {
+    const form = document.getElementById('wineForm');
+    const editId = form.dataset.editId;
+    
+    const vinData = {
+        nom: document.getElementById('f-nom').value.trim(),
+        import: document.getElementById('f-import').value.trim(),
+        couleur: document.getElementById('f-couleur').value,
+        prix: document.getElementById('f-prix').value,
+        millesime: document.getElementById('f-millesime').value,
+        pays: document.getElementById('f-pays').value,
+        region: document.getElementById('f-region').value,
+        cepage: document.getElementById('f-cepage').value,
+        appellation: document.getElementById('f-appellation').value.trim(),
+        importateur: document.getElementById('f-importateur').value.trim(),
+        particularite: document.getElementById('f-particularite').value.trim(),
+        accords: document.getElementById('f-accords').value.trim()
+    };
 
-        const qteAajouter = parseInt(document.getElementById('f-qte').value) || 0;
-        const emplacementChoisi = document.getElementById('f-loc-lieu').value || "Non spécifié";
+    if (!vinData.nom && !vinData.import) return alert("Nom ou Code-barres obligatoire");
 
-        if (editId) {
-            const idx = inventaire.findIndex(v => v.id == editId);
-            if (idx !== -1) {
-                inventaire[idx] = { ...inventaire[idx], ...vinData };
-                if (qteAajouter > 0) {
-                    if (!inventaire[idx].stocks) inventaire[idx].stocks = [];
-                    let sIdx = inventaire[idx].stocks.findIndex(s => s.emplacement === emplacementChoisi);
-                    if (sIdx > -1) inventaire[idx].stocks[sIdx].qte += qteAajouter;
-                    else inventaire[idx].stocks.push({ emplacement: emplacementChoisi, qte: qteAajouter });
-                }
-                inventaire[idx].qte = inventaire[idx].stocks.reduce((sum, s) => sum + s.qte, 0);
+    const qteAajouter = parseInt(document.getElementById('f-qte').value) || 0;
+    const emplacementChoisi = document.getElementById('f-loc-lieu').value || "Non spécifié";
+
+    if (editId) {
+        const idx = inventaire.findIndex(v => v.id == editId);
+        if (idx !== -1) {
+            inventaire[idx] = { ...inventaire[idx], ...vinData };
+            if (qteAajouter > 0) {
+                if (!inventaire[idx].stocks) inventaire[idx].stocks = [];
+                let sIdx = inventaire[idx].stocks.findIndex(s => s.emplacement === emplacementChoisi);
+                if (sIdx > -1) inventaire[idx].stocks[sIdx].qte += qteAajouter;
+                else inventaire[idx].stocks.push({ emplacement: emplacementChoisi, qte: qteAajouter });
             }
-        } else {
-            inventaire.push({
-                id: Date.now(),
-                ...vinData,
-                stocks: qteAajouter > 0 ? [{ emplacement: emplacementChoisi, qte: qteAajouter }] : [],
-                qte: qteAajouter
-            });
+            // Recalcul du total global
+            inventaire[idx].qte = inventaire[idx].stocks ? inventaire[idx].stocks.reduce((sum, s) => sum + s.qte, 0) : 0;
         }
+    } else {
+        // Nouvelle bouteille
+        inventaire.push({
+            id: Date.now(),
+            ...vinData,
+            stocks: qteAajouter > 0 ? [{ emplacement: emplacementChoisi, qte: qteAajouter }] : [],
+            qte: qteAajouter
+        });
+    }
 
-        sauvegarder();
-        closeModal();
+    // --- SYNCHRONISATION CLOUD ---
+    console.log("Envoi des données vers Google Sheets...");
+    await sauverInventaire(); 
+    
+    // Mise à jour interface
+    closeModal();
+    if (typeof renderSearchList === "function") renderSearchList();
+    majStatsAccueil();
+}
+
+/**
+ * Diminue le stock d'un emplacement et synchronise avec Google Sheets
+ */
+async function boireBouteille(id, emplacement) {
+    const idx = inventaire.findIndex(v => v.id == id);
+    if (idx === -1) return;
+
+    const sIdx = inventaire[idx].stocks.findIndex(s => s.emplacement === emplacement);
+    
+    if (sIdx > -1 && inventaire[idx].stocks[sIdx].qte > 0) {
+        // Diminution
+        inventaire[idx].stocks[sIdx].qte--;
+        
+        // Recalcul du total global
+        inventaire[idx].qte = inventaire[idx].stocks.reduce((sum, s) => sum + s.qte, 0);
+
+        // --- SYNCHRONISATION CLOUD ---
+        console.log("Mise à jour du stock (Boire) sur Google Sheets...");
+        await sauverInventaire();
+        
+        // Rafraîchissement des vues
+        if (typeof ouvrirFiche === "function") ouvrirFiche(id); 
         if (typeof renderSearchList === "function") renderSearchList();
         majStatsAccueil();
-    } // <--- CETTE ACCOLADE FERME ENREGISTRERBOUTEILLE
-
+    } else {
+        alert("Plus de stock à cet emplacement !");
+    }
+}
     // ================================================================
     // 5. MOTEUR DU SCANNER (QUAGGA2)
     // ================================================================
@@ -615,11 +703,57 @@
         form.dataset.editId = b.id;
 
        ['f-nom', 'f-couleur', 'f-pays', 'f-region', 'f-cepage', 'f-accords', 'f-import', 'f-appellation', 'f-particularite', 'f-importateur'].forEach(idChamp => {
-    const prop = idChamp.replace('f-', '');
-    const element = document.getElementById(idChamp);
-    if (element) {
-        element.value = b[prop] || "";
+    function ouvrirFiche(id) {
+    const b = inventaire.find(x => x.id == id);
+    if (!b) return;
+    
+    const form = document.getElementById('wineForm');
+    form.dataset.editId = b.id;
+
+    // 1. Remplissage automatique des champs texte et sélections
+    ['f-nom', 'f-couleur', 'f-pays', 'f-region', 'f-cepage', 'f-accords', 'f-import', 'f-appellation', 'f-particularite', 'f-importateur', 'f-prix', 'f-millesime'].forEach(idChamp => {
+        const prop = idChamp.replace('f-', '');
+        const element = document.getElementById(idChamp);
+        if (element) {
+            element.value = b[prop] || "";
+        }
+    });
+
+    // 2. Gestion de l'affichage des stocks et des boutons "Boire"
+    // On cherche un endroit dans ta modale pour afficher la liste des bouteilles par lieu
+    const stockContainer = document.getElementById('stock-details-container'); 
+    if (stockContainer) {
+        stockContainer.innerHTML = ""; // On vide l'ancien affichage
+        
+        if (b.stocks && b.stocks.length > 0) {
+            b.stocks.forEach(s => {
+                if (s.qte > 0) {
+                    const row = document.createElement('div');
+                    row.className = "flex justify-between items-center bg-white/5 p-2 rounded mb-1 border border-white/10";
+                    row.innerHTML = `
+                        <div class="text-[11px]">
+                            <span class="text-gray-400 uppercase">${s.emplacement}</span>
+                            <div class="text-white font-bold">Quantité: ${s.qte}</div>
+                        </div>
+                        <button onclick="boireBouteille(${b.id}, '${s.emplacement.replace(/'/g, "\\'")}')" 
+                                class="bg-red-900/40 hover:bg-red-800 text-red-200 text-[10px] px-3 py-1 rounded border border-red-500/30 transition-all">
+                            BOIRE
+                        </button>
+                    `;
+                    stockContainer.appendChild(row);
+                }
+            });
+        } else {
+            stockContainer.innerHTML = "<p class='text-gray-500 text-[10px] italic'>Aucun stock enregistré.</p>";
+        }
     }
+
+    // 3. Affichage de la modale
+    const modal = document.getElementById('wineModal');
+    if (modal) modal.classList.remove('hidden');
+    
+    console.log("Fiche ouverte pour : " + (b.nom || b.import));
+}
 });
 
         const zoneStocks = document.getElementById('liste-stocks-fiche');
@@ -696,16 +830,49 @@
     });
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    // Force la fermeture de la modale au chargement
+window.addEventListener('DOMContentLoaded', async () => {
+    // 1. Force la fermeture de la modale au chargement
     const modal = document.getElementById('wineModal');
     if (modal) modal.classList.add('hidden');
     
-    // Lance la mise à jour initiale (Stats + Date)
+    // 2. Lancement de la synchronisation avec Google Sheets
+    // On utilise "await" pour attendre que les données arrivent avant de continuer
+    console.log("Synchronisation avec Google Sheets en cours...");
+    await chargerInventaire(); 
+    
+    // 3. Mise à jour finale de l'interface (Stats + Date)
+    // Cette fonction sera aussi appelée à l'intérieur de chargerInventaire
     majStatsAccueil();
     
-    console.log("Démarrage : Interface initialisée, modale masquée et date à jour.");
+    console.log("Démarrage terminé : Données synchronisées, modale masquée.");
 });
+
+
+
+
+async function testerConnexion() {
+   // console.log("Envoi en cours vers :", SCRIPT_URL);
+    
+    // On crée un petit objet de test
+    const donneeTest = [{ 
+        id: "TEST-" + Date.now(), 
+        nom: "Test Connexion Google", 
+        qte: 10 
+    }];
+
+    try {
+        await fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors", // Requis pour Google Apps Script
+            cache: "no-cache",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(donneeTest)
+        });
+        alert("Signal envoyé ! Attends 3-4 secondes et regarde ton Sheets.");
+    } catch (error) {
+        alert("Erreur locale : " + error);
+    }
+}
 
 
 

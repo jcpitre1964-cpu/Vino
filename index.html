@@ -180,10 +180,8 @@
 
  <header class="text-center mb-8 pt-6">
     <h1 class="text-5xl font-bold tracking-[0.2em] uppercase" style="color: #d97a00;">VINO</h1>
-    <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collectionsprivées</p>
-    <div id="version-date" class="font-light tracking-widest text-gray-200" style="font-size: 14px; margin-top: 10px;">
-        Chargement de la version...
-    </div>
+    <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Coooooollections privées</p>
+   
 </header>
 
 <main class="max-w-md mx-auto">
@@ -278,16 +276,20 @@
                         <option value="rose">Rosé</option>
                     </select>
                 </div>
+
+
                 <div>
                     <p class="text-[9px] text-gray-500 uppercase mb-1">Qté à ajouter</p>
                     <input type="number" id="f-qte" value="1" class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm text-center outline-none">
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-3">
+             
                 <div>
                     <p class="text-[8px] text-gray-500 uppercase mb-1">Pays</p>
                     <input type="text" id="f-pays" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
                 </div>
+               
                 <div>
                     <p class="text-[8px] text-gray-500 uppercase mb-1">Région</p>
                     <input type="text" id="f-region" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
@@ -320,6 +322,30 @@
                     <select id="f-loc-e" class="w-full bg-black p-4 rounded-xl text-white border border-white/10 text-xs text-center font-bold"></select>
                 </div>
             </div>
+
+<div class="grid grid-cols-2 gap-3">
+    <div>
+        <p class="text-[8px] text-gray-500 uppercase mb-1">Appellation</p>
+        <input type="text" id="f-appellation" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
+    </div>
+    <div>
+        <p class="text-[8px] text-gray-500 uppercase mb-1">Importateur</p>
+        <input type="text" id="f-importateur" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
+    </div>
+</div>
+
+<div>
+    <p class="text-[8px] text-gray-500 uppercase mb-1">Particularité (Bio, Nature, etc.)</p>
+    <input type="text" id="f-particularite" placeholder="Ex: Vin nature, Bio..." class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
+</div>
+
+<div>
+    <p class="text-[8px] text-gray-500 uppercase mb-1">Accords Mets & Vins</p>
+    <textarea id="f-accords" rows="2" placeholder="Ex: Agneau, Pâtes crémeuses..." class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none"></textarea>
+</div>
+
+
+
             <button type="button" onclick="enregistrerBouteille()" class="w-full bg-red-900 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-white mt-4 shadow-2xl active:scale-95 transition-all">
                 Sauvegarder la fiche
             </button>
@@ -451,12 +477,18 @@
         
         const vinData = {
             nom: document.getElementById('f-nom').value.trim(),
-            import: document.getElementById('f-import').value.trim(),
-            couleur: document.getElementById('f-couleur').value,
-            prix: document.getElementById('f-prix').value,
-            millesime: document.getElementById('f-millesime').value,
-            cepage: document.getElementById('f-cepage') ? document.getElementById('f-cepage').value : "",
-            accords: document.getElementById('f-accords') ? document.getElementById('f-accords').value : ""
+    import: document.getElementById('f-import').value.trim(),
+    couleur: document.getElementById('f-couleur').value,
+    prix: document.getElementById('f-prix').value,
+    millesime: document.getElementById('f-millesime').value,
+    pays: document.getElementById('f-pays').value,
+    region: document.getElementById('f-region').value,
+    cepage: document.getElementById('f-cepage').value,
+    // Nouveaux champs :
+    appellation: document.getElementById('f-appellation').value.trim(),
+    importateur: document.getElementById('f-importateur').value.trim(),
+    particularite: document.getElementById('f-particularite').value.trim(),
+    accords: document.getElementById('f-accords').value.trim()
         };
 
         if (!vinData.nom && !vinData.import) return alert("Nom ou Code-barres obligatoire");
@@ -565,10 +597,13 @@
         const form = document.getElementById('wineForm');
         form.dataset.editId = b.id;
 
-        ['f-nom', 'f-couleur', 'f-pays', 'f-region', 'f-cepage', 'f-accords', 'f-import'].forEach(idChamp => {
-            const prop = idChamp.replace('f-', '');
-            document.getElementById(idChamp).value = b[prop] || "";
-        });
+       ['f-nom', 'f-couleur', 'f-pays', 'f-region', 'f-cepage', 'f-accords', 'f-import', 'f-appellation', 'f-particularite', 'f-importateur'].forEach(idChamp => {
+    const prop = idChamp.replace('f-', '');
+    const element = document.getElementById(idChamp);
+    if (element) {
+        element.value = b[prop] || "";
+    }
+});
 
         const zoneStocks = document.getElementById('liste-stocks-fiche');
         zoneStocks.innerHTML = (b.stocks || []).map((s, i) => `

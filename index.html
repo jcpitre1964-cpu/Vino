@@ -12,7 +12,7 @@
 
     <style>
 
-        
+
        /* SOMMAIRE DU STYLE :
         2. FOND D'ÉCRAN FIXE
         3. CARTES VITRÉES (GLASS)
@@ -778,27 +778,34 @@ function activerScanner() {
         Quagga.start();
     });
 
+    // ================================================================
     // 4. GESTION DE LA DÉTECTION DU CODE (QUAND LE SCAN RÉUSSIT)
+    // ================================================================
     Quagga.onDetected(function(result) {
         const code = result.codeResult.code;
 
-        // VÉRIFIER QUE LE CODE EST COMPLET (12 OU 13 CHIFFRES)
+        // VÉRIFIER QUE LE CODE EST VALIDE (12 OU 13 CHIFFRES)
         if (code && code.length >= 12) {
             
-            // ARRÊTER IMMÉDIATEMENT LA VIDÉO ET FERMER L'INTERFACE
+            // 1. ARRÊTER LE SCANNER IMMÉDIATEMENT
             stopScanner();
             
-            // FAIRE VIBRER LE TÉLÉPHONE POUR CONFIRMER LA LECTURE
+            // 2. VIBRATION DE CONFIRMATION
             if (navigator.vibrate) navigator.vibrate(100);
 
-            // ENVOYER LES CHIFFRES DANS LA CASE "CODE-BARRES" DE LA FICHE
-            const champ = document.getElementById('f-import');
-            if (champ) {
-                champ.value = code;
-                
-                // OUVRIR AUTOMATIQUEMENT LA FICHE DU VIN POUR ÉDITION
-                openModal('manuel');
-            }
+            // 3. OUVRIR LA FICHE DU VIN D'ABORD (IMPORTANT)
+            openModal('manuel');
+
+            // 4. ATTENDRE UN TOUT PETIT INSTANT QUE LA FENÊTRE S'AFFICHE
+            setTimeout(() => {
+                const champ = document.getElementById('f-import');
+                if (champ) {
+                    champ.value = code;
+                    console.log("SUCCÈS : CODE INSCRIT DANS F-IMPORT");
+                } else {
+                    alert("ERREUR : LE CHAMP 'F-IMPORT' EST INTROUVABLE");
+                }
+            }, 100); // DÉLAI DE 100 MILLISECUNDES
         }
     });
 }

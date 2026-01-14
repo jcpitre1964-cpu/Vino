@@ -182,108 +182,96 @@
 
 <header class="text-center mb-8 pt-6">
     <h1 class="text-4xl font-bold tracking-[0.3em] uppercase" style="color: #d97a00  ;">VINO</h1>
-    <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collections privées</p>
+    <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collectionsssss privées</p>
 </header>
 
 
 
     <main class="max-w-md mx-auto">
 
+    // ================================================================
+    // 1. PAGE D'ACCUEIL (SCANNER ET STATISTIQUES)
+    // ================================================================
+    <section id="page-accueil" class="page-content space-y-6">
 
-
-        
-        <section id="page-accueil" class="page-content space-y-6">
-
-    <div class="px-0">
-    <button type="button" onclick="activerScanner()" class="w-full flex items-center justify-center gap-4 bg-[#D97A00] text-white p-5 rounded-2xl active:scale-95 transition-all shadow-xl">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
-            <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
-            <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
-            <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
-            <rect x="7" y="12" width="10" height="0.1"></rect>
-        </svg>
-        <span class="font-bold uppercase tracking-[0.2em] text-sm">Scanner Code-Barres</span>
-    </button>
-</div>
-
-    <div class="grid grid-cols-2 gap-3">
-        <button onclick="openModal('manuel')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center text-white">Saisie Manuelle</button>
-        <button onclick="showPage('recherche')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest  text-center">Ma Cave 🍷</button>
-    </div>
-
-    <div class="glass-card p-6 shadow-2xl border-t border-white/10">
-        <div class="flex items-baseline justify-center gap-3 mb-4">
-            <span id="total-bottles" class="text-qxl font-thin text-white">0</span>
-            <p class="text-gray-300 uppercase text-[11px] tracking-[0.15em]">Bouteilles au total</p>
+        <div class="px-0">
+            <button type="button" onclick="activerScanner()" class="w-full flex items-center justify-center gap-4 bg-[#D97A00] text-white p-5 rounded-2xl active:scale-95 transition-all shadow-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+                    <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+                    <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+                    <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+                    <rect x="7" y="12" width="10" height="0.1"></rect>
+                </svg>
+                <span class="font-bold uppercase tracking-[0.2em] text-sm">Scanner Code-Barres</span>
+            </button>
         </div>
 
-        <div class="flex items-baseline justify-center gap-3 pt-4 border-t border-white/5">
-            <span id="total-cepages" class="text-qxl font-thin text-white">0</span>
-            <p class="text-gray-300 uppercase text-[11px] tracking-[0.15em]">Cépages différents</p>
+        <div class="grid grid-cols-2 gap-3">
+            <button type="button" onclick="openModal('manuel')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center text-white">Saisie Manuelle</button>
+            <button type="button" onclick="showPage('recherche')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center">Ma Cave 🍷</button>
+        </div>
+
+        <div class="glass-card p-6 shadow-2xl border-t border-white/10">
+            <div class="flex items-baseline justify-center gap-3 mb-4">
+                <span id="total-bottles" class="text-qxl font-thin text-white">0</span>
+                <p class="text-gray-300 uppercase text-[11px] tracking-[0.15em]">Bouteilles au total</p>
+            </div>
+
+            <div class="flex items-baseline justify-center gap-3 pt-4 border-t border-white/5">
+                <span id="total-cepages" class="text-qxl font-thin text-white">0</span>
+                <p class="text-gray-300 uppercase text-[11px] tracking-[0.15em]">Cépages différents</p>
+            </div>
+            
+            <div id="stats-cepages" class="mt-6 flex flex-wrap gap-2 justify-center"></div>
         </div>
         
-        <div id="stats-cepages" class="mt-6 flex flex-wrap gap-2 justify-center"></div>
-    </div>
-    
-</section>
+    </section>
 
-      
-  
-
-      
-      
-        <section id="page-recherche" class="page-content hidden space-y-4">
-            <div class="space-y-3 mb-6">
-                <div class="grid grid-cols-3 gap-2">
-                    <select id="search-couleur" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none border-white/20">
-                        <option value="">Couleurs</option>
-                        <option value="rouge">Rouge</option>
-                        <option value="blanc">Blanc</option>
-                        <option value="rose">Rosé</option>
-                    </select>
-                    <select id="search-cepage" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none border-white/20">
-                        <option value="">Cépages</option>
-                    </select>
-                    <select id="search-accords" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none border-white/20">
-                        <option value="">Accords</option>
-                    </select>
-                </div>
-                <input type="text" id="searchInput" onkeyup="renderSearchList()" placeholder="Recherche" class="glass-card w-full bg-transparent text-white p-3 text-xs outline-none border-white/20">
+    // ================================================================
+    // 2. PAGE DE RECHERCHE ET FILTRES
+    // ================================================================
+    <section id="page-recherche" class="page-content hidden space-y-4">
+        <div class="space-y-3 mb-6">
+            <div class="grid grid-cols-3 gap-2">
+                <select id="search-couleur" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none border-white/20">
+                    <option value="">Couleurs</option>
+                    <option value="rouge">Rouge</option>
+                    <option value="blanc">Blanc</option>
+                    <option value="rose">Rosé</option>
+                </select>
+                <select id="search-cepage" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none border-white/20">
+                    <option value="">Cépages</option>
+                </select>
+                <select id="search-accords" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none border-white/20">
+                    <option value="">Accords</option>
+                </select>
             </div>
-            <div id="search-results-list" class="space-y-4"></div>
-        </section>
+            <input type="text" id="searchInput" onkeyup="renderSearchList()" placeholder="Recherche" class="glass-card w-full bg-transparent text-white p-3 text-xs outline-none border-white/20">
+        </div>
+        <div id="search-results-list" class="space-y-4"></div>
+    </section>
 
+    // ================================================================
+    // 3. PAGE DES CELLIERS ET GRILLES VISUELLES
+    // ================================================================
+    <section id="page-celliers" class="page-content hidden space-y-6">
+        <div class="flex gap-2">
+            <button type="button" onclick="renderGrid('cellier')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold text-center">Cellier</button>
+            <button type="button" onclick="renderGrid('casier')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold text-center">Casier</button>
+            <button type="button" onclick="renderGrid('reserve')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold text-center">Réserve</button>
+        </div>
+        <div id="gridContainer" class="glass-card p-4 overflow-x-auto min-h-[300px]"></div>
+    </section>
 
+    // ================================================================
+    // 4. PAGE DE GESTION ET MAINTENANCE
+    // ================================================================
+    <section id="page-gestion" class="page-content hidden">
+        <button type="button" onclick="confirmReset()" class="w-full glass-card p-6 text-red-500 text-xs font-bold uppercase text-center">Réinitialisation complète</button>
+    </section>
 
- 
-
-        <section id="page-celliers" class="page-content hidden space-y-6">
-            <div class="flex gap-2">
-                <button onclick="renderGrid('cellier')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold text-center">Cellier</button>
-                <button onclick="renderGrid('casier')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold text-center">Casier</button>
-                <button onclick="renderGrid('reserve')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold text-center">Réserve</button>
-            </div>
-            <div id="gridContainer" class="glass-card p-4 overflow-x-auto min-h-[300px]"></div>
-        </section>
-
-  
-
-
-        <section id="page-gestion" class="page-content hidden">
-            <button onclick="confirmReset()" class="w-full glass-card p-6 text-red-500 text-xs font-bold uppercase text-center">Réinitialisation complète</button>
-        </section>
-
-
-
-
-
-
-
-
-
-
-    </main>
+</main>
 
 <div id="wineModal" class="hidden fixed inset-0 bg-black/95 z-50 overflow-y-auto p-4 flex items-start justify-center">
     <div class="glass-card w-full max-w-md p-6 my-8 relative border border-white/10 shadow-2xl">

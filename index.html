@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VinoCollections Privées</title>
+    <title>Vino - Collections Privées</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
@@ -182,27 +182,34 @@
 
 <header class="text-center mb-8 pt-6">
     <h1 class="text-4xl font-bold tracking-[0.3em] uppercase" style="color: #d97a00  ;">VINO</h1>
-    <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collectionsprivées</p>
+    <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collections privées</p>
 </header>
 
 
 
     <main class="max-w-md mx-auto">
+
+
+    // ================================================================
+    // PAGE 1: ACCUEIL
+    // ================================================================
+
+
         
         <section id="page-accueil" class="page-content space-y-6">
 
     <div class="px-0">
-        <button onclick="activerScanner()" class="w-full flex items-center justify-center gap-4 bg-[#D97A00] text-white p-5 rounded-2xl active:scale-95 transition-all shadow-xl">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
-                <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
-                <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
-                <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
-                <rect x="7" y="12" width="10" height="0.1"></rect>
-            </svg>
-            <span class="font-bold uppercase tracking-[0.2em] text-sm">Scanner Code-Barres</span>
-        </button>
-    </div>
+    <button type="button" onclick="activerScanner()" class="w-full flex items-center justify-center gap-4 bg-[#D97A00] text-white p-5 rounded-2xl active:scale-95 transition-all shadow-xl">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+            <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+            <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+            <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+            <rect x="7" y="12" width="10" height="0.1"></rect>
+        </svg>
+        <span class="font-bold uppercase tracking-[0.2em] text-sm">Scanner Code-Barres</span>
+    </button>
+</div>
 
     <div class="grid grid-cols-2 gap-3">
         <button onclick="openModal('manuel')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center text-white">Saisie Manuelle</button>
@@ -227,7 +234,11 @@
 
       
       
-      
+    // ================================================================
+    // PAGE 2 : LISTE DE RECHERCHE
+    // ================================================================
+
+
       
       
         <section id="page-recherche" class="page-content hidden space-y-4">
@@ -253,7 +264,9 @@
 
 
 
-
+    // ================================================================
+    // PAGE 3 : CELLIERS ET CASIERS
+    // ================================================================
 
 
         <section id="page-celliers" class="page-content hidden space-y-6">
@@ -264,6 +277,13 @@
             </div>
             <div id="gridContainer" class="glass-card p-4 overflow-x-auto min-h-[300px]"></div>
         </section>
+
+    // ================================================================
+    // PAGE 4 : GESTION DE L'APPLICATION
+    // ================================================================
+
+
+
 
         <section id="page-gestion" class="page-content hidden">
             <button onclick="confirmReset()" class="w-full glass-card p-6 text-red-500 text-xs font-bold uppercase text-center">Réinitialisation complète</button>
@@ -584,45 +604,57 @@
     // ================================================================
     // 5. MOTEUR DU SCANNER (QUAGGA2)
     // ================================================================
-    function activerScanner() {
-        document.body.style.overflow = 'hidden';
-        const container = document.getElementById('scanner-container');
-        if (container) container.classList.remove('hidden');
+   function activerScanner() {
+    // 1. OUVRE LE FORMULAIRE (pour être sûr que le champ f-import existe)
+    const modal = document.getElementById('wineModal');
+    if (modal) modal.classList.remove('hidden');
 
-        Quagga.init({
-            inputStream: {
-                name: "Live",
-                type: "LiveStream",
-                target: document.querySelector('#interactive'),
-                constraints: {
-                    facingMode: "environment",
-                    aspectRatio: { min: 1, max: 2 },
-                    width: { min: 640, ideal: 1280 },
-                    height: { min: 480, ideal: 720 }
-                },
+    document.body.style.overflow = 'hidden';
+    const container = document.getElementById('scanner-container');
+    if (container) container.classList.remove('hidden');
+
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector('#interactive'),
+            constraints: {
+                facingMode: "environment",
+                aspectRatio: { min: 1, max: 2 },
+                width: { min: 640, ideal: 1280 },
+                height: { min: 480, ideal: 720 }
             },
-            locator: { patchSize: "medium", halfSample: false },
-            decoder: { readers: ["ean_reader", "upc_reader"] },
-            locate: true,
-            frequency: 20
-        }, function(err) {
-            if (err) { console.error(err); return; }
-            Quagga.start();
-        });
+        },
+        locator: { patchSize: "medium", halfSample: false },
+        decoder: { readers: ["ean_reader", "upc_reader"] },
+        locate: true,
+        frequency: 20
+    }, function(err) {
+        if (err) { console.error(err); return; }
+        Quagga.start();
+    });
 
-        Quagga.onDetected((result) => {
-    if (result.codeResult && result.codeResult.code) {
-        // REMPLACEMENT ICI : On prend le code et on force 14 caractères
-        const codeScanne = result.codeResult.code.toString().padStart(14, '0');
-        
-        // On place le résultat dans la case du formulaire
-        document.getElementById('f-import').value = codeScanne;
+    // ÉCOUTEUR DE RÉSULTAT (Déjà corrigé avec les 14 chiffres)
+    Quagga.onDetected((result) => {
+        if (result.codeResult && result.codeResult.code) {
+            const codeScanne = result.codeResult.code.toString().padStart(14, '0');
+            
+            const inputImport = document.getElementById('f-import');
+            if (inputImport) {
+                inputImport.value = codeScanne;
+            }
 
-        // On arrête le scanner et on ferme la caméra
-        Quagga.stop();
-        document.getElementById('scanner-container').classList.add('hidden');
-    }
-});
+            Quagga.stop(); 
+            
+            const scannerContainer = document.getElementById('scanner-container');
+            if (scannerContainer) {
+                scannerContainer.classList.add('hidden');
+            }
+            
+            document.body.style.overflow = 'auto'; // Redonne le défilement
+        }
+    });
+}
     }
 
     function stopScanner() {

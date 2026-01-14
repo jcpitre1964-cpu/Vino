@@ -99,6 +99,77 @@
             min-height: 100vh;
             padding-bottom: 100px;
         }
+/* La zone de scan (viseur) */
+.scanner-laser {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 2px;
+    background-color: red;
+    box-shadow: 0 0 15px 2px rgba(255, 0, 0, 0.7);
+    z-index: 110;
+    animation: scan-anim 2s infinite ease-in-out;
+}
+
+@keyframes scan-anim {
+    0%, 100% { top: 30%; }
+    50% { top: 70%; }
+}
+
+/* Le cadre autour pour aider à viser */
+.scanner-outline {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    height: 40%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 15px;
+    z-index: 105;
+}
+
+/* Le cadre de visée */
+.scanner-outline {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px; /* Largeur de la zone de lecture */
+    height: 180px; /* Hauteur de la zone de lecture */
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    z-index: 105;
+    pointer-events: none;
+}
+
+/* La ligne rouge animée */
+.scanner-laser {
+    position: absolute;
+    width: 260px;
+    height: 2px;
+    background-color: #ff0000;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 110;
+    box-shadow: 0 0 8px 1px rgba(255, 0, 0, 0.8);
+    animation: scanning 2s infinite ease-in-out;
+}
+
+@keyframes scanning {
+    0% { top: 35%; }
+    50% { top: 65%; }
+    100% { top: 35%; }
+}
+
+
+
+
+
+
+
     </style>
 </head>
 
@@ -137,7 +208,7 @@
 
     <div class="grid grid-cols-2 gap-3">
         <button onclick="openModal('manuel')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center text-white">Saisie Manuelle</button>
-        <button onclick="showPage('recherche')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-red-300 text-center">Ma Cave 🍷</button>
+        <button onclick="showPage('recherche')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest  text-center">Ma Cave 🍷</button>
     </div>
 
     <div class="glass-card p-6 shadow-2xl border-t border-white/10">
@@ -226,9 +297,9 @@
 
         <form id="wineForm" class="space-y-4">
             <div>
-                <p class="text-[9px] text-gray-500 uppercase mb-1">Code-Barres / Code SAQ</p>
+                <p class="text-[9px] text-gray-500 uppercase mb-1">Code-Barres SAQ</p>
                 <div class="flex gap-2">
-                    <input type="text" id="f-import" placeholder="Numéro scanné..." 
+                    <input type="text" id="f-import" placeholder="" 
                         class="flex-1 bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm focus:border-red-900 outline-none">
                 </div>
                 
@@ -239,8 +310,8 @@
             </div>
 
             <div>
-                <p class="text-[9px] text-gray-500 uppercase mb-1">Nom du Vin / Appellation</p>
-                <input type="text" id="f-nom" placeholder="Château, Millésime..." 
+                <p class="text-[9px] text-gray-500 uppercase mb-1">Nom du Vin</p>
+                <input type="text" id="f-nom" placeholder="" 
                     class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm focus:border-red-900 outline-none">
             </div>
 
@@ -283,7 +354,7 @@
     </div>
 
     <div>
-        <p class="text-[8px] text-gray-500 uppercase mb-1">Accords / Notes de dégustation</p>
+        <p class="text-[8px] text-gray-500 uppercase mb-1">Accords</p>
         <textarea id="f-accords" rows="2" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs"></textarea>
     </div>
 
@@ -292,9 +363,9 @@
     <div class="glass-card p-4 bg-white/5 border-white/10 mt-4">
         <p class="text-[9px] text-gray-400 mb-3 uppercase text-center font-bold">Nouvel emplacement</p>
         <select id="f-loc-lieu" onchange="genererOptionsRangs()" class="w-full bg-black p-3 rounded-xl text-xs text-white mb-3 border border-white/10">
-            <option value="Cellier">Cellier (7x6)</option>
-            <option value="Casier">Casier (9x4)</option>
-            <option value="Réserve">Réserve (4x8)</option>
+            <option value="Cellier">Cellier</option>
+            <option value="Casier">Casier</option>
+            <option value="Réserve">Réserve</option>
         </select>
         <div class="grid grid-cols-2 gap-4">
             <select id="f-loc-r" class="w-full bg-black p-4 rounded-xl text-white border border-white/10 text-xs text-center font-bold"></select>
@@ -378,7 +449,7 @@
         currentFilters.nom = document.getElementById('searchInput').value.toLowerCase();
 
         if (!currentFilters.couleur && !currentFilters.cepage && !currentFilters.accords && !currentFilters.nom) {
-            list.innerHTML = "<p class='text-center text-gray-500 text-[10px] py-10 uppercase tracking-widest'>Entrez un critère</p>";
+            list.innerHTML = "<p class='text-center text-gray-200 text-[10px] py-10 uppercase tracking-widest'>Entrez un critère</p>";
             return;
         }
 
@@ -613,8 +684,6 @@ function majStatsAccueil() {
 
 function activerScanner() {
     const container = document.getElementById('scanner-container');
-    if (!container) return; // Sécurité si le bloc HTML est manquant
-    
     container.classList.remove('hidden');
 
     Quagga.init({
@@ -623,115 +692,153 @@ function activerScanner() {
             type: "LiveStream",
             target: document.querySelector('#interactive'),
             constraints: {
-                facingMode: "environment", // Force la caméra arrière du iPhone
-                aspectRatio: { min: 1, max: 2 }
+                facingMode: "environment",
+                aspectRatio: { min: 1, max: 2 },
+                width: { min: 640, ideal: 1280 }, // Aide l'iPhone à faire le focus
+                height: { min: 480, ideal: 720 }
             },
         },
+        locator: { 
+            patchSize: "medium", 
+            halfSample: false // Désactivé pour plus de précision sur les petits codes
+        },
         decoder: {
-            readers: ["ean_reader", "ean_8_reader", "upc_reader"]
-        }
+            readers: ["ean_reader", "upc_reader"] // Focus uniquement sur le vin
+        },
+        locate: true,
+        frequency: 20 // Plus de scans par seconde
     }, function(err) {
-        if (err) {
-            alert("Erreur Caméra : Assurez-vous d'être en HTTPS et d'autoriser l'accès.");
-            stopScanner();
-            return;
+        if (err) { console.log(err); return; }
+        Quagga.start();
+    });
+}
+
+
+
+
+
+function stopScanner() {
+    // 1. On arrête la capture vidéo de Quagga
+    if (typeof Quagga !== 'undefined') {
+        Quagga.stop();
+    }
+
+    // 2. On cache le conteneur du scanner
+    const container = document.getElementById('scanner-container');
+    if (container) {
+        container.classList.add('hidden');
+    }
+    
+    // Optionnel : on s'assure que le défilement de la page est réactivé
+    document.body.style.overflow = 'auto';
+}
+
+
+// ================================================================
+// FONCTION : ACTIVER LE SCANNER (DÉCLENCHÉE PAR LE BOUTON ORANGE)
+// ================================================================
+function activerScanner() {
+    // 1. BLOQUER LE DÉFILEMENT DE LA PAGE ARRIÈRE POUR ÉVITER LES MOUVEMENTS
+    document.body.style.overflow = 'hidden';
+
+    // 2. AFFICHER LA ZONE NOIRE DU SCANNER (LE CONTENEUR)
+    const container = document.getElementById('scanner-container');
+    if (container) {
+        container.classList.remove('hidden');
+    }
+
+    // 3. CONFIGURATION TECHNIQUE DU MOTEUR DE RECHERCHE (QUAGGA)
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector('#interactive'), // OÙ LA VIDÉO S'AFFICHE
+            constraints: {
+                facingMode: "environment", // UTILISER LA CAMÉRA ARRIÈRE
+                aspectRatio: { min: 1, max: 2 },
+                width: { min: 640, ideal: 1280 }, // QUALITÉ D'IMAGE ÉLEVÉE
+                height: { min: 480, ideal: 720 }
+            },
+        },
+        locator: { 
+            patchSize: "medium", 
+            halfSample: false // ANALYSE DE L'IMAGE À 100% POUR PLUS DE PRÉCISION
+        },
+        decoder: {
+            // RECHERCHE UNIQUEMENT DES CODES DE BOUTEILLES (EAN ET UPC)
+            readers: ["ean_reader", "upc_reader"]
+        },
+        locate: true,
+        frequency: 20 // NOMBRE D'ANALYSES PAR SECONDE
+    }, function(err) {
+        if (err) { 
+            console.error("ERREUR INITIALISATION :", err); 
+            alert("ERREUR : LA CAMÉRA N'EST PAS ACCESSIBLE");
+            return; 
         }
+        // LANCEMENT RÉEL DE LA CAMÉRA
         Quagga.start();
     });
 
+    // 4. GESTION DE LA DÉTECTION DU CODE (QUAND LE SCAN RÉUSSIT)
     Quagga.onDetected(function(result) {
         const code = result.codeResult.code;
-        if (code) {
-            // 1. On arrête le scan
+
+        // VÉRIFIER QUE LE CODE EST COMPLET (12 OU 13 CHIFFRES)
+        if (code && code.length >= 12) {
+            
+            // ARRÊTER IMMÉDIATEMENT LA VIDÉO ET FERMER L'INTERFACE
             stopScanner();
             
-            // 2. On met le code dans le champ 'f-import'
+            // FAIRE VIBRER LE TÉLÉPHONE POUR CONFIRMER LA LECTURE
+            if (navigator.vibrate) navigator.vibrate(100);
+
+            // ENVOYER LES CHIFFRES DANS LA CASE "CODE-BARRES" DE LA FICHE
             const champ = document.getElementById('f-import');
             if (champ) {
                 champ.value = code;
                 
-                // 3. On ouvre le formulaire pour voir le résultat
+                // OUVRIR AUTOMATIQUEMENT LA FICHE DU VIN POUR ÉDITION
                 openModal('manuel');
-                
-                // 4. On vibre pour confirmer
-                if (navigator.vibrate) navigator.vibrate(200);
             }
         }
     });
 }
 
+// ================================================================
+// FONCTION : ARRÊTER LE SCANNER ET NETTOYER L'ÉCRAN
+// ================================================================
 function stopScanner() {
-    Quagga.stop();
-    document.getElementById('scanner-container').classList.add('hidden');
-}
-
-
-
-function activerScanner() {
-    // 1. On affiche le conteneur noir que tu as placé en bas du body
-    const container = document.getElementById('scanner-container');
-    if (!container) return alert("Erreur: Conteneur de scan introuvable");
-    container.classList.remove('hidden');
-
-    // 2. Configuration de Quagga
-    Quagga.init({
-        inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: document.querySelector('#interactive'),
-            constraints: {
-                facingMode: "environment", // Utilise la caméra arrière
-                aspectRatio: { min: 1, max: 2 }
-            },
-        },
-        decoder: {
-            // On se concentre sur les types de codes-barres des bouteilles de vin
-            readers: ["ean_reader", "ean_8_reader", "upc_reader", "upc_e_reader"]
-        },
-        locate: true // Aide à trouver le code dans l'image
-    }, function(err) {
-        if (err) {
-            console.error(err);
-            alert("Caméra non accessible. Vérifiez que vous êtes en HTTPS.");
-            stopScanner();
-            return;
-        }
-        Quagga.start();
-    });
-
-    // 3. Quand le code est détecté
-    Quagga.onDetected(function(data) {
-        const code = data.codeResult.code;
-        
-        if (code) {
-            // Petit retour haptique (vibration) si supporté
-            if (navigator.vibrate) navigator.vibrate(100);
-            
-            // On arrête la caméra immédiatement
-            stopScanner();
-            
-            // ON ENVOIE LE CODE DANS LE FORMULAIRE
-            // Je suppose que ton champ code-barres s'appelle 'f-import'
-            const champCode = document.getElementById('f-import');
-            if (champCode) {
-                champCode.value = code;
-                
-                // On ouvre le modal d'ajout manuellement pour que l'utilisateur voit le code
-                openModal('manuel'); 
-                
-                // OPTIONNEL : Si tu veux lancer la recherche SAQ automatiquement :
-                // chercherSAQ();
-            }
-        }
-    });
-}
-
-function stopScanner() {
+    // 1. ÉTEINDRE LE MOTEUR QUAGGA (COUPE LA CAMÉRA)
     if (typeof Quagga !== 'undefined') {
         Quagga.stop();
     }
+
+    // 2. CACHER LE CONTENEUR NOIR DU SCANNER
     const container = document.getElementById('scanner-container');
-    if (container) container.classList.add('hidden');
+    if (container) {
+        container.classList.add('hidden');
+    }
+
+    // 3. RÉACTIVER LE DÉFILEMENT DE LA PAGE PRINCIPALE
+    document.body.style.overflow = 'auto';
+}
+
+// ================================================================
+// FONCTION : RECHERCHER LE CODE SUR LE SITE DE LA SAQ
+// ================================================================
+function chercherSAQ() {
+    // RÉCUPÉRER LE CODE QUI EST DANS LA CASE
+    const code = document.getElementById('f-import').value;
+    
+    if (!code) {
+        alert("VEUILLEZ SCANNER UN CODE AVANT DE RECHERCHER");
+        return;
+    }
+
+    // CONSTRUIRE L'ADRESSE DE RECHERCHE ET OUVRIR UN NOUVEL ONGLET
+    const url = `https://www.saq.com/fr/catalogsearch/result/?q=${code}`;
+    window.open(url, '_blank');
 }
 
 function chercherSAQ() {
@@ -751,8 +858,14 @@ function chercherSAQ() {
 
 <div id="scanner-container" class="hidden fixed inset-0 z-[100] bg-black">
     <div id="interactive" class="viewport w-full h-full"></div>
-    <button onclick="stopScanner()" class="absolute top-5 right-5 bg-white/20 p-3 rounded-full text-white">✕ Fermer</button>
-    <div class="absolute inset-0 border-2 border-red-500/30 m-20 pointer-events-none"></div>
+    
+    <div class="scanner-outline"></div>
+    <div class="scanner-laser"></div>
+    
+    <button type="button" onclick="stopScanner()" 
+        class="absolute top-8 right-8 text-white bg-black/50 w-12 h-12 rounded-full flex items-center justify-center z-[120] border border-white/20 active:bg-white/20 transition-all">
+        <span class="text-2xl">✕</span>
+    </button>
 </div>
 
 

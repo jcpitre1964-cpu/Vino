@@ -2,51 +2,117 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Vino - Collections Privées</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-
-
-
-
     <style>
-       
-           
-       
-       
-       body { 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; padding: 0; min-height: 100vh; color: #e5e7eb;
+        /* 1. FIX FOND D'ÉCRAN IMMOBILE (Spécial iOS/iPhone) */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
             background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9)), 
                         url('https://images.unsplash.com/photo-1738544475560-0683270451bd?q=80&w=1470&auto=format&fit=crop');
-            background-size: cover; background-position: center; background-attachment: fixed;
+            background-size: cover; 
+            background-position: center;
         }
-        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1.5rem; }
-        .accent-wine { background-color: rgba(99, 13, 22, 0.8); }
-        .nav-glass { background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.1); }
-        input, select { background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white !important; }
-        .label-micro { font-size: 8px; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280; margin-bottom: 2px; }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            min-height: 100vh; 
+            color: #e5e7eb;
+            background-color: #000;
+            overflow-x: hidden;
+        }
+
+        /* 2. CARTES ET ÉLÉMENTS VITRÉS */
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 1.5rem; 
+        }
+
+        .accent-wine { background-color: rgba(217, 122, 0, 0.8); }
+        
+        .nav-glass { 
+            background: rgba(10, 10, 10, 0.98); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+
+        /* 3. FORMULAIRES */
+        input, select { 
+            background: rgba(255,255,255,0.05) !important; 
+            border: 1px solid rgba(255,255,255,0.1) !important; 
+            color: white !important; 
+            border-radius: 0.75rem;
+        }
+
+        .label-micro { 
+            font-size: 8px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            color: #6b7280; 
+            margin-bottom: 2px; 
+        }
+
         select option { background-color: #1a1a1a !important; color: white !important; }
         
-        /* Style des flèches pour les selects */
         select {
             appearance: none;
+            -webkit-appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
-            background-position: right 0.5rem center;
+            background-position: right 0.75rem center;
             background-size: 1em;
-            padding-right: 1.5rem;
+            padding-right: 2rem;
+        }
+
+        /* 4. SCANNER ET CAMÉRA */
+        #interactive.viewport video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #interactive.viewport canvas.drawingBuffer {
+            display: none;
+        }
+
+        /* 5. STRUCTURE */
+        .page-content {
+            background: transparent !important;
+            min-height: 100vh;
+            padding-bottom: 100px;
         }
     </style>
 </head>
+
+
+
+
+
+
 <body class="p-4 pb-32">
 
   
 
 <header class="text-center mb-8 pt-6">
-    <h1 class="text-4xl font-bold tracking-[0.3em] uppercase" style="color: #e0c025;">VINO</h1>
+    <h1 class="text-4xl font-bold tracking-[0.3em] uppercase" style="color: #d97a00  ;">VINO</h1>
     <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collections privées</p>
 </header>
 
@@ -55,27 +121,40 @@
     <main class="max-w-md mx-auto">
         
         <section id="page-accueil" class="page-content space-y-6">
-            <div class="glass-card p-2 text-center shadow-2xl border-t border-white/10">
-                <span id="total-bottles" class="text-2xl font-thin text-white">0</span>
-                <p class="text-gray-500 uppercase text-[12px] mt-4 tracking-[0.1em]">Bouteilles au total</p>
-                
-                <div id="stats-cepages" class="mt-6 pt-4 border-t border-white/5 grid grid-cols-2 gap-2"></div>
-            </div>
 
+    <div class="px-0">
+        <button onclick="activerScanner()" class="w-full flex items-center justify-center gap-4 bg-[#D97A00] text-white p-5 rounded-2xl active:scale-95 transition-all shadow-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+                <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+                <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+                <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+                <rect x="7" y="12" width="10" height="0.1"></rect>
+            </svg>
+            <span class="font-bold uppercase tracking-[0.2em] text-sm">Scanner Code-Barres</span>
+        </button>
+    </div>
 
+    <div class="grid grid-cols-2 gap-3">
+        <button onclick="openModal('manuel')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center text-white">Saisie Manuelle</button>
+        <button onclick="showPage('recherche')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-red-300 text-center">Ma Cave 🍷</button>
+    </div>
 
+    <div class="glass-card p-6 shadow-2xl border-t border-white/10">
+        <div class="flex items-baseline justify-center gap-3 mb-4">
+            <span id="total-bottles" class="text-qxl font-thin text-white">0</span>
+            <p class="text-gray-300 uppercase text-[11px] tracking-[0.15em]">Bouteilles au total</p>
+        </div>
 
-            
-            <div class="grid grid-cols-1 gap-4">
-                <button onclick="openModal('scan')" class="accent-wine text-white py-5 rounded-2xl font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-3">
-                     Scanner Code-barres
-                </button>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="openModal('manuel')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center">Saisie Manuelle</button>
-                    <button onclick="showPage('recherche')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-red-300 text-center">Ma Cave 🍷</button>
-                </div>
-            </div>
-        </section>
+        <div class="flex items-baseline justify-center gap-3 pt-4 border-t border-white/5">
+            <span id="total-cepages" class="text-qxl font-thin text-white">0</span>
+            <p class="text-gray-300 uppercase text-[11px] tracking-[0.15em]">Cépages différents</p>
+        </div>
+        
+        <div id="stats-cepages" class="mt-6 flex flex-wrap gap-2 justify-center"></div>
+    </div>
+    
+</section>
 
       
       
@@ -132,6 +211,12 @@
 
     </main>
 
+
+
+
+
+
+
   <div id="wineModal" class="hidden fixed inset-0 bg-black/95 z-50 overflow-y-auto p-4 flex items-start justify-center">
     <div class="glass-card w-full max-w-md p-6 my-8 relative border border-white/10 shadow-2xl">
         
@@ -140,17 +225,24 @@
         <h2 class="text-xl font-thin text-white mb-6 uppercase tracking-widest text-center">Fiche du Vin</h2>
 
         <form id="wineForm" class="space-y-4">
-    <div>
-        <p class="text-[9px] text-gray-500 uppercase mb-1">Code-Barres (GTIN-14)</p>
-        <div class="flex gap-2">
-            <input type="text" id="f-nom" placeholder="Scannez ici..." 
-                class="flex-1 bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm focus:border-red-900 outline-none">
-        </div>
-        <button type="button" onclick="chercherSAQ()" 
-            class="w-full mt-2 py-3 border border-red-900/40 rounded-xl text-[10px] uppercase tracking-[0.2em] text-red-200 bg-red-900/10 active:bg-red-900/30 transition-all font-bold">
-            🔎 Chercher Code SAQ (14 chiffres)
-        </button>
-    </div>
+            <div>
+                <p class="text-[9px] text-gray-500 uppercase mb-1">Code-Barres / Code SAQ</p>
+                <div class="flex gap-2">
+                    <input type="text" id="f-import" placeholder="Numéro scanné..." 
+                        class="flex-1 bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm focus:border-red-900 outline-none">
+                </div>
+                
+                <button type="button" onclick="chercherSAQ()" 
+                    class="w-full mt-2 py-3 border border-red-900/40 rounded-xl text-[10px] uppercase tracking-[0.2em] text-red-200 bg-red-900/10 active:bg-red-900/30 transition-all font-bold">
+                    🔎 Identifier via la SAQ
+                </button>
+            </div>
+
+            <div>
+                <p class="text-[9px] text-gray-500 uppercase mb-1">Nom du Vin / Appellation</p>
+                <input type="text" id="f-nom" placeholder="Château, Millésime..." 
+                    class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm focus:border-red-900 outline-none">
+            </div>
 
     <div>
         <p class="text-[9px] text-gray-500 uppercase mb-1">Nom / Description du vin</p>
@@ -230,7 +322,7 @@
    
    
    
-   
+   <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
    
   <script>
     let inventaire = JSON.parse(localStorage.getItem('vino_db')) || [];
@@ -424,32 +516,244 @@
         document.getElementById('gridContainer').innerHTML = h + `</table>`;
     }
 
-    function chercherSAQ() {
-        let c = document.getElementById('f-nom').value.trim();
-        if (!c) return alert("Scannez d'abord");
-        c = c.padStart(14, '0');
-        document.getElementById('f-nom').value = c;
-        window.open(`https://www.google.com/search?q=site:saq.com+${c}`, '_blank');
+  function chercherSAQ() {
+    const code = document.getElementById('f-import').value;
+    
+    if (!code) {
+        alert("Veuillez d'abord scanner ou entrer un code.");
+        return;
     }
+
+    // Ouvre directement la recherche sur le site de la SAQ
+    const url = `https://www.saq.com/fr/catalogsearch/result/?q=${code}`;
+    window.open(url, '_blank');
+}
 
     function sauvegarder() { 
         localStorage.setItem('vino_db', JSON.stringify(inventaire)); 
         majStatsAccueil(); 
     }
+function majStatsAccueil() {
+    // 1. Calcul du total de bouteilles
+    const totalBtl = inventaire.reduce((sum, b) => sum + b.qte, 0);
+    const elBtl = document.getElementById('total-bottles');
+    if(elBtl) elBtl.innerText = totalBtl;
+    
+    // 2. Comptage des cépages pour les étiquettes et le total unique
+    const counts = {};
+    inventaire.forEach(b => { 
+        if(b.qte > 0) {
+            const c = b.cepage || "Inconnu";
+            counts[c] = (counts[c] || 0) + b.qte; 
+        }
+    });
 
-    function majStatsAccueil() {
-        const total = inventaire.reduce((sum, b) => sum + b.qte, 0);
-        const el = document.getElementById('total-bottles');
-        if(el) el.innerText = total;
-    }
-
+    // 3. Affichage du nombre de cépages différents (le nombre de clés dans l'objet counts)
+    const nbCepagesUniques = Object.keys(counts).filter(c => c !== "Inconnu").length;
+    const elCep = document.getElementById('total-cepages');
+    if(elCep) elCep.innerText = nbCepagesUniques;
+    
+    // 4. Génération des étiquettes (tags)
+    const statsZone = document.getElementById('stats-cepages');
+    if(!statsZone) return;
+    
+    statsZone.innerHTML = "";
+    Object.entries(counts)
+        .sort((a,b) => b[1] - a[1])
+        .forEach(([cepage, qte]) => {
+            const span = document.createElement('div');
+            span.className = "flex items-center bg-white/10 border border-white/5 pl-3 pr-2 py-1 rounded-full cursor-pointer active:bg-red-900/60 transition-all";
+            span.onclick = () => filtrerParCepageStat(cepage);
+            
+            span.innerHTML = `
+                <span class="text-[9px] text-gray-300 uppercase tracking-tight mr-2">${cepage}</span>
+                <span class="text-[10px] text-white font-black bg-white/10 px-2 py-0.5 rounded-full">${qte}</span>
+            `;
+            statsZone.appendChild(span);
+        });
+}
     // --- UN SEUL WINDOW.ONLOAD ---
     window.onload = function() {
         majStatsAccueil();
         genererOptionsRangs();
     };
+
+
+
+
+
+
+
+
+    function filtrerParCepageStat(nomCepage) {
+    // On réinitialise et on applique le filtre cépage
+    currentFilters = { couleur: "", cepage: nomCepage, accords: "", nom: "" };
+    
+    // Mise à jour des éléments visuels de la page recherche
+    const selectCep = document.getElementById('search-cepage');
+    if (selectCep) {
+        // On s'assure que le cépage existe dans la liste déroulante
+        if (![...selectCep.options].some(o => o.value === nomCepage)) {
+            const opt = document.createElement('option');
+            opt.value = nomCepage;
+            opt.innerText = nomCepage;
+            selectCep.appendChild(opt);
+        }
+        selectCep.value = nomCepage;
+    }
+    
+    // Reset des autres champs visuels
+    document.getElementById('searchInput').value = "";
+    document.getElementById('search-couleur').value = "";
+    document.getElementById('search-accords').value = "";
+
+    showPage('recherche');
+    renderSearchList();
+}
+
+function activerScanner() {
+    const container = document.getElementById('scanner-container');
+    if (!container) return; // Sécurité si le bloc HTML est manquant
+    
+    container.classList.remove('hidden');
+
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector('#interactive'),
+            constraints: {
+                facingMode: "environment", // Force la caméra arrière du iPhone
+                aspectRatio: { min: 1, max: 2 }
+            },
+        },
+        decoder: {
+            readers: ["ean_reader", "ean_8_reader", "upc_reader"]
+        }
+    }, function(err) {
+        if (err) {
+            alert("Erreur Caméra : Assurez-vous d'être en HTTPS et d'autoriser l'accès.");
+            stopScanner();
+            return;
+        }
+        Quagga.start();
+    });
+
+    Quagga.onDetected(function(result) {
+        const code = result.codeResult.code;
+        if (code) {
+            // 1. On arrête le scan
+            stopScanner();
+            
+            // 2. On met le code dans le champ 'f-import'
+            const champ = document.getElementById('f-import');
+            if (champ) {
+                champ.value = code;
+                
+                // 3. On ouvre le formulaire pour voir le résultat
+                openModal('manuel');
+                
+                // 4. On vibre pour confirmer
+                if (navigator.vibrate) navigator.vibrate(200);
+            }
+        }
+    });
+}
+
+function stopScanner() {
+    Quagga.stop();
+    document.getElementById('scanner-container').classList.add('hidden');
+}
+
+
+
+function activerScanner() {
+    // 1. On affiche le conteneur noir que tu as placé en bas du body
+    const container = document.getElementById('scanner-container');
+    if (!container) return alert("Erreur: Conteneur de scan introuvable");
+    container.classList.remove('hidden');
+
+    // 2. Configuration de Quagga
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector('#interactive'),
+            constraints: {
+                facingMode: "environment", // Utilise la caméra arrière
+                aspectRatio: { min: 1, max: 2 }
+            },
+        },
+        decoder: {
+            // On se concentre sur les types de codes-barres des bouteilles de vin
+            readers: ["ean_reader", "ean_8_reader", "upc_reader", "upc_e_reader"]
+        },
+        locate: true // Aide à trouver le code dans l'image
+    }, function(err) {
+        if (err) {
+            console.error(err);
+            alert("Caméra non accessible. Vérifiez que vous êtes en HTTPS.");
+            stopScanner();
+            return;
+        }
+        Quagga.start();
+    });
+
+    // 3. Quand le code est détecté
+    Quagga.onDetected(function(data) {
+        const code = data.codeResult.code;
+        
+        if (code) {
+            // Petit retour haptique (vibration) si supporté
+            if (navigator.vibrate) navigator.vibrate(100);
+            
+            // On arrête la caméra immédiatement
+            stopScanner();
+            
+            // ON ENVOIE LE CODE DANS LE FORMULAIRE
+            // Je suppose que ton champ code-barres s'appelle 'f-import'
+            const champCode = document.getElementById('f-import');
+            if (champCode) {
+                champCode.value = code;
+                
+                // On ouvre le modal d'ajout manuellement pour que l'utilisateur voit le code
+                openModal('manuel'); 
+                
+                // OPTIONNEL : Si tu veux lancer la recherche SAQ automatiquement :
+                // chercherSAQ();
+            }
+        }
+    });
+}
+
+function stopScanner() {
+    if (typeof Quagga !== 'undefined') {
+        Quagga.stop();
+    }
+    const container = document.getElementById('scanner-container');
+    if (container) container.classList.add('hidden');
+}
+
+function chercherSAQ() {
+    const code = document.getElementById('f-import').value;
+    
+    if (!code) {
+        alert("Veuillez d'abord scanner ou entrer un code.");
+        return;
+    }
+
+    // Ouvre une recherche Google ciblée sur le produit SAQ dans un nouvel onglet
+    const url = `https://www.google.com/search?q=site:saq.com+${code}`;
+    window.open(url, '_blank');
+}
+
 </script>
 
+<div id="scanner-container" class="hidden fixed inset-0 z-[100] bg-black">
+    <div id="interactive" class="viewport w-full h-full"></div>
+    <button onclick="stopScanner()" class="absolute top-5 right-5 bg-white/20 p-3 rounded-full text-white">✕ Fermer</button>
+    <div class="absolute inset-0 border-2 border-red-500/30 m-20 pointer-events-none"></div>
+</div>
 
 
 

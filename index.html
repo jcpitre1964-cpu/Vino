@@ -183,6 +183,9 @@
 <header class="text-center mb-8 pt-6">
     <h1 class="text-5xl font-bold tracking-[0.2em] uppercase" style="color: #d97a00  ;">VINO</h1>
     <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collectionsprivées</p>
+    <div id="version-date" style="text-align:center; font-size: 10px; color: #666; margin-bottom: 5px;">
+    Chargement de la version...
+</div>
 </header>
 
 
@@ -758,7 +761,22 @@
     </button>
 </div>
 
-
+<script>
+    // Script pour afficher la date de dernière modification du fichier
+    window.addEventListener('load', function() {
+        const dateElement = document.getElementById('version-date');
+        if (dateElement) {
+            // Récupère la date du fichier index.html sur le serveur
+            const lastMod = new Date(document.lastModified);
+            
+            // Formatage de la date en français (ex: 14 janv. 2026 à 11:15)
+            const options = { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            const dateFormatee = lastMod.toLocaleDateString('fr-FR', options);
+            
+            dateElement.innerHTML = "Version du : " + dateFormatee;
+        }
+    });
+</script>
 
 
 </body>

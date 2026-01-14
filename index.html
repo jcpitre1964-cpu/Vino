@@ -509,12 +509,13 @@
                 target: document.querySelector('#interactive'),
                 constraints: {
                     facingMode: "environment",
+                    focusMode: "continuous",
                     aspectRatio: { min: 1, max: 2 },
                     width: { min: 640, ideal: 1280 },
                     height: { min: 480, ideal: 720 }
                 },
             },
-            locator: { patchSize: "medium", halfSample: false },
+            locator: { patchSize: "small", halfSample: false },
             decoder: { readers: ["ean_reader", "upc_reader", "code_128_reader"] },
             locate: true,
             frequency: 10
@@ -523,19 +524,27 @@
             Quagga.start();
         });
 
-        Quagga.onDetected((result) => {
-            if (result.codeResult && result.codeResult.code) {
-                const codeScanne = result.codeResult.code;
-                if (codeScanne.length === 14) {
-                    stopScanner();
-                    const inputImport = document.getElementById('f-import');
-                    if (inputImport) {
-                        inputImport.value = codeScanne;
-                        if (navigator.vibrate) navigator.vibrate(100);
-                    }
-                }
+       Quagga.onDetected((result) => {
+    if (result.codeResult && result.codeResult.code) {
+        let codeScanne = result.codeResult.code;
+        
+        // On accepte dès que c'est un code standard (12 ou 13 chiffres)
+        if (codeScanne.length >= 12) { 
+            stopScanner();
+            
+            // RÈGLE SAQ : Si le code a 13 chiffres, on ajoute un 0 devant pour faire 14
+            if (codeScanne.length === 13) {
+                codeScanne = "0" + codeScanne;
             }
-        });
+            
+            const inputImport = document.getElementById('f-import');
+            if (inputImport) {
+                inputImport.value = codeScanne; // Ici, on aura toujours le format SAQ
+                if (navigator.vibrate) navigator.vibrate(100);
+            }
+        }
+    }
+});
     }
 
     function stopScanner() {

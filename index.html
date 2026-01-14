@@ -182,7 +182,7 @@
 
 <header class="text-center mb-8 pt-6">
     <h1 class="text-5xl font-bold tracking-[0.2em] uppercase" style="color: #d97a00  ;">VINO</h1>
-    <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collectionsprivées</p>
+    <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collections privées</p>
 </header>
 
 
@@ -207,7 +207,7 @@
 
         <div class="grid grid-cols-2 gap-3">
             <button type="button" onclick="openModal('manuel')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center text-white">Saisie Manuelle</button>
-            <button type="button" onclick="showPage('recherche')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center">Ma Cave 🍷</button>
+            <button type="button" onclick="showPage('recherche')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center">🍷</button>
         </div>
 
         <div class="glass-card p-6 shadow-2xl border-t border-white/10">
@@ -619,20 +619,43 @@
             Quagga.start();
         });
 
-       // 3. Écouteur de résultat
+      // 3. Écouteur de résultat
         Quagga.onDetected((result) => {
             if (result.codeResult && result.codeResult.code) {
                 const codeScanne = result.codeResult.code;
                 
-                // On arrête le scanner proprement
-                stopScanner();
+                // VERIFICATION : On ne traite le code que s'il fait exactement 14 caractères
+                if (codeScanne.length === 14) {
+                    
+                    // On arrête le scanner proprement
+                    stopScanner();
 
-                // On remplit le champ dans la fiche
-                const inputImport = document.getElementById('f-import');
-                if (inputImport) {
-                    inputImport.value = codeScanne;
-                    if (navigator.vibrate) navigator.vibrate(100);
+                    // On remplit le champ dans la fiche
+                    const inputImport = document.getElementById('f-import');
+                    if (inputImport) {
+                        inputImport.value = codeScanne;
+                        if (navigator.vibrate) navigator.vibrate(100);
+                        
+                        // Optionnel : Lancer la recherche automatique ici
+                        // btnRecherche.click(); 
+                    }
+                } else {
+                    // Si le code n'est pas bon, on continue de chercher sans rien fermer
+                    console.log("Code incomplet détecté : " + codeScanne);
                 }
+            }
+        });
+    }
+
+    function stopScanner() {
+        if (typeof Quagga !== 'undefined') {
+            Quagga.stop();
+            Quagga.offDetected(); 
+        }
+        const container = document.getElementById('scanner-container');
+        if (container) container.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
             }
         });
     }

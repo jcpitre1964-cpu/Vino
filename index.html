@@ -181,31 +181,29 @@
   
 
 <header class="text-center mb-8 pt-6">
-    <h1 class="text-4xl font-bold tracking-[0.3em] uppercase" style="color: #d97a00  ;">VINO</h1>
-    <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collectionsssss privées</p>
+    <h1 class="text-5xl font-bold tracking-[0.2em] uppercase" style="color: #d97a00  ;">VINO</h1>
+    <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collections privées</p>
 </header>
 
 
 
     <main class="max-w-md mx-auto">
 
-    // ================================================================
-    // 1. PAGE D'ACCUEIL (SCANNER ET STATISTIQUES)
-    // ================================================================
+    
     <section id="page-accueil" class="page-content space-y-6">
 
-        <div class="px-0">
-            <button type="button" onclick="activerScanner()" class="w-full flex items-center justify-center gap-4 bg-[#D97A00] text-white p-5 rounded-2xl active:scale-95 transition-all shadow-xl">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
-                    <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
-                    <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
-                    <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
-                    <rect x="7" y="12" width="10" height="0.1"></rect>
-                </svg>
-                <span class="font-bold uppercase tracking-[0.2em] text-sm">Scanner Code-Barres</span>
-            </button>
-        </div>
+       <div class="px-0">
+    <button type="button" onclick="activerScanner()" class="w-full flex items-center justify-center gap-4 bg-[#D97A00] text-white p-5 rounded-2xl active:scale-95 transition-all shadow-xl">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+            <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+            <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+            <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+            <rect x="7" y="12" width="10" height="0.1"></rect>
+        </svg>
+        <span class="font-bold uppercase tracking-[0.2em] text-sm">Scanner Code-Barres</span>
+    </button>
+</div>
 
         <div class="grid grid-cols-2 gap-3">
             <button type="button" onclick="openModal('manuel')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center text-white">Saisie Manuelle</button>
@@ -228,9 +226,7 @@
         
     </section>
 
-    // ================================================================
-    // 2. PAGE DE RECHERCHE ET FILTRES
-    // ================================================================
+   
     <section id="page-recherche" class="page-content hidden space-y-4">
         <div class="space-y-3 mb-6">
             <div class="grid grid-cols-3 gap-2">
@@ -252,9 +248,7 @@
         <div id="search-results-list" class="space-y-4"></div>
     </section>
 
-    // ================================================================
-    // 3. PAGE DES CELLIERS ET GRILLES VISUELLES
-    // ================================================================
+
     <section id="page-celliers" class="page-content hidden space-y-6">
         <div class="flex gap-2">
             <button type="button" onclick="renderGrid('cellier')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold text-center">Cellier</button>
@@ -264,9 +258,7 @@
         <div id="gridContainer" class="glass-card p-4 overflow-x-auto min-h-[300px]"></div>
     </section>
 
-    // ================================================================
-    // 4. PAGE DE GESTION ET MAINTENANCE
-    // ================================================================
+
     <section id="page-gestion" class="page-content hidden">
         <button type="button" onclick="confirmReset()" class="w-full glass-card p-6 text-red-500 text-xs font-bold uppercase text-center">Réinitialisation complète</button>
     </section>
@@ -295,7 +287,7 @@
 
             <div>
                 <p class="text-[9px] text-gray-500 uppercase mb-1">Nom / Description du vin</p>
-                <input type="text" id="f-nom" placeholder="Copier le nom ici..." 
+                <input type="text" id="f-nom" placeholder="Nom du vin..." 
                     class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm focus:border-red-900 outline-none">
             </div>
 
@@ -310,33 +302,56 @@
                     </select>
                 </div>
                 <div>
-                    <p class="text-[9px] text-gray-500 uppercase mb-1">Emplacement</p>
-                    <select id="f-emplacement" class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm outline-none">
-                        <option value="" disabled selected>Choisir...</option>
-                        <option value="cellier">Cellier</option>
-                        <option value="casier">Casier</option>
-                        <option value="reserve">Réserve</option>
-                    </select>
+                    <p class="text-[9px] text-gray-500 uppercase mb-1">Qté à ajouter</p>
+                    <input type="number" id="f-qte" value="1" class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm text-center outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <p class="text-[8px] text-gray-500 uppercase mb-1">Pays</p>
+                    <input type="text" id="f-pays" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
+                </div>
+                <div>
+                    <p class="text-[8px] text-gray-500 uppercase mb-1">Région</p>
+                    <input type="text" id="f-region" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <p class="text-[9px] text-gray-500 uppercase mb-1">Prix ($)</p>
-                    <input type="number" id="f-prix" placeholder="0.00" 
-                        class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm outline-none">
+                    <input type="number" id="f-prix" placeholder="0.00" class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm outline-none">
                 </div>
                 <div>
                     <p class="text-[9px] text-gray-500 uppercase mb-1">Millésime</p>
-                    <input type="number" id="f-millesime" placeholder="2024" 
-                        class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm outline-none">
+                    <input type="number" id="f-millesime" placeholder="2024" class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm outline-none">
                 </div>
             </div>
 
-            <button type="submit" class="w-full py-4 bg-red-900 text-white rounded-xl uppercase tracking-widest text-xs font-bold mt-4 shadow-lg active:scale-95 transition-transform">
-                Ajouter à ma collection
-            </button>
+            <div>
+                <p class="text-[8px] text-gray-500 uppercase mb-1">Cépage(s)</p>
+                <input type="text" id="f-cepage" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
+            </div>
 
+            <div id="liste-stocks-fiche" class="space-y-2"></div>
+
+            <div class="glass-card p-4 bg-white/5 border-white/10 mt-4">
+                <p class="text-[9px] text-gray-400 mb-3 uppercase text-center font-bold">Nouvel emplacement</p>
+                <select id="f-loc-lieu" onchange="genererOptionsRangs()" class="w-full bg-black p-3 rounded-xl text-xs text-white mb-3 border border-white/10">
+                    <option value="Cellier">Cellier</option>
+                    <option value="Casier">Casier</option>
+                    <option value="Réserve">Réserve</option>
+                </select>
+                <div class="grid grid-cols-2 gap-4">
+                    <select id="f-loc-r" class="w-full bg-black p-4 rounded-xl text-white border border-white/10 text-xs text-center font-bold"></select>
+                    <select id="f-loc-e" class="w-full bg-black p-4 rounded-xl text-white border border-white/10 text-xs text-center font-bold"></select>
+                </div>
+            </div>
+
+            <button type="button" onclick="enregistrerBouteille()" class="w-full bg-red-900 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-white mt-4 shadow-2xl active:scale-95 transition-all">
+                Sauvegarder la fiche
+            </button>
         </form>
     </div>
 </div>

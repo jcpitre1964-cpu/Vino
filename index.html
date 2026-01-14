@@ -10,7 +10,748 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
+    <style><!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vino - Collections Privées</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <style>
+
+
+       /* SOMMAIRE DU STYLE :
+        2. FOND D'ÉCRAN FIXE
+        3. CARTES VITRÉES (GLASS)
+        4. COULEURS ACCENTUÉES
+        5. FORMULAIRES & INPUTS
+        6. SCANNER INTERFACE
+        7. STRUCTURE DE PAGE
+        */
+       
+       
+       
+       
+       
+        /* ============================================================ */
+        /* 2. STYLE GÉNÉRAL ET FOND D'ÉCRAN (FIXE POUR IPHONE)          */
+        /* ============================================================ */
+        body::before {
+            content: "";
+            position: fixed;
+            /* UTILISER -10% POUR COUVRIR LES ZONES DE REBOND D'IOS */
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            z-index: -1;
+            background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9)), 
+                        url('https://images.unsplash.com/photo-1738544475560-0683270451bd?q=80&w=1470&auto=format&fit=crop');
+            background-size: cover; 
+            background-position: center;
+            /* EMPÊCHE L'IMAGE DE RECALCULER SA TAILLE AU SCROLL */
+            will-change: transform;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            /* REMPLACER VH PAR SVH POUR LES NAVIGATEURS MODERNES */
+            min-height: 100svh; 
+            color: #e5e7eb;
+            background-color: #000;
+            overflow-x: hidden;
+            /* STABILISE LE RENDU SUR MOBILE */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ============================================================ */
+        /* 3. COMPOSANTS VISUELS (CARTES ET COULEURS)                   */
+        /* ============================================================ */
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 1.5rem; 
+        }
+
+        .accent-wine { background-color: rgba(217, 122, 0, 0.8); }
+        
+        .nav-glass { 
+            background: rgba(10, 10, 10, 0.98); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+
+        /* ============================================================ */
+        /* 4. FORMULAIRES ET SAISIE DE DONNÉES                          */
+        /* ============================================================ */
+        input, select { 
+            background: rgba(255,255,255,0.05) !important; 
+            border: 1px solid rgba(255,255,255,0.1) !important; 
+            color: white !important; 
+            border-radius: 0.75rem;
+        }
+
+        .label-micro { 
+            font-size: 8px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            color: #6b7280; 
+            margin-bottom: 2px; 
+        }
+
+        select option { background-color: #1a1a1a !important; color: white !important; }
+        
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1em;
+            padding-right: 2rem;
+        }
+
+        /* ============================================================ */
+        /* 5. INTERFACE DU SCANNER ET ANIMATION LASER                   */
+        /* ============================================================ */
+        
+        /* VIDÉO DE LA CAMÉRA */
+        #interactive.viewport video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* CACHER LES ÉLÉMENTS DE DESSIN INUTILES */
+        #interactive.viewport canvas.drawingBuffer {
+            display: none;
+        }
+
+        /* CADRE DE VISÉE POUR CENTRER LA BOUTEILLE */
+        .scanner-outline {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px; 
+            height: 180px; 
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            z-index: 105;
+            pointer-events: none;
+        }
+
+        /* LIGNE ROUGE QUI BOUGE (EFFET LASER) */
+        .scanner-laser {
+            position: absolute;
+            width: 260px;
+            height: 2px;
+            background-color: #ff0000;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 110;
+            box-shadow: 0 0 8px 1px rgba(255, 0, 0, 0.8);
+            animation: scanning 2s infinite ease-in-out;
+        }
+
+        /* ANIMATION DU LASER (HAUT ET BAS) */
+        @keyframes scanning {
+            0% { top: 35%; }
+            50% { top: 65%; }
+            100% { top: 35%; }
+        }
+
+        /* ============================================================ */
+        /* 6. STRUCTURE DES PAGES                                       */
+        /* ============================================================ */
+        .page-content {
+            background: transparent !important;
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+    </style>
+</head>
+
+
+
+
+
+<body class="p-4 pb-32">
+
+  
+
+<header class="text-center mb-8 pt-6">
+    <h1 class="text-5xl font-bold tracking-[0.2em] uppercase" style="color: #d97a00  ;">VINO</h1>
+    <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collections privées</p>
+</header>
+
+
+
+    <main class="max-w-md mx-auto">
+
+    
+    <section id="page-accueil" class="page-content space-y-6">
+
+       <div class="px-0">
+    <button type="button" onclick="activerScanner()" class="w-full flex items-center justify-center gap-4 bg-[#D97A00] text-white p-5 rounded-2xl active:scale-95 transition-all shadow-xl">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+            <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+            <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+            <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+            <rect x="7" y="12" width="10" height="0.1"></rect>
+        </svg>
+        <span class="font-bold uppercase tracking-[0.2em] text-sm">Scanner Code-Barres</span>
+    </button>
+</div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <button type="button" onclick="openModal('manuel')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center text-white">Saisie Manuelle</button>
+            <button type="button" onclick="showPage('recherche')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center">Ma Cave 🍷</button>
+        </div>
+
+        <div class="glass-card p-6 shadow-2xl border-t border-white/10">
+            <div class="flex items-baseline justify-center gap-3 mb-4">
+                <span id="total-bottles" class="text-qxl font-thin text-white">0</span>
+                <p class="text-gray-300 uppercase text-[11px] tracking-[0.15em]">Bouteilles au total</p>
+            </div>
+
+            <div class="flex items-baseline justify-center gap-3 pt-4 border-t border-white/5">
+                <span id="total-cepages" class="text-qxl font-thin text-white">0</span>
+                <p class="text-gray-300 uppercase text-[11px] tracking-[0.15em]">Cépages différents</p>
+            </div>
+            
+            <div id="stats-cepages" class="mt-6 flex flex-wrap gap-2 justify-center"></div>
+        </div>
+        
+    </section>
+
+   
+    <section id="page-recherche" class="page-content hidden space-y-4">
+        <div class="space-y-3 mb-6">
+            <div class="grid grid-cols-3 gap-2">
+                <select id="search-couleur" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none border-white/20">
+                    <option value="">Couleurs</option>
+                    <option value="rouge">Rouge</option>
+                    <option value="blanc">Blanc</option>
+                    <option value="rose">Rosé</option>
+                </select>
+                <select id="search-cepage" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none border-white/20">
+                    <option value="">Cépages</option>
+                </select>
+                <select id="search-accords" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none border-white/20">
+                    <option value="">Accords</option>
+                </select>
+            </div>
+            <input type="text" id="searchInput" onkeyup="renderSearchList()" placeholder="Recherche" class="glass-card w-full bg-transparent text-white p-3 text-xs outline-none border-white/20">
+        </div>
+        <div id="search-results-list" class="space-y-4"></div>
+    </section>
+
+
+    <section id="page-celliers" class="page-content hidden space-y-6">
+        <div class="flex gap-2">
+            <button type="button" onclick="renderGrid('cellier')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold text-center">Cellier</button>
+            <button type="button" onclick="renderGrid('casier')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold text-center">Casier</button>
+            <button type="button" onclick="renderGrid('reserve')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold text-center">Réserve</button>
+        </div>
+        <div id="gridContainer" class="glass-card p-4 overflow-x-auto min-h-[300px]"></div>
+    </section>
+
+
+    <section id="page-gestion" class="page-content hidden">
+        <button type="button" onclick="confirmReset()" class="w-full glass-card p-6 text-red-500 text-xs font-bold uppercase text-center">Réinitialisation complète</button>
+    </section>
+
+</main>
+
+<div id="wineModal" class="hidden fixed inset-0 bg-black/95 z-50 overflow-y-auto p-4 flex items-start justify-center">
+    <div class="glass-card w-full max-w-md p-6 my-8 relative border border-white/10 shadow-2xl">
+        
+        <button type="button" onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 text-2xl">✕</button>
+
+        <h2 class="text-xl font-thin text-white mb-6 uppercase tracking-widest text-center">Fiche du Vin</h2>
+
+        <form id="wineForm" class="space-y-4">
+            
+            <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                <p class="text-[9px] text-gray-500 uppercase mb-2">1. Scanner ou Saisir le Code</p>
+                <input type="text" id="f-import" placeholder="00000000000000" 
+                    class="w-full bg-black/20 p-4 rounded-xl text-white border border-white/10 text-sm focus:border-red-900 outline-none mb-2">
+                
+                <button type="button" onclick="chercherSAQ()" 
+                    class="w-full py-3 border border-red-900/40 rounded-xl text-[10px] uppercase tracking-[0.2em] text-red-200 bg-red-900/10 active:bg-red-900/30 transition-all font-bold">
+                    🔎 Chercher sur SAQ.com
+                </button>
+            </div>
+
+            <div>
+                <p class="text-[9px] text-gray-500 uppercase mb-1">Nom / Description du vin</p>
+                <input type="text" id="f-nom" placeholder="Nom du vin..." 
+                    class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm focus:border-red-900 outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <p class="text-[9px] text-gray-500 uppercase mb-1">Couleur</p>
+                    <select id="f-couleur" class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm outline-none">
+                        <option value="" disabled selected>Choisir...</option>
+                        <option value="rouge">Rouge</option>
+                        <option value="blanc">Blanc</option>
+                        <option value="rose">Rosé</option>
+                    </select>
+                </div>
+                <div>
+                    <p class="text-[9px] text-gray-500 uppercase mb-1">Qté à ajouter</p>
+                    <input type="number" id="f-qte" value="1" class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm text-center outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <p class="text-[8px] text-gray-500 uppercase mb-1">Pays</p>
+                    <input type="text" id="f-pays" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
+                </div>
+                <div>
+                    <p class="text-[8px] text-gray-500 uppercase mb-1">Région</p>
+                    <input type="text" id="f-region" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <p class="text-[9px] text-gray-500 uppercase mb-1">Prix ($)</p>
+                    <input type="number" id="f-prix" placeholder="0.00" class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm outline-none">
+                </div>
+                <div>
+                    <p class="text-[9px] text-gray-500 uppercase mb-1">Millésime</p>
+                    <input type="number" id="f-millesime" placeholder="2024" class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm outline-none">
+                </div>
+            </div>
+
+            <div>
+                <p class="text-[8px] text-gray-500 uppercase mb-1">Cépage(s)</p>
+                <input type="text" id="f-cepage" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
+            </div>
+
+            <div id="liste-stocks-fiche" class="space-y-2"></div>
+
+            <div class="glass-card p-4 bg-white/5 border-white/10 mt-4">
+                <p class="text-[9px] text-gray-400 mb-3 uppercase text-center font-bold">Nouvel emplacement</p>
+                <select id="f-loc-lieu" onchange="genererOptionsRangs()" class="w-full bg-black p-3 rounded-xl text-xs text-white mb-3 border border-white/10">
+                    <option value="Cellier">Cellier</option>
+                    <option value="Casier">Casier</option>
+                    <option value="Réserve">Réserve</option>
+                </select>
+                <div class="grid grid-cols-2 gap-4">
+                    <select id="f-loc-r" class="w-full bg-black p-4 rounded-xl text-white border border-white/10 text-xs text-center font-bold"></select>
+                    <select id="f-loc-e" class="w-full bg-black p-4 rounded-xl text-white border border-white/10 text-xs text-center font-bold"></select>
+                </div>
+            </div>
+
+            <button type="button" onclick="enregistrerBouteille()" class="w-full bg-red-900 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-white mt-4 shadow-2xl active:scale-95 transition-all">
+                Sauvegarder la fiche
+            </button>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+<select id="f-emplacement" class="glass-card bg-transparent text-white p-3 text-xs outline-none border-white/20 w-full mb-4">
+    <option value="" disabled selected>Choisir un emplacement</option>
+    <option value="cellier">Cellier</option>
+    <option value="casier">Casier</option>
+    <option value="reserve">Réserve</option>
+</select>
+        </div>
+        <div>
+            <p class="text-[9px] text-gray-500 uppercase mb-1">Qté à ajouter</p>
+            <input type="number" id="f-qte" value="1" class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm text-center">
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+        <div>
+            <p class="text-[8px] text-gray-500 uppercase mb-1">Pays</p>
+            <input type="text" id="f-pays" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs">
+        </div>
+        <div>
+            <p class="text-[8px] text-gray-500 uppercase mb-1">Région</p>
+            <input type="text" id="f-region" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs">
+        </div>
+    </div>
+
+    <div>
+        <p class="text-[8px] text-gray-500 uppercase mb-1">Cépage(s)</p>
+        <input type="text" id="f-cepage" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs">
+    </div>
+
+    <div>
+        <p class="text-[8px] text-gray-500 uppercase mb-1">Accords</p>
+        <textarea id="f-accords" rows="2" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs"></textarea>
+    </div>
+
+    <div id="liste-stocks-fiche" class="space-y-2 mt-4"></div>
+
+    <div class="glass-card p-4 bg-white/5 border-white/10 mt-4">
+        <p class="text-[9px] text-gray-400 mb-3 uppercase text-center font-bold">Nouvel emplacement</p>
+        <select id="f-loc-lieu" onchange="genererOptionsRangs()" class="w-full bg-black p-3 rounded-xl text-xs text-white mb-3 border border-white/10">
+            <option value="Cellier">Cellier</option>
+            <option value="Casier">Casier</option>
+            <option value="Réserve">Réserve</option>
+        </select>
+        <div class="grid grid-cols-2 gap-4">
+            <select id="f-loc-r" class="w-full bg-black p-4 rounded-xl text-white border border-white/10 text-xs text-center font-bold"></select>
+            <select id="f-loc-e" class="w-full bg-black p-4 rounded-xl text-white border border-white/10 text-xs text-center font-bold"></select>
+        </div>
+    </div>
+
+    <button type="button" onclick="enregistrerBouteille()" class="w-full bg-red-900 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-white mt-4 shadow-2xl active:scale-95 transition-all">
+        Sauvegarder la fiche
+    </button>
+</form>
+    </div>
+</div>
+
+    <nav class="fixed bottom-0 left-0 right-0 nav-glass px-4 py-4 flex justify-between items-center z-[90] rounded-t-[2rem]">
+        <button onclick="showPage('accueil')" class="flex-1 text-[9px] uppercase font-bold text-white tracking-widest text-center">Accueil</button>
+        <button onclick="showPage('recherche')" class="flex-1 text-[9px] uppercase font-bold text-white tracking-widest text-center">Liste</button>
+        <button onclick="showPage('celliers')" class="flex-1 text-[9px] uppercase font-bold text-white tracking-widest text-center">Celliers</button>
+        <button onclick="showPage('gestion')" class="flex-1 text-[9px] uppercase font-bold text-white tracking-widest text-center">Gestion</button>
+    </nav>
+
+   
+   
+   
+   
+   
+   
+   <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+   
+  <script>
+    // ================================================================
+    // 1. VARIABLES GLOBALES ET BASE DE DONNÉES LOCALES
+    // ================================================================
+    let inventaire = JSON.parse(localStorage.getItem('vino_db')) || [];
+    let currentFilters = { couleur: "", cepage: "", accords: "", nom: "" };
+
+    const cepagesDB = {
+        rouge: ['Cabernet Sauvignon', 'Merlot', 'Pinot Noir', 'Syrah', 'Sangiovese', 'Malbec', 'Grenache'],
+        blanc: ['Chardonnay', 'Sauvignon Blanc', 'Riesling', 'Pinot Gris', 'Chenin Blanc'],
+        rose: ['Grenache', 'Cinsault', 'Syrah']
+    };
+
+    // ================================================================
+    // 2. NAVIGATION ET GESTION DES FENÊTRES (MODALS)
+    // ================================================================
+    function showPage(p) { 
+        document.querySelectorAll('.page-content').forEach(pg => pg.classList.add('hidden'));
+        document.getElementById('page-' + p).classList.remove('hidden');
+        if(p === 'recherche') renderSearchList();
+    }
+
+    function openModal(mode, lieu, r, e) { 
+        const modal = document.getElementById('wineModal');
+        const form = document.getElementById('wineForm');
+        if (modal) modal.classList.remove('hidden'); 
+        if (form) form.reset();
+
+        // REMPLISSAGE AUTO SI ON CLIQUE SUR UNE CASE DU CELLIER
+        if (mode === 'manuel' && lieu) {
+            const selectLieu = document.getElementById('f-loc-lieu');
+            if (selectLieu) {
+                selectLieu.value = lieu;
+                genererOptionsRangs(); 
+                document.getElementById('f-loc-r').value = r;
+                document.getElementById('f-loc-e').value = e;
+            }
+        }
+    }
+    
+    function closeModal() {
+        document.getElementById('wineModal').classList.add('hidden');
+        const form = document.getElementById('wineForm');
+        if (form) {
+            form.reset();
+            delete form.dataset.editId;
+        }
+    }
+
+    // ================================================================
+    // 3. SYSTÈME DE RECHERCHE ET AFFICHAGE DE LA LISTE
+    // ================================================================
+    function renderSearchList() {
+        const list = document.getElementById('search-results-list');
+        if (!list) return;
+
+        currentFilters.couleur = document.getElementById('search-couleur').value;
+        currentFilters.cepage = document.getElementById('search-cepage').value;
+        currentFilters.accords = document.getElementById('search-accords').value;
+        currentFilters.nom = document.getElementById('searchInput').value.toLowerCase();
+
+        if (!currentFilters.couleur && !currentFilters.cepage && !currentFilters.accords && !currentFilters.nom) {
+            list.innerHTML = "<p class='text-center text-gray-200 text-[10px] py-10 uppercase tracking-widest'>Entrez un critère</p>";
+            return;
+        }
+
+        list.innerHTML = "";
+        const filtered = inventaire.filter(b => {
+            const matchCoul = !currentFilters.couleur || b.couleur === currentFilters.couleur;
+            const matchCep = !currentFilters.cepage || b.cepage === currentFilters.cepage;
+            const matchTexte = !currentFilters.nom || 
+                (b.nom && b.nom.toLowerCase().includes(currentFilters.nom)) ||
+                (b.import && b.import.toLowerCase().includes(currentFilters.nom));
+            return matchCoul && matchCep && matchTexte && b.qte > 0;
+        });
+
+        filtered.forEach(b => {
+            const card = document.createElement('div');
+            const borderColor = b.couleur === 'rouge' ? 'border-red-900' : (b.couleur === 'blanc' ? 'border-yellow-100' : 'border-pink-400');
+            card.className = "glass-card p-5 border-l-4 mb-3 cursor-pointer " + borderColor;
+            card.onclick = () => ouvrirFiche(b.id);
+            card.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-white leading-tight">${b.import || b.nom}</h3>
+                        <p class="text-[10px] text-gray-400 uppercase mt-1">${b.cepage || 'Cépage'} • ${b.pays || 'Pays'}</p>
+                    </div>
+                    <div class="text-right ml-4"><span class="text-2xl font-thin text-white">x${b.qte}</span></div>
+                </div>`;
+            list.appendChild(card);
+        });
+    }
+
+    // ================================================================
+    // 4. ACTIONS DE STOCK (ENREGISTRER / BOIRE)
+    // ================================================================
+    function enregistrerBouteille() {
+    const form = document.getElementById('wineForm');
+    const editId = form.dataset.editId;
+    
+    // 1. Récupération des données selon tes nouveaux IDs
+    const vinData = {
+        nom: document.getElementById('f-nom').value.trim(),
+        import: document.getElementById('f-import').value.trim(),
+        couleur: document.getElementById('f-couleur').value,
+        prix: document.getElementById('f-prix').value,
+        millesime: document.getElementById('f-millesime').value,
+        cepage: document.getElementById('f-cepage') ? document.getElementById('f-cepage').value : "",
+        accords: document.getElementById('f-accords') ? document.getElementById('f-accords').value : ""
+    };
+
+    // Validation de base
+    if (!vinData.nom && !vinData.import) return alert("Nom ou Code-barres obligatoire");
+
+    // 2. Gestion simplifiée de l'emplacement et quantité
+    const qteAajouter = parseInt(document.getElementById('f-quantite').value) || 0;
+    const emplacementChoisi = document.getElementById('f-emplacement').value || "Non spécifié";
+
+    if (editId) {
+        // Mode MODIFICATION
+        const idx = inventaire.findIndex(v => v.id == editId);
+        if (idx === -1) return;
+
+        inventaire[idx] = { ...inventaire[idx], ...vinData };
+        
+        if (qteAajouter > 0) {
+            if (!inventaire[idx].stocks) inventaire[idx].stocks = [];
+            let sIdx = inventaire[idx].stocks.findIndex(s => s.emplacement === emplacementChoisi);
+            
+            if (sIdx > -1) inventaire[idx].stocks[sIdx].qte += qteAajouter;
+            else inventaire[idx].stocks.push({ emplacement: emplacementChoisi, qte: qteAajouter });
+        }
+        inventaire[idx].qte = inventaire[idx].stocks.reduce((sum, s) => sum + s.qte, 0);
+    } else {
+        // Mode NOUVEL AJOUT
+        inventaire.push({
+            id: Date.now(),
+            ...vinData,
+            stocks: qteAajouter > 0 ? [{ emplacement: emplacementChoisi, qte: qteAajouter }] : [],
+            qte: qteAajouter
+        });
+    }
+
+    // 3. Sauvegarde et mise à jour de l'écran
+    sauvegarder();
+    closeModal();
+    if (typeof renderSearchList === "function") renderSearchList();
+    if (typeof afficherCellier === "function") afficherCellier(); // Au cas où ta fonction s'appelle comme ça
+}
+
+// ================================================================
+    // 5. MOTEUR DU SCANNER (QUAGGA2)
+    // ================================================================
+    function activerScanner() {
+        // 1. Préparer l'interface
+        const modal = document.getElementById('wineModal');
+        if (modal) modal.classList.remove('hidden');
+
+        document.body.style.overflow = 'hidden';
+        const container = document.getElementById('scanner-container');
+        if (container) container.classList.remove('hidden');
+
+        // 2. Initialiser Quagga
+        Quagga.init({
+            inputStream: {
+                name: "Live",
+                type: "LiveStream",
+                target: document.querySelector('#interactive'),
+                constraints: {
+                    facingMode: "environment",
+                    aspectRatio: { min: 1, max: 2 },
+                    width: { min: 640, ideal: 1280 },
+                    height: { min: 480, ideal: 720 }
+                },
+            },
+            locator: { patchSize: "medium", halfSample: false },
+            decoder: { readers: ["ean_reader", "upc_reader", "code_128_reader"] },
+            locate: true,
+            frequency: 10
+        }, function(err) {
+            if (err) { console.error("Erreur Quagga:", err); return; }
+            Quagga.start();
+        });
+
+       // 3. Écouteur de résultat
+        Quagga.onDetected((result) => {
+            if (result.codeResult && result.codeResult.code) {
+                const codeScanne = result.codeResult.code;
+                
+                // On arrête le scanner proprement
+                stopScanner();
+
+                // On remplit le champ dans la fiche
+                const inputImport = document.getElementById('f-import');
+                if (inputImport) {
+                    inputImport.value = codeScanne;
+                    if (navigator.vibrate) navigator.vibrate(100);
+                }
+            }
+        });
+    }
+
+    function stopScanner() {
+        if (typeof Quagga !== 'undefined') {
+            Quagga.stop();
+            Quagga.offDetected(); 
+        }
+        const container = document.getElementById('scanner-container');
+        if (container) container.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+    // ================================================================
+    // 6. UTILITAIRES, STATISTIQUES ET SAUVEGARDE
+    // ================================================================
+    function ouvrirFiche(id) {
+        const b = inventaire.find(x => x.id == id);
+        if (!b) return;
+        const form = document.getElementById('wineForm');
+        form.dataset.editId = b.id;
+
+        ['f-nom', 'f-couleur', 'f-pays', 'f-region', 'f-cepage', 'f-accords', 'f-import'].forEach(idChamp => {
+            const prop = idChamp.replace('f-', '');
+            document.getElementById(idChamp).value = b[prop] || "";
+        });
+
+        const zoneStocks = document.getElementById('liste-stocks-fiche');
+        zoneStocks.innerHTML = (b.stocks || []).map((s, i) => `
+            <div class="bg-white/5 p-4 rounded-2xl border border-white/10 mb-2">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs text-white">${s.emplacement}</span>
+                    <span class="text-red-200 font-bold">${s.qte} BTL</span>
+                </div>
+                <button type="button" onclick="boirePrecis(${b.id}, ${i})" class="w-full py-2 bg-red-900/20 rounded-xl text-[10px] text-red-100 font-bold">BU 🍷</button>
+            </div>`).join('') || "<p class='text-center py-4 text-gray-500'>Aucun stock.</p>";
+
+        document.getElementById('wineModal').classList.remove('hidden');
+    }
+
+  function chercherSAQ() {
+    const code = document.getElementById('f-import').value;
+    if (!code) return alert("Veuillez d'abord scanner un code.");
+    
+    // On change l'URL de Google pour celle de la SAQ
+    const url = `https://www.saq.com/fr/catalogsearch/result/?q=${code}`;
+    window.open(url, '_blank');
+}
+
+    function sauvegarder() { 
+        localStorage.setItem('vino_db', JSON.stringify(inventaire)); 
+        majStatsAccueil(); 
+    }
+
+    function majStatsAccueil() {
+        const totalBtl = inventaire.reduce((sum, b) => sum + b.qte, 0);
+        const elBtl = document.getElementById('total-bottles');
+        if(elBtl) elBtl.innerText = totalBtl;
+        
+        const counts = {};
+        inventaire.forEach(b => { 
+            if(b.qte > 0) {
+                const c = b.cepage || "Inconnu";
+                counts[c] = (counts[c] || 0) + b.qte; 
+            }
+        });
+
+        const nbCepagesUniques = Object.keys(counts).filter(c => c !== "Inconnu").length;
+        const elCep = document.getElementById('total-cepages');
+        if(elCep) elCep.innerText = nbCepagesUniques;
+        
+        const statsZone = document.getElementById('stats-cepages');
+        if(!statsZone) return;
+        
+        statsZone.innerHTML = "";
+        Object.entries(counts).sort((a,b) => b[1] - a[1]).forEach(([cepage, qte]) => {
+            const span = document.createElement('div');
+            span.className = "flex items-center bg-white/10 border border-white/5 pl-3 pr-2 py-1 rounded-full cursor-pointer active:bg-red-900/60 transition-all";
+            span.onclick = () => filtrerParCepageStat(cepage);
+            span.innerHTML = `<span class="text-[9px] text-gray-300 uppercase mr-2">${cepage}</span><span class="text-[10px] text-white font-black bg-white/10 px-2 py-0.5 rounded-full">${qte}</span>`;
+            statsZone.appendChild(span);
+        });
+    }
+
+    // --- INITIALISATION AU CHARGEMENT ---
+    window.onload = function() {
+        majStatsAccueil();
+    };
+</script>
+
+<div id="scanner-container" class="hidden fixed inset-0 z-[100] bg-black">
+    <div id="interactive" class="viewport w-full h-full"></div>
+    
+    <div class="scanner-outline"></div>
+    <div class="scanner-laser"></div>
+    
+    <button type="button" onclick="stopScanner()" 
+        class="absolute top-8 right-8 text-white bg-black/50 w-12 h-12 rounded-full flex items-center justify-center z-[120] border border-white/20 active:bg-white/20 transition-all">
+        <span class="text-2xl">✕</span>
+    </button>
+</div>
+
+
+
+
+</body>
+</html>
 
 
        /* SOMMAIRE DU STYLE :

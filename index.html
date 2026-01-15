@@ -253,19 +253,29 @@
     </section>
 </main>
 
-<div id="wineModal" class="hidden fixed inset-0 bg-black/95 z-50 overflow-y-auto p-4 flex items-start justify-center">
-    <div class="glass-card w-full max-w-md p-6 my-8 relative border border-white/10 shadow-2xl">
+<div id="wineModal" class="hidden fixed inset-0 bg-black/50 z-50 overflow-y-auto p-4 flex items-start justify-center backdrop-blur-sm">
+    
+    <div class="w-full max-w-md p-6 my-8 relative border border-white/10 shadow-2xl bg-black rounded-2xl">
+       
         <button type="button" onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 text-2xl">✕</button>
-        <h2 class="text-xl font-thin text-white mb-6 uppercase tracking-widest text-center">Ajouter un vin</h2>
+        <h2 class="text-xl font-thin text-white mb-6 uppercase tracking-widest text-center" style="color: #d97a00;">Ajouter un vin</h2>
         <form id="wineForm" class="space-y-4">
+
             <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
                 <p class="text-[9px] text-gray-500 uppercase mb-2">Scanner ou Saisir le Code</p>
-                <input type="text" id="f-import" placeholder="00000000000000" class="w-full bg-black/20 p-4 rounded-xl text-white border border-white/10 text-sm focus:border-red-900 outline-none mb-2">
-               <button id="btn-saq" type="button" onclick="chercherSAQ()"
-  class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-xs outline-none text-center tracking-[0.05em] uppercase transition-all font-normal">
-  🔎 SAQ
-</button>
-
+                
+                <div class="flex items-stretch gap-2 mb-2">
+                    <input type="text" id="f-import" placeholder="00000000000000" class="flex-1 bg-black/20 p-4 rounded-xl text-white border border-white/10 text-sm focus:border-red-900 outline-none">
+                    
+                    <button type="button" onclick="ouvrirScanner()" class="px-4 flex items-center justify-center rounded-xl transition-all active:scale-95 shadow-lg" style="background-color: #d97a00;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7V5a2 2 0 012-2h2m10 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2m-10 0H5a2 2 0 01-2-2v-2" />
+                        </svg>
+                    </button>
+                </div>
+                <button id="btn-saq" type="button" onclick="chercherSAQ()" class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-xs outline-none text-center tracking-[0.05em] uppercase transition-all font-normal">
+                    🔎 SAQ
+                </button>
             </div>
 
             <div id="stock-details-container" class="space-y-2"></div>
@@ -275,79 +285,71 @@
                 <input type="text" id="f-nom"  class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm focus:border-red-900 outline-none">
             </div>
             
-                <div>
-                    <p class="text-[9px] text-gray-300 uppercase mb-1">Couleur</p>
-                    <select id="f-couleur" class="w-full bg-white/5 p-2 rounded-xl text-white border border-white/10 text-sm outline-none">
-                        <option value="" disabled selected>choisir</option>
-                        <option value="rouge">Rouge</option>
-                        <option value="blanc">Blanc</option>
-                        <option value="rose">Rosé</option>
-                    </select>
-                </div>
-
-
-                
-            
-            
-             
-                <div>
-                    <p class="text-[8px] text-gray-300 uppercase mb-1">Pays</p>
-                    <input type="text" id="f-pays" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
-                </div>
-               
-                <div>
-                    <p class="text-[8px] text-gray-300 uppercase mb-1">Région</p>
-                    <input type="text" id="f-region" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
-                </div>
-          
-          <div>
-        <p class="text-[8px] text-gray-300 uppercase mb-1">Appellation</p>
-        <input type="text" id="f-appellation" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
-    </div>
-          
-          
-          
-          
-                <div>
-                <p class="text-[8px] text-gray-300 uppercase mb-1">Cépage(s)</p>
-                <input type="text" id="f-cepage" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
+            <div>
+                <p class="text-[9px] text-gray-300 uppercase mb-1">Couleur</p>
+                <select id="f-couleur" class="w-full bg-white/5 p-2 rounded-xl text-white border border-white/10 text-sm outline-none">
+                    <option value="" disabled selected>choisir</option>
+                    <option value="rouge">Rouge</option>
+                    <option value="blanc">Blanc</option>
+                    <option value="rose">Rosé</option>
+                </select>
             </div>
 
-<div>
+           <div class="mb-4">
+    <p class="text-[8px] text-gray-300 uppercase mb-1">Pays</p>
+    <input type="text" id="f-pays" list="list-pays" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none focus:border-[#d97a00]">
+    <datalist id="list-pays"></datalist>
+</div>
+
+<div class="mb-4">
+    <p class="text-[8px] text-gray-300 uppercase mb-1">Région</p>
+    <input type="text" id="f-region" list="list-region" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none focus:border-[#d97a00]">
+    <datalist id="list-region"></datalist>
+</div>
+
+<div class="mb-4">
+    <p class="text-[8px] text-gray-300 uppercase mb-1">Appellation</p>
+    <input type="text" id="f-appellation" list="list-appellation" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none focus:border-[#d97a00]">
+    <datalist id="list-appellation"></datalist>
+</div>
+
+<div class="mb-4">
+    <p class="text-[8px] text-gray-300 uppercase mb-1">Cépage(s)</p>
+    <input type="text" id="f-cepage" list="list-cepage" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none focus:border-[#d97a00]">
+    <datalist id="list-cepage"></datalist>
+</div>
+
+<div class="mb-4">
     <p class="text-[8px] text-gray-300 uppercase mb-1">Particularité</p>
-    <input type="text" id="f-particularite"  class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
+    <input type="text" id="f-particularite" list="list-particularite" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none focus:border-[#d97a00]">
+    <datalist id="list-particularite"></datalist>
 </div>
 
-<div>
+<div class="mb-4">
     <p class="text-[8px] text-gray-300 uppercase mb-1">Accords</p>
-    <textarea id="f-accords" rows="2"  class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none"></textarea>
+    <textarea id="f-accords" rows="2" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none focus:border-[#d97a00]"></textarea>
 </div>
-           
-                <div>
-                   <!--    <p hidden class="text-[9px] text-gray-500 uppercase mb-1">Prix ($)</p>-->
-                    <input type="hidden" id="f-prix" placeholder="0.00" class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm outline-none">
-                </div>
-                <div>
-                   <!--      <p class="text-[9px] text-gray-500 uppercase mb-1">Millésime</p>-->
-                    <input type="hidden" id="f-millesime" placeholder="2024" class="w-full bg-white/5 p-4 rounded-xl text-white border border-white/10 text-sm outline-none">
-                </div>
-            
-            
-    <div>
-        <p class="text-[8px] text-gray-300 uppercase mb-1">Importateur</p>
-        <input type="text" id="f-importateur" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none">
-    </div>
 
+<div class="mb-4">
+    <p class="text-[8px] text-gray-300 uppercase mb-1">Importateur</p>
+    <input type="text" id="f-importateur" list="list-importateur" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none focus:border-[#d97a00]">
+    <datalist id="list-importateur"></datalist>
+</div>
 
-<div>
-                  <!--   <p class="text-[9px] text-gray-500 uppercase mb-1">Qté à ajouter</p>-->
-                    <input type="hidden" id="f-qte" name="qte" value="1">
-                </div>
+<div class="mb-4">
+    <p class="text-[8px] text-gray-300 uppercase mb-1">Conseillé par</p>
+    <input type="text" id="f-conseiller" list="list-conseiller" class="w-full bg-white/5 p-3 rounded-xl text-white border border-white/10 text-xs outline-none focus:border-[#d97a00]">
+    <datalist id="list-conseiller"></datalist>
+</div>
 
-
-
+<input type="hidden" id="f-prix">
+<input type="hidden" id="f-millesime">
+            <div>
+                <input type="hidden" id="f-qte" name="qte" value="1">
+            </div>
 
             <div id="liste-stocks-fiche" class="space-y-2"></div>
+
             <div class="glass-card p-4 bg-white/5 border-white/10 mt-4">
                 <p class="text-[9px] text-gray-400 mb-3 uppercase text-center font-bold">Nouvel emplacement</p>
                 <select id="f-loc-lieu" onchange="genererOptionsRangs()" class="w-full bg-black p-3 rounded-xl text-xs text-white mb-3 border border-white/10">
@@ -375,7 +377,7 @@
 
 
 
-    <nav class="fixed bottom-0 left-0 right-0 nav-glass px-4 py-4 flex justify-between items-center z-[90] rounded-t-[2rem]">
+    <nav class="fixed bottom-0 left-0 right-0 nav-glass px-4 py-4 flex justify-between items-center z-[90] ">
         <button onclick="showPage('accueil')" class="flex-1 text-[9px] uppercase font-bold text-white tracking-widest text-center">Accueil</button>
         <button onclick="showPage('recherche')" class="flex-1 text-[9px] uppercase font-bold text-white tracking-widest text-center">Liste</button>
         <button onclick="showPage('celliers')" class="flex-1 text-[9px] uppercase font-bold text-white tracking-widest text-center">Celliers</button>
@@ -392,7 +394,7 @@
    
   <script>  
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQ-N2SMpjhY9q4au31twy1UCBdUH41D_mCA7UwG4y3rIeoGpMztczAOoHel-5U7mDvZA/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzuFCMwCmAg9SB5RD7bn0kALq0afvrx802rvIpX3fMFmOQQtwHbiHAYAZu7lXDnTv1OfQ/exec";
 
 
    // ================================================================
@@ -475,6 +477,28 @@ async function sauverInventaire() {
         }
     }
     
+
+// FONCTION POUR CHARGER LES SUGGESTIONS DEPUIS LE SHEETS
+function chargerToutesLesListes() {
+  // On vérifie si on est bien dans l'environnement Google
+  if (typeof google !== 'undefined' && google.script && google.script.run) {
+    console.log("Tentative de récupération des listes...");
+    google.script.run.withSuccessHandler(function(data) {
+       // ... le reste de ton code de remplissage ...
+       console.log("Données reçues :", data);
+    }).getListesSuggestions();
+  } else {
+    console.warn("L'API Google n'est pas détectée. Assurez-vous d'utiliser l'URL de déploiement (/exec).");
+  }
+}
+
+
+
+
+
+
+
+
     function closeModal() {
         document.getElementById('wineModal').classList.add('hidden');
         const form = document.getElementById('wineForm');
@@ -882,6 +906,61 @@ async function testerConnexion() {
         alert("Erreur locale : " + error);
     }
 }
+function chargerToutesLesListes() {
+  google.script.run.withSuccessHandler(function(data) {
+    // IDs de tes listes dans l'ordre des colonnes A à H
+    const ids = ['list-pays', 'list-region', 'list-appellation', 'list-cepage', 'list-particularite', 'list-accords', 'list-importateur', 'list-conseiller'];
+    
+    data.forEach(ligne => {
+      ligne.forEach((valeur, index) => {
+        if (valeur && valeur !== "") {
+          const dl = document.getElementById(ids[index]);
+          if (dl) {
+            let opt = document.createElement('option');
+            opt.value = valeur;
+            dl.appendChild(opt);
+          }
+        }
+      });
+    });
+  }).getListesSuggestions();
+}
+
+// Charge les listes dès que la page est prête
+window.addEventListener('load', function() {
+  chargerToutesLesListes();
+});
+
+function chargerToutesLesListes() {
+  console.log("Tentative de récupération des listes...");
+  
+  google.script.run.withSuccessHandler(function(data) {
+    console.log("Données reçues du Sheets :", data); // <--- TEST IMPORTANT
+    
+    if (typeof data === 'string' && data.startsWith("Erreur")) {
+      console.error(data);
+      return;
+    }
+
+    const ids = ['list-pays', 'list-region', 'list-appellation', 'list-cepage', 'list-particularite', 'list-accords', 'list-importateur', 'list-conseiller'];
+    
+    data.forEach(ligne => {
+      ligne.forEach((valeur, index) => {
+        if (valeur && valeur !== "") {
+          const dl = document.getElementById(ids[index]);
+          if (dl) {
+            let opt = document.createElement('option');
+            opt.value = valeur;
+            dl.appendChild(opt);
+          }
+        }
+      });
+    });
+  }).getListesSuggestions();
+}
+
+// Force le chargement au démarrage de la page
+window.onload = chargerToutesLesListes;
 
 
 

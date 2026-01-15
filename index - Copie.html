@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vino - Collections Privées</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* TOUT VOTRE STYLE D'ORIGINE CONSERVÉ */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -5%; left: -5%; width: 110%; height: 110%;
+            z-index: -1;
+            background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9)), 
+                        url('https://images.unsplash.com/photo-1738544475560-0683270451bd?q=80&w=1470&auto=format&fit=crop');
+            background-size: cover; 
+            background-position: center;
+            will-change: transform;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; padding: 0; 
+            min-height: 100svh; 
+            color: #e5e7eb;
+            background-color: #000;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 1.5rem; 
+        }
+
+        .nav-glass { 
+            background: rgba(10, 10, 10, 0.98); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+
+        input, select, textarea { 
+            background: rgba(255,255,255,0.05) !important; 
+            border: 1px solid rgba(255,255,255,0.1) !important; 
+            color: white !important; 
+            border-radius: 0.75rem;
+        }
+
+        #interactive.viewport video { width: 100%; height: 100%; object-fit: cover; }
+        #interactive.viewport canvas.drawingBuffer { display: none; }
+
+        .scanner-outline {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 280px; height: 180px; border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px; z-index: 105; pointer-events: none;
+        }
+
+        .scanner-laser {
+            position: absolute; width: 260px; height: 2px; background-color: #ff0000;
+            left: 50%; transform: translateX(-50%); z-index: 110;
+            box-shadow: 0 0 8px 1px rgba(255, 0, 0, 0.8);
+            animation: scanning 2s infinite ease-in-out;
+        }
+
+        @keyframes scanning { 0% { top: 35%; } 50% { top: 65%; } 100% { top: 35%; } }
+        .page-content { background: transparent !important; min-height: 100vh; padding-bottom: 100px; }
+    </style>
+</head>
+
+<body class="p-4 pb-32">
+
+<header class="text-center mb-8 pt-6">
+    <h1 class="text-5xl font-bold tracking-[0.2em] uppercase" style="color: #d97a00;">VINO</h1>
+    <p class="text-xs uppercase tracking-[0.40em] text-gray-200 font-light mt-4">Collections privées</p>
+    <div id="version-date" class="font-light tracking-widest text-gray-200" style="font-size: 14px; margin-top: 10px;">
+        Chargement...
+    </div>
+</header>
+
+<main class="max-w-md mx-auto">
+    <section id="page-accueil" class="page-content space-y-6">
+        <button type="button" onclick="activerScanner()" class="w-full flex items-center justify-center gap-4 bg-[#D97A00] text-white p-5 rounded-2xl active:scale-95 transition-all shadow-xl">
+            <span class="font-bold uppercase tracking-[0.2em] text-sm">Scanner Code-Barres</span>
+        </button>
+
+        <div class="grid grid-cols-2 gap-3">
+            <button type="button" onclick="openModal('manuel')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center text-white">Saisie Manuelle</button>
+            <button type="button" onclick="showPage('recherche')" class="glass-card py-4 text-[10px] font-bold uppercase tracking-widest text-center">🍷 Liste</button>
+        </div>
+
+        <div class="glass-card p-6 shadow-2xl border-t border-white/10">
+            <div class="flex items-baseline justify-center gap-3 mb-4">
+                <span id="total-bottles" class="text-4xl font-thin text-white">0</span>
+                <p class="text-gray-300 uppercase text-[11px] tracking-[0.15em]">Bouteilles au total</p>
+            </div>
+            <div class="flex items-baseline justify-center gap-3 pt-4 border-t border-white/5">
+                <span id="total-cepages" class="text-4xl font-thin text-white">0</span>
+                <p class="text-gray-300 uppercase text-[11px] tracking-[0.15em]">Cépages différents</p>
+            </div>
+            <div id="stats-cepages" class="mt-6 flex flex-wrap gap-2 justify-center"></div>
+        </div>
+    </section>
+
+    <section id="page-recherche" class="page-content hidden space-y-4">
+        <div class="space-y-3 mb-6">
+            <div class="grid grid-cols-3 gap-2">
+                <select id="search-couleur" onchange="renderSearchList()" class="glass-card p-3 text-[9px] uppercase text-white outline-none">
+                    <option value="">Couleurs</option>
+                    <option value="rouge">Rouge</option>
+                    <option value="blanc">Blanc</option>
+                    <option value="rose">Rosé</option>
+                </select>
+                <select id="search-cepage" onchange="renderSearchList()" class="glass-card p-3 text-[9px] uppercase text-white outline-none">
+                    <option value="">Cépages</option>
+                </select>
+                <select id="search-accords" onchange="renderSearchList()" class="glass-card p-3 text-[9px] uppercase text-white outline-none">
+                    <option value="">Accords</option>
+                </select>
+            </div>
+            <input type="text" id="searchInput" onkeyup="renderSearchList()" placeholder="Recherche par nom..." class="glass-card w-full p-3 text-xs outline-none">
+        </div>
+        <div id="search-results-list" class="space-y-4"></div>
+    </section>
+</main>
+
+<div id="wineModal" class="hidden fixed inset-0 bg-black/95 z-50 overflow-y-auto p-4 flex items-start justify-center">
+    <div class="glass-card w-full max-w-md p-6 my-8 relative border border-white/10">
+        <button type="button" onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 text-2xl">✕</button>
+        <h2 class="text-xl font-thin text-white mb-6 uppercase tracking-widest text-center">Fiche du Vin</h2>
+
+        <form id="wineForm" class="space-y-4">
+            <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                <p class="text-[9px] text-gray-500 uppercase mb-2">1. Code-Barres</p>
+                <input type="text" id="f-import" placeholder="000000000000" class="w-full p-4 text-sm mb-2">
+                <button type="button" onclick="chercherSAQ()" class="w-full py-3 border border-red-900/40 rounded-xl text-[10px] uppercase text-red-200 bg-red-900/10 font-bold">🔎 Chercher sur SAQ.com</button>
+            </div>
+
+            <input type="text" id="f-nom" placeholder="Nom du vin..." class="w-full p-4 text-sm">
+
+            <div class="grid grid-cols-2 gap-3">
+                <select id="f-couleur" class="w-full p-4 text-sm">
+                    <option value="" disabled selected>Couleur...</option>
+                    <option value="rouge">Rouge</option>
+                    <option value="blanc">Blanc</option>
+                    <option value="rose">Rosé</option>
+                </select>
+                <input type="number" id="f-quantite" value="1" class="w-full p-4 text-sm text-center">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <input type="text" id="f-pays" placeholder="Pays" class="w-full p-3 text-xs">
+                <input type="text" id="f-region" placeholder="Région" class="w-full p-3 text-xs">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <input type="number" id="f-prix" placeholder="Prix ($)" class="w-full p-3 text-xs">
+                <input type="number" id="f-millesime" placeholder="Année" class="w-full p-3 text-xs">
+            </div>
+
+            <input type="text" id="f-cepage" placeholder="Cépage(s)" class="w-full p-3 text-xs">
+            <textarea id="f-accords" placeholder="Accords mets-vins" class="w-full p-3 text-xs" rows="2"></textarea>
+
+            <div class="glass-card p-4 bg-white/5 border-white/10 mt-4">
+                <p class="text-[9px] text-gray-400 mb-3 uppercase text-center font-bold">Localisation</p>
+                <select id="f-loc-lieu" onchange="genererOptionsRangs()" class="w-full p-3 text-xs mb-3">
+                    <option value="Cellier">Cellier</option>
+                    <option value="Casier">Casier</option>
+                    <option value="Réserve">Réserve</option>
+                </select>
+                <div class="grid grid-cols-2 gap-4">
+                    <select id="f-loc-r" class="w-full p-4 text-xs text-center font-bold"></select>
+                    <select id="f-loc-e" class="w-full p-4 text-xs text-center font-bold"></select>
+                </div>
+            </div>
+
+            <button type="button" onclick="enregistrerBouteille()" class="w-full bg-red-900 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-white shadow-2xl">Sauvegarder la fiche</button>
+        </form>
+    </div>
+</div>
+
+<nav class="fixed bottom-0 left-0 right-0 nav-glass px-4 py-4 flex justify-between items-center z-[90] rounded-t-[2rem]">
+    <button onclick="showPage('accueil')" class="flex-1 text-[9px] uppercase font-bold text-white tracking-widest text-center">Accueil</button>
+    <button onclick="showPage('recherche')" class="flex-1 text-[9px] uppercase font-bold text-white tracking-widest text-center">🍷 Liste</button>
+</nav>
+
+<div id="scanner-container" class="hidden fixed inset-0 z-[100] bg-black">
+    <div id="interactive" class="viewport w-full h-full"></div>
+    <div class="scanner-outline"></div>
+    <div class="scanner-laser"></div>
+    <button type="button" onclick="stopScanner()" class="absolute top-8 right-8 text-white bg-black/50 w-12 h-12 rounded-full flex items-center justify-center border border-white/20">✕</button>
+</div>
+
+<script>
+    // TOUTE VOTRE LOGIQUE RÉPARÉE SANS DOUBLONS
+    let inventaire = JSON.parse(localStorage.getItem('vino_db')) || [];
+
+    function showPage(p) {
+        document.querySelectorAll('.page-content').forEach(pg => pg.classList.add('hidden'));
+        document.getElementById('page-' + p).classList.remove('hidden');
+        if(p === 'recherche') renderSearchList();
+    }
+
+    function genererOptionsRangs() {
+        const lieu = document.getElementById('f-loc-lieu').value;
+        const selR = document.getElementById('f-loc-r');
+        const selE = document.getElementById('f-loc-e');
+        selR.innerHTML = ""; selE.innerHTML = "";
+        let maxR = (lieu === "Cellier") ? 10 : 5;
+        let maxE = (lieu === "Cellier") ? 8 : 12;
+        for(let i=1; i<=maxR; i++) selR.innerHTML += `<option value="R${i}">Rang ${i}</option>`;
+        for(let i=1; i<=maxE; i++) selE.innerHTML += `<option value="E${i}">Empl. ${i}</option>`;
+    }
+
+    function openModal(mode) {
+        document.getElementById('wineModal').classList.remove('hidden');
+        const form = document.getElementById('wineForm');
+        form.reset();
+        delete form.dataset.editId;
+        genererOptionsRangs();
+    }
+
+    function closeModal() {
+        document.getElementById('wineModal').classList.add('hidden');
+        stopScanner();
+    }
+
+    function enregistrerBouteille() {
+        const form = document.getElementById('wineForm');
+        const editId = form.dataset.editId;
+        
+        const vin = {
+            id: editId ? parseInt(editId) : Date.now(),
+            nom: document.getElementById('f-nom').value,
+            import: document.getElementById('f-import').value,
+            couleur: document.getElementById('f-couleur').value,
+            quantite: parseInt(document.getElementById('f-quantite').value) || 1,
+            pays: document.getElementById('f-pays').value,
+            region: document.getElementById('f-region').value,
+            prix: document.getElementById('f-prix').value,
+            millesime: document.getElementById('f-millesime').value,
+            cepage: document.getElementById('f-cepage').value,
+            accords: document.getElementById('f-accords').value,
+            lieu: document.getElementById('f-loc-lieu').value,
+            pos: document.getElementById('f-loc-r').value + "-" + document.getElementById('f-loc-e').value
+        };
+
+        if (editId) {
+            const idx = inventaire.findIndex(v => v.id == editId);
+            inventaire[idx] = vin;
+        } else {
+            inventaire.push(vin);
+        }
+
+        localStorage.setItem('vino_db', JSON.stringify(inventaire));
+        closeModal();
+        majStatsAccueil();
+    }
+
+    function renderSearchList() {
+        const list = document.getElementById('search-results-list');
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        list.innerHTML = "";
+        inventaire.filter(v => (v.nom || "").toLowerCase().includes(term)).forEach(v => {
+            const card = document.createElement('div');
+            card.className = "glass-card p-5 mb-3 cursor-pointer border-l-4 border-orange-500";
+            card.onclick = () => {
+                openModal('edit');
+                const form = document.getElementById('wineForm');
+                form.dataset.editId = v.id;
+                document.getElementById('f-nom').value = v.nom || "";
+                document.getElementById('f-import').value = v.import || "";
+                document.getElementById('f-quantite').value = v.quantite || 1;
+                document.getElementById('f-pays').value = v.pays || "";
+                document.getElementById('f-region').value = v.region || "";
+                document.getElementById('f-prix').value = v.prix || "";
+                document.getElementById('f-millesime').value = v.millesime || "";
+                document.getElementById('f-cepage').value = v.cepage || "";
+                document.getElementById('f-accords').value = v.accords || "";
+                document.getElementById('f-loc-lieu').value = v.lieu || "Cellier";
+                genererOptionsRangs();
+            };
+            card.innerHTML = `<div class="flex justify-between"><div><p class="font-bold">${v.nom}</p><p class="text-[9px] uppercase text-gray-400">${v.lieu} | ${v.pos}</p></div><span class="text-xl">x${v.quantite}</span></div>`;
+            list.appendChild(card);
+        });
+    }
+
+    function majStatsAccueil() {
+        const total = inventaire.reduce((sum, v) => sum + (parseInt(v.quantite) || 0), 0);
+        document.getElementById('total-bottles').innerText = total;
+        const uniqueCepages = [...new Set(inventaire.map(v => v.cepage).filter(c => c))];
+        document.getElementById('total-cepages').innerText = uniqueCepages.length;
+    }
+
+    function activerScanner() {
+        document.getElementById('scanner-container').classList.remove('hidden');
+        Quagga.init({
+            inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#interactive') },
+            decoder: { readers: ["ean_reader", "upc_reader"] }
+        }, (err) => { if(!err) Quagga.start(); });
+        Quagga.onDetected((res) => {
+            document.getElementById('f-import').value = res.codeResult.code;
+            stopScanner();
+            openModal('manuel');
+        });
+    }
+
+    function stopScanner() { Quagga.stop(); document.getElementById('scanner-container').classList.add('hidden'); }
+    function chercherSAQ() { 
+        const c = document.getElementById('f-import').value;
+        if(c) window.open(`https://www.saq.com/fr/catalogsearch/result/?q=${c}`, '_blank');
+    }
+
+    window.onload = () => {
+        majStatsAccueil();
+        genererOptionsRangs();
+        const dateEl = document.getElementById('version-date');
+        if(dateEl) dateEl.innerText = "Version : " + new Date(document.lastModified).toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+    };
+</script>
+</body>
+</html>

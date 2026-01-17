@@ -285,61 +285,64 @@ select option {
 </div>
 
     <section id="page-recherche" class="page-content hidden space-y-4">
-        <div class="grid grid-cols-3 gap-2">
-            <select id="search-couleur" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none">
-                <option value="">Couleurs</option>
-                <option value="rouge">Rouge</option>
-                <option value="blanc">Blanc</option>
-                <option value="rose">Rosé</option>
-            </select>
-            <select id="search-cepage" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none">
-                <option value="">Cépages</option>
-            </select>
-            <select id="search-accords" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none">
-                <option value="">Accords</option>
-            </select>
-        </div>
-        <input type="text" id="searchInput" onkeyup="renderSearchList()" placeholder="Recherche..." class="glass-card w-full bg-transparent text-white p-3 text-xs outline-none">
-        <div id="search-results-list" class="space-y-4"></div>
-    </section>
+    <div class="grid grid-cols-3 gap-2">
+        <select id="search-couleur" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none">
+            <option value="">Couleurs</option>
+            <option value="rouge">Rouge</option>
+            <option value="blanc">Blanc</option>
+            <option value="rose">Rosé</option>
+        </select>
+        <select id="search-cepage" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none">
+            <option value="">Cépages</option>
+        </select>
+        <select id="search-accords" onchange="renderSearchList()" class="glass-card bg-transparent text-[9px] p-3 uppercase text-white outline-none">
+            <option value="">Accords</option>
+        </select>
+    </div>
 
-    <section id="page-celliers" class="page-content hidden space-y-6">
-        <div class="flex gap-2">
-            <button onclick="renderGrid('cellier')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold">Cellier</button>
-            <button onclick="renderGrid('casier')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold">Casier</button>
-            <button onclick="renderGrid('reserve')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold">Réserve</button>
-        </div>
-        <div id="gridContainer" class="glass-card p-4 overflow-x-auto min-h-[300px]"></div>
-    </section>
+    <input type="text" id="searchInput" onkeyup="renderSearchList()" placeholder="Recherche..." class="glass-card w-full bg-transparent text-white p-3 text-xs outline-none">
 
-    <section id="page-gestion" class="page-content hidden space-y-6">
-        <button type="button" onclick="confirmReset()" class="w-full glass-card p-6 text-red-500 text-xs font-bold uppercase text-center border border-red-900/20">
-            Réinitialisation complète
-        </button>
-    </section>
+    <div id="search-results-list" class="space-y-4"></div>
+</section>
+
+<section id="page-celliers" class="page-content hidden space-y-6">
+    <div class="flex gap-2">
+        <button onclick="renderGrid('cellier')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold">Cellier</button>
+        <button onclick="renderGrid('casier')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold">Casier</button>
+        <button onclick="renderGrid('reserve')" class="glass-card flex-1 py-3 text-[9px] uppercase font-bold">Réserve</button>
+    </div>
+    <div id="gridContainer" class="glass-card p-4 overflow-x-auto min-h-[300px]"></div>
+</section>
+
+<section id="page-gestion" class="page-content hidden space-y-6">
+    <button type="button" onclick="confirmReset()" class="w-full glass-card p-6 text-red-500 text-xs font-bold uppercase text-center border border-red-900/20">
+        Réinitialisation complète
+    </button>
+</section>
 </main>
 
 <div id="wineModal" class="hidden fixed inset-0 bg-black/50 z-50 overflow-y-auto p-4 flex items-start justify-center backdrop-blur-sm">
-    
-    <div class="w-full max-w-md p-6 my-8 relative border border-white/10 shadow-2xl bg-black ">
+    <div class="w-full max-w-md p-6 my-8 relative border border-white/10 shadow-2xl bg-black">
        
         <button type="button" onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 text-2xl">✕</button>
         <h2 class="text-xl font-thin text-white mb-6 uppercase tracking-widest text-center" style="color: #d97a00;">Ajouter un vin</h2>
+
         <form id="wineForm" class="space-y-4">
 
-            <div class="bg-white/5 p-4  border border-white/5">
+            <div class="bg-white/5 p-4 border border-white/5">
                 <p class="text-[9px] text-gray-500 uppercase mb-2">Scanner ou Saisir le Code</p>
                 
                 <div class="flex items-stretch gap-2 mb-2">
-                    <input type="text" id="f-import" placeholder="00000000000000" class="flex-1 bg-black/20 p-4  text-white border border-white/10 text-sm focus:border-red-900 outline-none">
+                    <input type="text" id="f-import" placeholder="00000000000000" class="flex-1 bg-black/20 p-4 text-white border border-white/10 text-sm focus:border-red-900 outline-none">
                     
-                    <button type="button" onclick="ouvrirScanner()" class="px-4 flex items-center justify-center  transition-all active:scale-95 shadow-lg" style="background-color: #d97a00;">
+                    <button type="button" onclick="ouvrirScanner()" class="px-4 flex items-center justify-center transition-all active:scale-95 shadow-lg" style="background-color: #d97a00;">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7V5a2 2 0 012-2h2m10 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2m-10 0H5a2 2 0 01-2-2v-2" />
                         </svg>
                     </button>
                 </div>
-                <button id="btn-saq" type="button" onclick="chercherSAQ()" class="w-full bg-white/5 p-4  text-white border border-white/10 text-xs outline-none text-center tracking-[0.05em] uppercase transition-all font-normal">
+
+                <button id="btn-saq" type="button" onclick="chercherSAQ()" class="w-full bg-white/5 p-4 text-white border border-white/10 text-xs outline-none text-center tracking-[0.05em] uppercase transition-all font-normal">
                     🔎 SAQ
                 </button>
             </div>
@@ -348,38 +351,32 @@ select option {
 
             <div>
                 <p class="text-[9px] text-gray-300 uppercase mb-1">Nom</p>
-                <input type="text" id="f-nom"  class="w-full bg-white/5 p-4  text-white border border-white/10 text-sm focus:border-red-900 outline-none">
+                <input type="text" id="f-nom" class="w-full bg-white/5 p-4 text-white border border-white/10 text-sm focus:border-red-900 outline-none">
             </div>
-            
-            <div>
-    <p class="text-[9px] text-gray-300 uppercase mb-1">Couleur</p>
-   <div class="mb-4">
-    <p class="text-[8px] text-gray-300 uppercase mb-1">Couleur</p>
 
-    <!-- Bouton du menu -->
-    <div id="select-couleur" class="w-full bg-white/5 p-2 text-white border border-white/10 text-sm cursor-pointer">
-        choisir
-    </div>
+            <div class="mb-4">
+                <p class="text-[8px] text-gray-300 uppercase mb-1">Couleur</p>
 
-    <!-- Options du menu -->
-    <div id="options-couleur" class="hidden bg-white/10 border border-white/20 text-white text-sm mt-1">
-        <div data-value="rouge" class="p-2 hover:bg-white/20 cursor-pointer">Rouge</div>
-        <div data-value="blanc" class="p-2 hover:bg-white/20 cursor-pointer">Blanc</div>
-        <div data-value="rose" class="p-2 hover:bg-white/20 cursor-pointer">Rosé</div>
-    </div>
+                <div id="select-couleur" class="w-full bg-white/5 p-2 text-white border border-white/10 text-sm cursor-pointer">
+                    choisir
+                </div>
 
-    <!-- Valeur réelle envoyée au JS -->
-    <input id="f-couleur" type="hidden">
-</div>
+                <div id="options-couleur" class="hidden bg-white/10 border border-white/20 text-white text-sm mt-1">
+                    <div data-value="rouge" class="p-2 hover:bg-white/20 cursor-pointer">Rouge</div>
+                    <div data-value="blanc" class="p-2 hover:bg-white/20 cursor-pointer">Blanc</div>
+                    <div data-value="rose" class="p-2 hover:bg-white/20 cursor-pointer">Rosé</div>
+                </div>
 
+                <input id="f-couleur" type="hidden">
+            </div>
 
-<div class="mb-4">
-    <p class="text-[8px] text-gray-300 uppercase mb-1">Pays</p>
+            <div class="mb-4">
+                <p class="text-[8px] text-gray-300 uppercase mb-1">Pays</p>
 
-    <!-- Bouton du menu -->
-    <div id="select-pays" class="w-full bg-white/5 p-2 text-white border border-white/10 text-sm cursor-pointer">
-        choisir
-    </div>
+                <div id="select-pays" class="w-full bg-white/5 p-2 text-white border border-white/10 text-sm cursor-pointer">
+                    choisir
+                </div>
+            </div>
 
     <!-- Options du menu -->
     <div id="options-pays" class="hidden bg-white/10 border border-white/20 text-white text-sm mt-1">
@@ -547,27 +544,17 @@ select option {
     <button onclick="navigate('gestion')" class="text-left text-sm uppercase font-bold text-white tracking-widest border-b border-white/5 pb-2">Gestion</button>
 </nav>
 
-<div id="overlay" class="fixed inset-0 bg-black/20 backdrop-blur-[2px] hidden z-[80]"></div>
+<!-- Un SEUL overlay -->
+<div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm hidden z-[80]"></div>
 
-<div id="overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-[80]"></div>
 
-   
-   
-   
-   
-   
-   
-   <script src="https://cdn.jsdelivr.net/npm/..."></script>
+<script>const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwN0243cV4QPUGzPwWV8anlIjZjyxwj-DVd4QQGN63N7EH3zRfUqERW-MaQH4ko9hLhXQ/exec";
 
-<script>
-
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxterM7Pl9QXjI79ZEsDsItBOYLgLPtAS5UaP9TOjQD7OFbb70SYsf1W4Gf5JGm3bGp_g/exec?getInventaire=1";
-
+console.log("VERSION JC 2");
 
 // ================================================================
 // 1. VARIABLES GLOBALES ET CONNEXION CLOUD
 // ================================================================
-
 
 let inventaire = []; 
 let currentFilters = { couleur: "", cepage: "", accords: "", nom: "" };
@@ -576,183 +563,169 @@ const cepagesDB = {
     rouge: ['Cabernet Sauvignon', 'Merlot', 'Pinot Noir', 'Syrah', 'Sangiovese', 'Malbec', 'Grenache'],
     blanc: ['Chardonnay', 'Sauvignon Blanc', 'Riesling', 'Pinot Gris', 'Chenin Blanc'],
     rose: ['Grenache', 'Cinsault', 'Syrah']
-}; // <-- Le point-virgule ici est important
+};
 
 // --- CHARGER DEPUIS GOOGLE ---
 async function chargerInventaire() {
-    try {
-        const response = await fetch(SCRIPT_URL, {
-            method: "GET",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ action: "get" })
+    });
 
+    const data = await response.json();
 
-        const data = await response.json();
-        
-        if (data && data.length > 0) {
-            inventaire = data;
-            localStorage.setItem('vino_db', JSON.stringify(inventaire));
-            console.log("Données chargées depuis Google Sheets");
-        } else {
-            inventaire = JSON.parse(localStorage.getItem('vino_db')) || [];
-        }
-    } catch (e) {
-        console.log("Mode hors-ligne : chargement local");
-        inventaire = JSON.parse(localStorage.getItem('vino_db')) || [];
+    if (data && data.length > 0) {
+      inventaire = data;
+      localStorage.setItem('vino_db', JSON.stringify(inventaire));
+      console.log("Données chargées depuis Google Sheets");
+    } else {
+      inventaire = JSON.parse(localStorage.getItem('vino_db')) || [];
     }
+  } catch (e) {
+    console.log("Mode hors-ligne : chargement local");
+    inventaire = JSON.parse(localStorage.getItem('vino_db')) || [];
+  }
 
-    renderSearchList();
-    majStatsAccueil();
+  renderSearchList();
+  majStatsAccueil();
 }
-
 
 // --- SAUVEGARDER VERS GOOGLE ---
 async function sauverInventaire() {
-    // Sauvegarde locale immédiate
-    localStorage.setItem('vino_db', JSON.stringify(inventaire));
+  localStorage.setItem('vino_db', JSON.stringify(inventaire));
 
-    // Envoi vers le Cloud
-    try {
-        const response = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(inventaire)
-        });
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ action: "get" })
+    });
 
-        const result = await response.json();
-        console.log("Synchro Cloud réussie :", result);
-
-    } catch (e) {
-        console.error("Erreur synchro Cloud :", e);
-    }
-}
-
-    // ================================================================
-    // 2. NAVIGATION ET GESTION DES FENÊTRES (MODALS)
-    // ================================================================
-    function showPage(p) { 
-        document.querySelectorAll('.page-content').forEach(pg => pg.classList.add('hidden'));
-        document.getElementById('page-' + p).classList.remove('hidden');
-        if(p === 'recherche') renderSearchList();
-    }
-
-    function openModal(mode, lieu, r, e) { 
-        const modal = document.getElementById('wineModal');
-        const form = document.getElementById('wineForm');
-        if (modal) modal.classList.remove('hidden'); 
-        if (form) form.reset();
-
-        // REMPLISSAGE AUTO SI ON CLIQUE SUR UNE CASE DU CELLIER
-        if (mode === 'manuel' && lieu) {
-            const selectLieu = document.getElementById('f-loc-lieu');
-            if (selectLieu) {
-                selectLieu.value = lieu;
-                genererOptionsRangs(); 
-                document.getElementById('f-loc-r').value = r;
-                document.getElementById('f-loc-e').value = e;
-            }
-        }
-    }
-    
-
-// FONCTION POUR CHARGER LES SUGGESTIONS DEPUIS LE SHEETS
-function chargerToutesLesListes() {
-  // On vérifie si on est bien dans l'environnement Google
-  if (typeof google !== 'undefined' && google.script && google.script.run) {
-    console.log("Tentative de récupération des listes...");
-    google.script.run.withSuccessHandler(function(data) {
-       // ... le reste de ton code de remplissage ...
-       console.log("Données reçues :", data);
-    }).getListesSuggestions();
-  } else {
-    console.warn("L'API Google n'est pas détectée. Assurez-vous d'utiliser l'URL de déploiement (/exec).");
+    const result = await response.json();
+    console.log("Synchro Cloud réussie :", result);
+  } catch (e) {
+    console.error("Erreur synchro Cloud :", e);
   }
 }
 
 
+    // ================================================================
+// 2. NAVIGATION ET GESTION DES FENÊTRES (MODALS)
+// ================================================================
+function showPage(p) { 
+    document.querySelectorAll('.page-content').forEach(pg => pg.classList.add('hidden'));
+    document.getElementById('page-' + p).classList.remove('hidden');
+    if (p === 'recherche') renderSearchList();
+}
 
+function openModal(mode, lieu, r, e) { 
+    const modal = document.getElementById('wineModal');
+    const form = document.getElementById('wineForm');
 
+    if (modal) modal.classList.remove('hidden'); 
+    if (form) form.reset();
 
-
-
-
-    function closeModal() {
-        document.getElementById('wineModal').classList.add('hidden');
-        const form = document.getElementById('wineForm');
-        if (form) {
-            form.reset();
-            delete form.dataset.editId;
+    // REMPLISSAGE AUTO SI ON CLIQUE SUR UNE CASE DU CELLIER
+    if (mode === 'manuel' && lieu) {
+        const selectLieu = document.getElementById('f-loc-lieu');
+        if (selectLieu) {
+            selectLieu.value = lieu;
+            genererOptionsRangs(); 
+            document.getElementById('f-loc-r').value = r;
+            document.getElementById('f-loc-e').value = e;
         }
     }
+}
 
-    // ================================================================
-    // 3. SYSTÈME DE RECHERCHE ET AFFICHAGE DE LA LISTE
-    // ================================================================
-    function renderSearchList() {
-        const list = document.getElementById('search-results-list');
-        if (!list) return;
+// FONCTION POUR CHARGER LES SUGGESTIONS DEPUIS LE SHEETS (désactivée)
+function chargerToutesLesListes() {
+    console.log("Listes non chargées (fonction désactivée).");
+}
 
-        currentFilters.couleur = document.getElementById('search-couleur').value;
-        currentFilters.cepage = document.getElementById('search-cepage').value;
-        currentFilters.accords = document.getElementById('search-accords').value;
-        currentFilters.nom = document.getElementById('searchInput').value.toLowerCase();
+function closeModal() {
+    const modal = document.getElementById('wineModal');
+    const form = document.getElementById('wineForm');
 
-        if (!currentFilters.couleur && !currentFilters.cepage && !currentFilters.accords && !currentFilters.nom) {
-            list.innerHTML = "<p class='text-center text-gray-200 text-[10px] py-10 uppercase tracking-widest'>Entrez un critère</p>";
-            return;
-        }
+    if (modal) modal.classList.add('hidden');
+    if (form) {
+        form.reset();
+        delete form.dataset.editId;
+    }
+}
 
-        list.innerHTML = "";
-        const filtered = inventaire.filter(b => {
-            const matchCoul = !currentFilters.couleur || b.couleur === currentFilters.couleur;
-            const matchCep = !currentFilters.cepage || b.cepage === currentFilters.cepage;
-            const matchTexte = !currentFilters.nom || 
-                (b.nom && b.nom.toLowerCase().includes(currentFilters.nom)) ||
-                (b.import && b.import.toLowerCase().includes(currentFilters.nom));
-            return matchCoul && matchCep && matchTexte && b.qte > 0;
-        });
+// ================================================================
+// 3. SYSTÈME DE RECHERCHE ET AFFICHAGE DE LA LISTE
+// ================================================================
+function renderSearchList() {
+    const list = document.getElementById('search-results-list');
+    if (!list) return;
 
-        filtered.forEach(b => {
-    const card = document.createElement('div');
-    
-    // Définition de la couleur de bordure selon le vin
-    const borderColor = b.couleur === 'rouge' ? 'border-red-900' : (b.couleur === 'blanc' ? 'border-yellow-100' : 'border-pink-400');
-    card.className = "glass-card p-5 border-l-4 mb-3 cursor-pointer " + borderColor;
-    card.onclick = () => ouvrirFiche(b.id);
+    currentFilters.couleur = document.getElementById('search-couleur').value;
+    currentFilters.cepage = document.getElementById('search-cepage').value;
+    currentFilters.accords = document.getElementById('search-accords').value;
+    currentFilters.nom = document.getElementById('searchInput').value.toLowerCase();
 
-    // Détection du badge BIO (si le mot "bio" est présent dans particularite)
-    const isBio = b.particularite && b.particularite.toLowerCase().includes('bio');
-    const bioBadge = isBio ? `<span class="ml-2 bg-green-900/40 text-green-400 text-[8px] px-2 py-0.5  border border-green-500/30 font-bold uppercase">Bio</span>` : '';
+    if (!currentFilters.couleur && !currentFilters.cepage && !currentFilters.accords && !currentFilters.nom) {
+        list.innerHTML = "<p class='text-center text-gray-200 text-[10px] py-10 uppercase tracking-widest'>Entrez un critère</p>";
+        return;
+    }
 
-    // Construction du contenu de la carte
-    card.innerHTML = `
-        <div class="flex justify-between items-start">
-            <div class="flex-1">
-                <div class="flex items-center">
-                    <h3 class="text-lg font-bold text-white leading-tight">${b.nom || b.import}</h3>
-                    ${bioBadge}
+    list.innerHTML = "";
+
+    const filtered = inventaire.filter(b => {
+        const matchCoul = !currentFilters.couleur || b.couleur === currentFilters.couleur;
+        const matchCep = !currentFilters.cepage || b.cepage === currentFilters.cepage;
+        const matchTexte =
+            !currentFilters.nom ||
+            (b.nom && b.nom.toLowerCase().includes(currentFilters.nom)) ||
+            (b.import && b.import.toLowerCase().includes(currentFilters.nom));
+
+        return matchCoul && matchCep && matchTexte && b.qte > 0;
+    });
+
+    filtered.forEach(b => {
+        const card = document.createElement('div');
+
+        const borderColor =
+            b.couleur === 'rouge'
+                ? 'border-red-900'
+                : b.couleur === 'blanc'
+                ? 'border-yellow-100'
+                : 'border-pink-400';
+
+        card.className = "glass-card p-5 border-l-4 mb-3 cursor-pointer " + borderColor;
+        card.onclick = () => ouvrirFiche(b.id);
+
+        const isBio = b.particularite && b.particularite.toLowerCase().includes('bio');
+        const bioBadge = isBio
+            ? `<span class="ml-2 bg-green-900/40 text-green-400 text-[8px] px-2 py-0.5 border border-green-500/30 font-bold uppercase">Bio</span>`
+            : '';
+
+        card.innerHTML = `
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <div class="flex items-center">
+                        <h3 class="text-lg font-bold text-white leading-tight">${b.nom || b.import}</h3>
+                        ${bioBadge}
+                    </div>
+                    <p class="text-[10px] text-gray-400 uppercase mt-1">
+                        ${b.appellation || b.cepage || 'Vin'} • ${b.pays || 'Provenance'}
+                    </p>
+                    ${b.importateur ? `<p class="text-[9px] text-gray-500 italic mt-0.5">${b.importateur}</p>` : ''}
                 </div>
-                <p class="text-[10px] text-gray-400 uppercase mt-1">
-                    ${b.appellation || b.cepage || 'Vin'} • ${b.pays || 'Provenance'}
-                </p>
-                ${b.importateur ? `<p class="text-[9px] text-gray-500 italic mt-0.5">${b.importateur}</p>` : ''}
+                <div class="text-right ml-4">
+                    <span class="text-2xl font-thin text-white">x${b.qte}</span>
+                </div>
             </div>
-            <div class="text-right ml-4">
-                <span class="text-2xl font-thin text-white">x${b.qte}</span>
-            </div>
-        </div>`;
-    
-    list.appendChild(card);
-});
-    }
+        `;
 
- // ================================================================
+        list.appendChild(card);
+    });
+}
+
+// ================================================================
 // 4. ACTIONS DE STOCK (ENREGISTRER / BOIRE)
 // ================================================================
 
@@ -778,7 +751,10 @@ async function enregistrerBouteille() {
         accords: document.getElementById('f-accords').value.trim()
     };
 
-    if (!vinData.nom && !vinData.import) return alert("Nom ou Code-barres obligatoire");
+    if (!vinData.nom && !vinData.import) {
+        alert("Nom ou Code-barres obligatoire");
+        return;
+    }
 
     const qteAajouter = parseInt(document.getElementById('f-qte').value) || 0;
     const emplacementChoisi = document.getElementById('f-loc-lieu').value || "Non spécifié";
@@ -787,17 +763,20 @@ async function enregistrerBouteille() {
         const idx = inventaire.findIndex(v => v.id == editId);
         if (idx !== -1) {
             inventaire[idx] = { ...inventaire[idx], ...vinData };
+
             if (qteAajouter > 0) {
                 if (!inventaire[idx].stocks) inventaire[idx].stocks = [];
-                let sIdx = inventaire[idx].stocks.findIndex(s => s.emplacement === emplacementChoisi);
+                const sIdx = inventaire[idx].stocks.findIndex(s => s.emplacement === emplacementChoisi);
+
                 if (sIdx > -1) inventaire[idx].stocks[sIdx].qte += qteAajouter;
                 else inventaire[idx].stocks.push({ emplacement: emplacementChoisi, qte: qteAajouter });
             }
-            // Recalcul du total global
-            inventaire[idx].qte = inventaire[idx].stocks ? inventaire[idx].stocks.reduce((sum, s) => sum + s.qte, 0) : 0;
+
+            inventaire[idx].qte = inventaire[idx].stocks
+                ? inventaire[idx].stocks.reduce((sum, s) => sum + s.qte, 0)
+                : 0;
         }
     } else {
-        // Nouvelle bouteille
         inventaire.push({
             id: Date.now(),
             ...vinData,
@@ -806,11 +785,9 @@ async function enregistrerBouteille() {
         });
     }
 
-    // --- SYNCHRONISATION CLOUD ---
     console.log("Envoi des données vers Google Sheets...");
     await sauverInventaire(); 
     
-    // Mise à jour interface
     closeModal();
     if (typeof renderSearchList === "function") renderSearchList();
     majStatsAccueil();
@@ -826,17 +803,13 @@ async function boireBouteille(id, emplacement) {
     const sIdx = inventaire[idx].stocks.findIndex(s => s.emplacement === emplacement);
     
     if (sIdx > -1 && inventaire[idx].stocks[sIdx].qte > 0) {
-        // Diminution
         inventaire[idx].stocks[sIdx].qte--;
-        
-        // Recalcul du total global
+
         inventaire[idx].qte = inventaire[idx].stocks.reduce((sum, s) => sum + s.qte, 0);
 
-        // --- SYNCHRONISATION CLOUD ---
         console.log("Mise à jour du stock (Boire) sur Google Sheets...");
         await sauverInventaire();
         
-        // Rafraîchissement des vues
         if (typeof ouvrirFiche === "function") ouvrirFiche(id); 
         if (typeof renderSearchList === "function") renderSearchList();
         majStatsAccueil();
@@ -844,71 +817,79 @@ async function boireBouteille(id, emplacement) {
         alert("Plus de stock à cet emplacement !");
     }
 }
+
     // ================================================================
-    // 5. MOTEUR DU SCANNER (QUAGGA2)
-    // ================================================================
-    function activerScanner() {
-        const modal = document.getElementById('wineModal');
-        if (modal) modal.classList.remove('hidden');
+// 5. MOTEUR DU SCANNER (QUAGGA2)
+// ================================================================
+function activerScanner() {
+    const modal = document.getElementById('wineModal');
+    if (modal) modal.classList.remove('hidden');
 
-        document.body.style.overflow = 'hidden';
-        const container = document.getElementById('scanner-container');
-        if (container) container.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
 
-        Quagga.init({
-            inputStream: {
-                name: "Live",
-                type: "LiveStream",
-                target: document.querySelector('#interactive'),
-                constraints: {
-                    facingMode: "environment",
-                    focusMode: "continuous",
-                    aspectRatio: { min: 1, max: 2 },
-                    width: { min: 640, ideal: 1280 },
-                    height: { min: 480, ideal: 720 }
-                },
-            },
-            locator: { patchSize: "small", halfSample: false },
-            decoder: { readers: ["ean_reader", "upc_reader", "code_128_reader"] },
-            locate: true,
-            frequency: 10
-        }, function(err) {
-            if (err) { console.error("Erreur Quagga:", err); return; }
-            Quagga.start();
-        });
+    const container = document.getElementById('scanner-container');
+    if (container) container.classList.remove('hidden');
 
-       Quagga.onDetected((result) => {
-    if (result.codeResult && result.codeResult.code) {
-        let codeScanne = result.codeResult.code;
-        
-        // On accepte dès que c'est un code standard (12 ou 13 chiffres)
-        if (codeScanne.length >= 12) { 
-            stopScanner();
-            
-            // RÈGLE SAQ : Si le code a 13 chiffres, on ajoute un 0 devant pour faire 14
-            if (codeScanne.length === 13) {
-                codeScanne = "0" + codeScanne;
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector('#interactive'),
+            constraints: {
+                facingMode: "environment",
+                focusMode: "continuous",
+                aspectRatio: { min: 1, max: 2 },
+                width: { min: 640, ideal: 1280 },
+                height: { min: 480, ideal: 720 }
             }
-            
-            const inputImport = document.getElementById('f-import');
-            if (inputImport) {
-                inputImport.value = codeScanne; // Ici, on aura toujours le format SAQ
-                if (navigator.vibrate) navigator.vibrate(100);
+        },
+        locator: { patchSize: "small", halfSample: false },
+        decoder: { readers: ["ean_reader", "upc_reader", "code_128_reader"] },
+        locate: true,
+        frequency: 10
+    }, function(err) {
+        if (err) {
+            console.error("Erreur Quagga:", err);
+            return;
+        }
+        Quagga.start();
+    });
+
+    Quagga.onDetected(result => {
+        if (result.codeResult && result.codeResult.code) {
+            let codeScanne = result.codeResult.code;
+
+            // On accepte dès que c'est un code standard (12 ou 13 chiffres)
+            if (codeScanne.length >= 12) {
+                stopScanner();
+
+                // RÈGLE SAQ : Si le code a 13 chiffres, on ajoute un 0 devant pour faire 14
+                if (codeScanne.length === 13) {
+                    codeScanne = "0" + codeScanne;
+                }
+
+                const inputImport = document.getElementById('f-import');
+                if (inputImport) {
+                    inputImport.value = codeScanne;
+                    if (navigator.vibrate) navigator.vibrate(100);
+                }
             }
         }
-    }
-});
+    });
+}
+
+function stopScanner() {
+    if (typeof Quagga !== 'undefined') {
+        Quagga.stop();
+        Quagga.offDetected();
     }
 
-    function stopScanner() {
-        if (typeof Quagga !== 'undefined') {
-            Quagga.stop();
-            Quagga.offDetected(); 
-        }
-        const container = document.getElementById('scanner-container');
-        if (container) container.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }
+    const container = document.getElementById('scanner-container');
+    if (container) container.classList.add('hidden');
+
+    document.body.style.overflow = 'auto';
+}
+
     // ================================================================
     // 6. UTILITAIRES, STATISTIQUES ET SAUVEGARDE
     // ================================================================
@@ -995,11 +976,11 @@ async function boireBouteille(id, emplacement) {
 }
 
     function sauvegarder() { 
-        localStorage.setItem('vino_db', JSON.stringify(inventaire)); 
-        majStatsAccueil(); 
-    }
+    localStorage.setItem('vino_db', JSON.stringify(inventaire)); 
+    majStatsAccueil(); 
+}
 
-   function majStatsAccueil() {
+function majStatsAccueil() {
     // 1. Mise à jour de la date de version
     const versionDateEl = document.getElementById('version-date');
     if (versionDateEl) {
@@ -1037,13 +1018,18 @@ async function boireBouteille(id, emplacement) {
     if (!statsZone) return;
     
     statsZone.innerHTML = "";
-    Object.entries(counts).sort((a,b) => b[1] - a[1]).forEach(([cepage, qte]) => {
-        const span = document.createElement('div');
-        span.className = "flex items-center bg-white/10 border border-white/5 pl-3 pr-2 py-1  cursor-pointer active:bg-red-900/60 transition-all";
-        span.onclick = () => filtrerParCepageStat(cepage);
-        span.innerHTML = `<span class="text-[9px] text-gray-300 uppercase mr-2">${cepage}</span><span class="text-[10px] text-white font-black bg-white/10 px-2 py-0.5 ">${qte}</span>`;
-        statsZone.appendChild(span);
-    });
+    Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([cepage, qte]) => {
+            const span = document.createElement('div');
+            span.className = "flex items-center bg-white/10 border border-white/5 pl-3 pr-2 py-1 cursor-pointer active:bg-red-900/60 transition-all";
+            span.onclick = () => filtrerParCepageStat(cepage);
+            span.innerHTML = `
+                <span class="text-[9px] text-gray-300 uppercase mr-2">${cepage}</span>
+                <span class="text-[10px] text-white font-black bg-white/10 px-2 py-0.5">${qte}</span>
+            `;
+            statsZone.appendChild(span);
+        });
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -1052,36 +1038,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (modal) modal.classList.add('hidden');
     
     // 2. Lancement de la synchronisation avec Google Sheets
-    // On utilise "await" pour attendre que les données arrivent avant de continuer
     console.log("Synchronisation avec Google Sheets en cours...");
     await chargerInventaire(); 
     
-    // 3. Mise à jour finale de l'interface (Stats + Date)
-    // Cette fonction sera aussi appelée à l'intérieur de chargerInventaire
+    // 3. Mise à jour finale de l'interface
     majStatsAccueil();
     
     console.log("Démarrage terminé : Données synchronisées, modale masquée.");
 });
 
 
-
-
 async function testerConnexion() {
-    const donneeTest = [{ 
-        id: "TEST-" + Date.now(), 
-        nom: "Test Connexion Google", 
-        qte: 10 
-    }];
-
     try {
         const response = await fetch(SCRIPT_URL, {
             method: "POST",
-            mode: "cors",
-            cache: "no-cache",
-            headers: { 
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(donneeTest)
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({ action: "get" })
         });
 
         const result = await response.json();
@@ -1092,76 +1064,26 @@ async function testerConnexion() {
     }
 }
 
+// Fonction désactivée (doublon supprimé)
 function chargerToutesLesListes() {
-  google.script.run.withSuccessHandler(function(data) {
-    // IDs de tes listes dans l'ordre des colonnes A à H
-    const ids = ['list-pays', 'list-region', 'list-appellation', 'list-cepage', 'list-particularite', 'list-accords', 'list-importateur', 'list-conseiller'];
-    
-    data.forEach(ligne => {
-      ligne.forEach((valeur, index) => {
-        if (valeur && valeur !== "") {
-          const dl = document.getElementById(ids[index]);
-          if (dl) {
-            let opt = document.createElement('option');
-            opt.value = valeur;
-            dl.appendChild(opt);
-          }
-        }
-      });
-    });
-  }).getListesSuggestions();
+    console.log("Listes non chargées (fonction désactivée).");
 }
 
-// Charge les listes dès que la page est prête
-window.addEventListener('load', function() {
-  chargerToutesLesListes();
+// Charge les listes au chargement
+window.addEventListener('load', () => {
+    chargerToutesLesListes();
 });
 
-function chargerToutesLesListes() {
-  console.log("Tentative de récupération des listes...");
-  
-  google.script.run.withSuccessHandler(function(data) {
-    console.log("Données reçues du Sheets :", data); // <--- TEST IMPORTANT
-    
-    if (typeof data === 'string' && data.startsWith("Erreur")) {
-      console.error(data);
-      return;
-    }
-
-    const ids = ['list-pays', 'list-region', 'list-appellation', 'list-cepage', 'list-particularite', 'list-accords', 'list-importateur', 'list-conseiller'];
-    
-    data.forEach(ligne => {
-      ligne.forEach((valeur, index) => {
-        if (valeur && valeur !== "") {
-          const dl = document.getElementById(ids[index]);
-          if (dl) {
-            let opt = document.createElement('option');
-            opt.value = valeur;
-            dl.appendChild(opt);
-          }
-        }
-      });
-    });
-  }).getListesSuggestions();
-}
-
-// Force le chargement au démarrage de la page
-window.onload = chargerToutesLesListes;
-
-
-
+// MENU BURGER
 const burgerBtn = document.getElementById('burger-btn');
 const navMenu = document.getElementById('nav-menu');
 const overlay = document.getElementById('overlay');
 const bars = document.querySelectorAll('.bar');
 
 function toggleMenu() {
-    // Fait glisser le menu
     navMenu.classList.toggle('translate-x-full');
-    // Affiche/cache le fond flou
     overlay.classList.toggle('hidden');
-    
-    // Animation du burger en X
+
     bars[0].classList.toggle('rotate-45');
     bars[0].classList.toggle('translate-y-2');
     bars[1].classList.toggle('opacity-0');
@@ -1169,7 +1091,6 @@ function toggleMenu() {
     bars[2].classList.toggle('-translate-y-2');
 }
 
-// Pour fermer quand on clique sur un lien ou sur le fond
 function navigate(page) {
     showPage(page);
     toggleMenu();
@@ -1178,13 +1099,14 @@ function navigate(page) {
 burgerBtn.addEventListener('click', toggleMenu);
 overlay.addEventListener('click', toggleMenu);
 
-
 function initCustomSelect(id) {
     const select = document.getElementById("select-" + id);
     const options = document.getElementById("options-" + id);
     const hidden = document.getElementById("f-" + id);
 
     console.log("ID:", id, "select:", select, "options:", options, "hidden:", hidden);
+
+    if (!select || !options || !hidden) return;
 
     select.onclick = () => {
         options.classList.toggle("hidden");
@@ -1200,10 +1122,10 @@ function initCustomSelect(id) {
 }
 
 // Initialiser les menus
-window.onload = () => {
+window.addEventListener("load", () => {
     ["couleur", "pays", "region", "appellation", "cepage", "particularite", "importateur"]
         .forEach(initCustomSelect);
-};
+});
 
 
 
@@ -1212,19 +1134,15 @@ window.onload = () => {
 
 <div id="scanner-container" class="hidden fixed inset-0 z-[100] bg-black">
     <div id="interactive" class="viewport w-full h-full"></div>
-    
+
     <div class="scanner-outline"></div>
     <div class="scanner-laser"></div>
-    
-    <button type="button" onclick="stopScanner()" 
-        class="absolute top-8 right-8 text-white bg-black/50 w-12 h-12  flex items-center justify-center z-[120] border border-white/20 active:bg-white/20 transition-all">
+
+    <button type="button" onclick="stopScanner()"
+        class="absolute top-8 right-8 text-white bg-black/50 w-12 h-12 flex items-center justify-center z-[120] border border-white/20 active:bg-white/20 transition-all">
         <span class="text-2xl">✕</span>
     </button>
 </div>
 
-
-
 </body>
-
 </html>
-
